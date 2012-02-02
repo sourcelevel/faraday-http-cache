@@ -17,5 +17,6 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'multi_json'
   gem.add_dependency 'active_support', '~> 3.0'
   gem.add_development_dependency 'faraday', '0.8.0.rc2'
+  gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rspec',   '~> 2.0'
 end
