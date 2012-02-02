@@ -13,6 +13,23 @@ describe Faraday::CacheStore::Middleware do
   let(:storage) { double('The cache storage', :read => nil, :write => nil) }
   subject { described_class.new(app, storage) }
 
+  [:get, :head].each do |method|
+    it "tries to cache #{method} requests" do
+      storage.should_receive(:read)
+      valid_request = request.merge(:method => method)
+      subject.call(valid_request)
+    end
+  end
+
+  [:post, :put, :delete, :patch, :options].each do |invalid_method|
+    it "doesn't store #{invalid_method} requests" do
+      storage.should_not_receive(:read)
+      storage.should_not_receive(:write)
+      unacceptable_request = request.merge(:method => invalid_method)
+      subject.call(unacceptable_request)
+    end
+  end
+
   it 'stores the request and the response' do
     storage.should_receive(:write).with(request, serializable_response)
     subject.call(request)

@@ -8,10 +8,19 @@ module Faraday
       end
 
       def call(env)
-        fetch(env) { @app.call(env) }
+        if can_cache?(env[:method])
+          fetch(env) { @app.call(env) }
+        else
+          @app.call(env)
+        end
       end
 
       private
+      def can_cache?(method)
+        method == :get || method == :head
+      end
+
+
       def fetch(request)
         response = @storage.read(request)
         if response
