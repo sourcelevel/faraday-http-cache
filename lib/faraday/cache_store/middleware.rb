@@ -20,14 +20,16 @@ module Faraday
         method == :get || method == :head
       end
 
-
       def fetch(request)
         response = @storage.read(request)
         if response
-          Faraday::Response.new(response)
+          entry = Entry.new(response)
+          entry.to_response
         else
           response = yield
-          @storage.write(request, response.marshal_dump)
+          payload = response.marshal_dump
+          payload[:timestamp] = Time.now
+          @storage.write(request, payload)
           response
         end
       end

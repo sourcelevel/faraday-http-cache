@@ -35,6 +35,11 @@ describe Faraday::CacheStore::Middleware do
     subject.call(request)
   end
 
+  it 'sets the request timestamp when writing' do
+    storage.should_receive(:write).with(request, hash_including(:timestamp))
+    subject.call(request)
+  end
+
   it 'calls the underlying application just once if the storage has the response' do
     app.should_receive(:call).once
     subject.call(request)
