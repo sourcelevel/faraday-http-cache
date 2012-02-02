@@ -2,10 +2,11 @@ require 'spec_helper'
 
 describe Faraday::CacheStore::Entry do
 
-  describe '#fresh?' do
+  describe 'freshness' do
+    it "it's fresh if the max-age from the response hasn't expired yet"
   end
 
-  describe "#to_response" do
+  describe "response unboxing" do
     subject { described_class.new(:status => 200, :response_headers => {}, :body => 'Hi!') }
     let(:response) { subject.to_response }
 
