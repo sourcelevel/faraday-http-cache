@@ -7,6 +7,7 @@ module Faraday
       def initialize(payload = {})
         @now = Time.now
         @payload = payload
+        headers['Date'] ||= @now.httpdate
       end
 
       def fresh?
@@ -26,13 +27,7 @@ module Faraday
       end
 
       def date
-        date_header = headers['Date']
-        if date_header
-          Time.httpdate(headers['Date'])
-        else
-          headers['Date'] = @now.httpdate
-          @now
-        end
+        Time.httpdate(headers['Date'])
       end
 
       def max_age

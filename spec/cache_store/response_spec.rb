@@ -20,6 +20,13 @@ describe Faraday::CacheStore::Response do
     end
   end
 
+  it "sets the 'Date' header if isn't present" do
+    headers = { 'Date' => nil }
+    response = Faraday::CacheStore::Response.new(:response_headers => headers)
+
+    response.date.should be_present
+  end
+
   describe 'max age calculation' do
 
     it 'uses the shared max age directive when present' do
@@ -41,7 +48,7 @@ describe Faraday::CacheStore::Response do
     end
 
     it "returns nil when there's no information to calculate the max age" do
-      response = Faraday::CacheStore::Response.new()
+      response = Faraday::CacheStore::Response.new
       response.max_age.should be_nil
     end
   end
@@ -58,10 +65,9 @@ describe Faraday::CacheStore::Response do
       response.age.should == 3
     end
 
-    it "sets the 'Date' header if isn't present and calculates the age" do
+    it "returns 0 if there's no 'Age' or 'Date' header present" do
       response = Faraday::CacheStore::Response.new(:response_headers => {})
       response.age.should == 0
-      response.date.should be_present
     end
   end
 
@@ -87,7 +93,7 @@ describe Faraday::CacheStore::Response do
     end
 
     it 'merges the headers' do
-      response.headers.should == {}
+      response.headers.should be_a Hash
     end
 
     it 'merges the body' do

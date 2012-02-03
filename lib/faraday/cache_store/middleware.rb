@@ -29,7 +29,6 @@ module Faraday
         else
           response = yield
           payload = response.marshal_dump
-          payload[:timestamp] = Time.now
           @storage.write(request, payload)
           response
         end
