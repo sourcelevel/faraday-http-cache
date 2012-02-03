@@ -2,7 +2,7 @@ require 'faraday/cache_store/cache_control'
 
 module Faraday
   module CacheStore
-    class Entry
+    class Response
 
       def initialize(payload = {})
         @now = Time.now

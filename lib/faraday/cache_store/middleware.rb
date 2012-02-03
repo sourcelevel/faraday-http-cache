@@ -21,10 +21,11 @@ module Faraday
       end
 
       def fetch(request)
-        response = @storage.read(request)
-        if response
-          entry = Entry.new(response)
-          entry.to_response
+        response = nil
+        entry = @storage.read(request)
+        if entry
+          response = Response.new(entry)
+          entry.to_hash
         else
           response = yield
           payload = response.marshal_dump
