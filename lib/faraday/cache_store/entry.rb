@@ -4,7 +4,7 @@ module Faraday
   module CacheStore
     class Entry
 
-      def initialize(payload)
+      def initialize(payload = {})
         @now = Time.now
         @payload = payload
       end
@@ -35,9 +35,16 @@ module Faraday
         end
       end
 
-      private
       def max_age
-        cache_control.max_age
+        cache_control.shared_max_age ||
+          cache_control.max_age ||
+          (expires && (expires - date))
+      end
+
+      private
+
+      def expires
+        headers['Expires'] && Time.httpdate(headers['Expires'])
       end
 
       def cache_control
@@ -45,7 +52,7 @@ module Faraday
       end
 
       def headers
-        @payload[:response_headers]
+        @payload[:response_headers] ||= {}
       end
     end
   end

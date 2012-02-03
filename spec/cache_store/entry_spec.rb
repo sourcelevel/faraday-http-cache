@@ -20,8 +20,33 @@ describe Faraday::CacheStore::Entry do
     end
   end
 
-  describe 'age and time to live' do
+  describe 'max age calculation' do
 
+    it 'uses the shared max age directive when present' do
+      headers = { 'Cache-Control' => 's-maxage=200, max-age=0'}
+      entry = Faraday::CacheStore::Entry.new(:response_headers => headers)
+      entry.max_age.should == 200
+    end
+
+    it 'uses the max age directive when present' do
+      headers = { 'Cache-Control' => 'max-age=200'}
+      entry = Faraday::CacheStore::Entry.new(:response_headers => headers)
+      entry.max_age.should == 200
+    end
+
+    it "fallsback to the expiration date leftovers" do
+      headers = { 'Expires' => (Time.now + 100).httpdate, 'Date' => Time.now.httpdate }
+      entry = Faraday::CacheStore::Entry.new(:response_headers => headers)
+      entry.max_age.should == 100
+    end
+
+    it "returns nil when there's no information to calculate the max age" do
+      entry = Faraday::CacheStore::Entry.new()
+      entry.max_age.should be_nil
+    end
+  end
+
+  describe 'age calculation' do
     it "uses the 'Age' header if it's present" do
       entry = Faraday::CacheStore::Entry.new(:response_headers => { 'Age' => '3' })
       entry.age.should == 3
@@ -38,7 +63,9 @@ describe Faraday::CacheStore::Entry do
       entry.age.should == 0
       entry.date.should be_present
     end
+  end
 
+  describe 'time to live calculation' do
     it "returns the time to live based on the max age limit" do
       date = 200.seconds.ago.httpdate
       headers = { 'Cache-Control' => 'max-age=400', 'Date' => date }
