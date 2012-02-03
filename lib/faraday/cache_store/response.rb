@@ -1,3 +1,4 @@
+require 'time'
 require 'faraday/cache_store/cache_control'
 
 module Faraday
@@ -14,12 +15,15 @@ module Faraday
         ttl > 0
       end
 
-      def age
-        (headers['Age'] || (@now - date)).to_i
+      CACHEABLE_STATUS_CODES = [200, 203, 300, 301, 302, 404, 410]
+
+      def cacheable?
+        return false if cache_control.private? || cache_control.no_store?
+        fresh? && cacheable_status_code?
       end
 
-      def to_response
-        Faraday::Response.new(@payload)
+      def age
+        (headers['Age'] || (@now - date)).to_i
       end
 
       def ttl
@@ -36,7 +40,15 @@ module Faraday
           (expires && (expires - date))
       end
 
+      def to_response
+        Faraday::Response.new(@payload)
+      end
+
       private
+
+      def cacheable_status_code?
+        CACHEABLE_STATUS_CODES.include?(@payload[:status])
+      end
 
       def expires
         headers['Expires'] && Time.httpdate(headers['Expires'])

@@ -2,6 +2,37 @@ require 'spec_helper'
 
 describe Faraday::CacheStore::Response do
 
+  describe 'cacheable?' do
+    it "the response isn't' cacheable if the response is marked as private" do
+      headers  = { 'Cache-Control' => 'private' }
+      response = Faraday::CacheStore::Response.new(:response_headers => headers)
+
+      response.should_not be_cacheable
+    end
+
+    it "the response isn't' cacheable if it shouldn't be stored" do
+      headers  = { 'Cache-Control' => 'no-store' }
+      response = Faraday::CacheStore::Response.new(:response_headers => headers)
+
+      response.should_not be_cacheable
+    end
+
+    it "the response isn't cacheable when the status code isn't acceptable" do
+      headers  = { 'Cache-Control' => 'max-age=400' }
+      response = Faraday::CacheStore::Response.new(:status => 503, :response_headers => headers)
+      response.should_not be_cacheable
+    end
+
+    [200, 203, 300, 301, 302, 404, 410].each do |status|
+      it "the response is cacheable if the status code is #{status} and the response is fresh" do
+        headers  = { 'Cache-Control' => 'max-age=400' }
+        response = Faraday::CacheStore::Response.new(:status => status, :response_headers => headers)
+
+        response.should be_cacheable
+      end
+    end
+  end
+
   describe 'freshness' do
     it "is fresh if the response still has some time to live" do
       date = 200.seconds.ago.httpdate
