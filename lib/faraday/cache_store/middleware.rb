@@ -1,15 +1,18 @@
+require 'active_support/core_ext/hash/slice'
+
 module Faraday
   module CacheStore
     class Middleware < Faraday::Middleware
 
-      def initialize(app, storage)
+      def initialize(app, store = nil, options = {})
         super(app)
-        @storage = storage
+        @storage = Storage.new(store, options)
       end
 
       def call(env)
-        if can_cache?(env[:method])
-          fetch(env) { @app.call(env) }
+        request = env.slice(:method, :url, :request_headers)
+        if can_cache?(request[:method])
+          fetch(request) { @app.call(env) }
         else
           @app.call(env)
         end
@@ -21,17 +24,18 @@ module Faraday
       end
 
       def fetch(request)
-        response = nil
         entry = @storage.read(request)
-        if entry
-          response = Response.new(entry)
-          entry.to_hash
+
+        if entry && entry.fresh?
+          response = entry
         else
-          response = yield
-          payload = response.marshal_dump
-          @storage.write(request, payload)
-          response
+          response = Response.new(yield.marshal_dump)
         end
+
+        if response.cacheable?
+          @storage.write(request, response)
+        end
+        response.to_response
       end
     end
   end

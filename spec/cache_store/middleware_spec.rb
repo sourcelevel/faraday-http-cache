@@ -2,43 +2,42 @@ require 'spec_helper'
 
 describe Faraday::CacheStore::Middleware do
 
-  let(:request) do
-    { :method => :get, :request_headers => {}, :url => URI.parse("http://foo.bar/") }
-  end
+  let(:client) do
+    Faraday.new do |stack|
+      stack.use :cache_store
 
-  let(:serializable_response) { Hash.new }
-  let(:response) { double('a response instance', :marshal_dump => serializable_response) }
-
-  let(:app) { double('', :call => response) }
-  let(:storage) { double('The cache storage', :read => nil, :write => nil) }
-  subject { described_class.new(app, storage) }
-
-  [:get, :head].each do |method|
-    it "tries to cache #{method} requests" do
-      storage.should_receive(:read)
-      valid_request = request.merge(:method => method)
-      subject.call(valid_request)
+      stack.adapter :test do |stubs|
+        stubs.post('post')   { [200, { 'Cache-Control' => 'max-age=400' }, "post:#{@post_count+=1}"] }
+        stubs.get('broken')  { [500, {'Cache-Control' => 'max-age=400' },  "broken:#{@broken_count+=1}"] }
+        stubs.get('get')     { [200, {'Cache-Control' => 'max-age=200' },  "get:#{@get_count+=1}"] }
+        stubs.get('private') { [200, {'Cache-Control' => 'private' },      "get:#{@get_count+=1}"] }
+      end
     end
   end
 
-  [:post, :put, :delete, :patch, :options].each do |invalid_method|
-    it "doesn't store #{invalid_method} requests" do
-      storage.should_not_receive(:read)
-      storage.should_not_receive(:write)
-      unacceptable_request = request.merge(:method => invalid_method)
-      subject.call(unacceptable_request)
-    end
+  before do
+    @post_count = 0
+    @broken_count = 0
+    @get_count = 0
   end
 
-  it 'stores the request and the response' do
-    storage.should_receive(:write).with(request, serializable_response)
-    subject.call(request)
+  it "doesn't cache POST requests" do
+    client.post('post').body
+    client.post('post').body.should == "post:2"
   end
 
-  it 'calls the underlying application just once if the storage has the response' do
-    app.should_receive(:call).once
-    subject.call(request)
-    storage.stub(:read) { serializable_response }
-    subject.call(request)
+  it "doesn't cache responses with invalid status code" do
+    client.get('broken')
+    client.get('broken').body.should == "broken:2"
+  end
+
+  it "doesn't cache requests with a private cache control" do
+    client.get('private')
+    client.get('private').body.should == "get:2"
+  end
+
+  it "caches GET responses" do
+    client.get('get')
+    client.get('get').body.should == "get:1"
   end
 end
