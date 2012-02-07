@@ -11,11 +11,19 @@ gem 'faraday-http-cache'
 
 ## Usage and configuration
 
-Just add the `http_cache` middleware to your Faraday stack, as in:
+If you're using Faraday 0.8 or higher, you can use the new shortcut using a symbol:
 
-```rails
+```ruby
 client = Faraday.new do |builder|
   builder.middleware :http_cache
+end
+```
+
+For previous versions of Faraday, the usage is:
+
+```ruby
+client = Faraday.new do |builder|
+  builder.middleware Faraday::HttpCache::Middleware
 end
 ```
 

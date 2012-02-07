@@ -4,7 +4,7 @@ describe Faraday::HttpCache::Middleware do
 
   let(:client) do
     Faraday.new do |stack|
-      stack.use :http_cache
+      stack.use Faraday::HttpCache::Middleware
 
       stack.adapter :test do |stubs|
         stubs.post('post')   { [200, { 'Cache-Control' => 'max-age=400' }, "post:#{@post_count+=1}"] }
