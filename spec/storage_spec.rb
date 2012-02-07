@@ -24,7 +24,7 @@ describe Faraday::HttpCache::Storage do
     it 'writes the response json to the underlying cache using a digest as the key' do
       json = MultiJson.encode(response.payload)
 
-      cache.should_receive(:write).with('a41588bc25996b8dc390d145d7e752a0006f7101', json)
+      cache.should_receive(:write).with('503ac9f7180ca1cdec49e8eb73a9cc0b47c27325', json)
       subject.write(request, response)
     end
   end

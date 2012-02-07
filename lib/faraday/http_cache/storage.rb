@@ -29,7 +29,8 @@ module Faraday
 
       private
       def cache_key_for(object)
-        Digest::SHA1.hexdigest(MultiJson.encode(object))
+        array = object.stringify_keys.to_a.sort
+        Digest::SHA1.hexdigest(MultiJson.encode(array))
       end
     end
   end
