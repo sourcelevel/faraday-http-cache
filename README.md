@@ -26,10 +26,15 @@ The middleware uses the `ActiveSupport::Cache` API to record the responses from 
 client = Faraday.new do |builder|
   builder.middleware :cache_store, :mem_cache_store, "localhost:11211"
 end
+
+# Or use the Rails.cache instance inside your Rails app.
+client = Faraday.new do |builder|
+  builder.use :cache_store, Rails.cache
+end
 ```
 
 The default store provided by ActiveSupport is the `MemoryStore` one, so it's important to configure a proper one for your production environment.
 
 ## Dependencies
 
-`faraday-cache_store` is built on top of `faraday` 0.8.x and `active_support` 3.x.
+`faraday-cache_store` is built on top of `faraday` 0.8.x and `activesupport` 3.x.
