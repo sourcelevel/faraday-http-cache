@@ -12,6 +12,7 @@ describe Faraday::HttpCache::Middleware do
         stubs.get('get')       { [200, {'Cache-Control' => 'max-age=200' },  "get:#{@get_count+=1}"] }
         stubs.get('private')   { [200, {'Cache-Control' => 'private' },      "get:#{@get_count+=1}"] }
         stubs.get('dontstore') { [200, {'Cache-Control' => 'no-store' },  "get:#{@get_count+=1}"] }
+        stubs.get('expires')   { [200, {'Expires' => (Time.now + 10).httpdate }, "get:#{@get_count+=1}"]}
       end
     end
   end
@@ -40,6 +41,11 @@ describe Faraday::HttpCache::Middleware do
   it "doesn't cache requests with a explicit no-store directive" do
     client.get('dontstore')
     client.get('dontstore').body.should == "get:2"
+  end
+
+  it "caches requests with the 'Expires' header" do
+    client.get('expires')
+    client.get('expires').body.should == "get:1"
   end
 
   it "caches GET responses" do
