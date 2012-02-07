@@ -4,6 +4,7 @@ require 'faraday/http_cache/cache_control'
 module Faraday
   module HttpCache
     class Response
+      CACHEABLE_STATUS_CODES = [200, 203, 300, 301, 302, 404, 410]
 
       attr_reader :payload
 
@@ -16,8 +17,6 @@ module Faraday
       def fresh?
         ttl > 0
       end
-
-      CACHEABLE_STATUS_CODES = [200, 203, 300, 301, 302, 404, 410]
 
       def cacheable?
         return false if cache_control.private? || cache_control.no_store?
