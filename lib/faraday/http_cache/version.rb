@@ -1,5 +1,5 @@
 module Faraday
-  module CacheStore
+  module HttpCache
     VERSION = "0.0.1"
   end
 end

@@ -1,10 +1,10 @@
 require 'spec_helper'
 
-describe Faraday::CacheStore::Middleware do
+describe Faraday::HttpCache::Middleware do
 
   let(:client) do
     Faraday.new do |stack|
-      stack.use :cache_store
+      stack.use :http_cache
 
       stack.adapter :test do |stubs|
         stubs.post('post')   { [200, { 'Cache-Control' => 'max-age=400' }, "post:#{@post_count+=1}"] }

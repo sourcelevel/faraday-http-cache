@@ -1,4 +1,4 @@
-require 'faraday-cache_store'
+require 'faraday_http_cache'
 require 'active_support/core_ext/date/calculations'
 require 'active_support/core_ext/numeric/time'
 

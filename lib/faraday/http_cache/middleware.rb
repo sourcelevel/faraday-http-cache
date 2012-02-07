@@ -1,7 +1,7 @@
 require 'active_support/core_ext/hash/slice'
 
 module Faraday
-  module CacheStore
+  module HttpCache
     class Middleware < Faraday::Middleware
 
       def initialize(app, store = nil, options = {})

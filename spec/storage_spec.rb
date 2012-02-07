@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Faraday::CacheStore::Storage do
+describe Faraday::HttpCache::Storage do
 
   let(:request) do
     { :method => :get, :request_headers => {}, :url => URI.parse("http://foo.bar/") }
@@ -10,12 +10,12 @@ describe Faraday::CacheStore::Storage do
 
   let(:cache) { ActiveSupport::Cache.lookup_store }
 
-  subject { Faraday::CacheStore::Storage.new(cache) }
+  subject { Faraday::HttpCache::Storage.new(cache) }
 
   describe 'Cache configuration' do
     it 'lookups a ActiveSupport cache store' do
       ActiveSupport::Cache.should_receive(:lookup_store).with(:file_store, '/tmp')
-      Faraday::CacheStore::Storage.new(:file_store, '/tmp')
+      Faraday::HttpCache::Storage.new(:file_store, '/tmp')
     end
   end
 
@@ -37,7 +37,7 @@ describe Faraday::CacheStore::Storage do
     it 'decodes a stored response' do
       subject.write(request, response)
 
-      subject.read(request).should be_a(Faraday::CacheStore::Response)
+      subject.read(request).should be_a(Faraday::HttpCache::Response)
     end
   end
 end

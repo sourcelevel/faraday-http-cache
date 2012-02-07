@@ -3,7 +3,7 @@ require 'active_support/cache'
 require 'active_support/core_ext/hash/keys'
 
 module Faraday
-  module CacheStore
+  module HttpCache
     class Storage
 
       attr_reader :cache
@@ -18,7 +18,7 @@ module Faraday
         cache.write(key, value)
       end
 
-      def read(request, klass = Faraday::CacheStore::Response)
+      def read(request, klass = Faraday::HttpCache::Response)
         key = cache_key_for(request)
         value = cache.read(key)
         if value

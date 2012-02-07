@@ -1,7 +1,7 @@
 require 'forwardable'
 
 module Faraday
-  module CacheStore
+  module HttpCache
     # A parser for the `Cache-Control` header, based on the implementation
     # done in the rack-cache gem by Ryan Tomayko.
     class CacheControl

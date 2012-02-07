@@ -1,8 +1,8 @@
 require 'time'
-require 'faraday/cache_store/cache_control'
+require 'faraday/http_cache/cache_control'
 
 module Faraday
-  module CacheStore
+  module HttpCache
     class Response
 
       attr_reader :payload
