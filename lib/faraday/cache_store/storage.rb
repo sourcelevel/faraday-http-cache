@@ -1,27 +1,29 @@
 require 'digest/sha1'
+require 'active_support/cache'
 require 'active_support/core_ext/hash/keys'
 
 module Faraday
   module CacheStore
     class Storage
 
-      attr_reader :backend
+      attr_reader :cache
 
-      def initialize(backend)
-        @backend = backend
+      def initialize(store = nil, options = {})
+        @cache = ActiveSupport::Cache.lookup_store(store, options)
       end
 
       def write(request, response)
         key = cache_key_for(request)
-        value = MultiJson.encode(response)
-        backend.write(key, value)
+        value = MultiJson.encode(response.payload)
+        cache.write(key, value)
       end
 
-      def read(request)
+      def read(request, klass = Faraday::CacheStore::Response)
         key = cache_key_for(request)
-        value = backend.read(key)
+        value = cache.read(key)
         if value
-          MultiJson.decode(value).symbolize_keys
+          payload = MultiJson.decode(value).symbolize_keys
+          klass.new(payload)
         end
       end
 

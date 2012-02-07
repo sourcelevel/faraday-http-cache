@@ -5,6 +5,8 @@ module Faraday
   module CacheStore
     class Response
 
+      attr_reader :payload
+
       def initialize(payload = {})
         @now = Time.now
         @payload = payload
