@@ -1,5 +1,5 @@
 # Faraday Http Cache
-A `Faraday` middleware to handle HTTP caching on your client application, validating expiration headers from previous responses.
+a [Faraday](https://github.com/technoweenie/faraday) middleware that respects HTTP cache, by validating expiration headers from stored responses.
 
 ## Installation
 
