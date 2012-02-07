@@ -2,6 +2,10 @@ require 'spec_helper'
 
 describe Faraday::HttpCache::Middleware do
 
+  let(:yesterday) {
+    1.day.ago.httpdate
+  }
+
   let(:client) do
     Faraday.new do |stack|
       stack.use Faraday::HttpCache::Middleware
@@ -13,6 +17,7 @@ describe Faraday::HttpCache::Middleware do
         stubs.get('private')   { [200, {'Cache-Control' => 'private' },      "#{@request_count+=1}"] }
         stubs.get('dontstore') { [200, {'Cache-Control' => 'no-store' },  "#{@request_count+=1}"] }
         stubs.get('expires')   { [200, {'Expires' => (Time.now + 10).httpdate }, "#{@request_count+=1}"]}
+        stubs.get('yesterday') { [200, {'Date' => yesterday, 'Expires' => yesterday }, "#{@request_count+=1}"] }
       end
     end
   end
@@ -41,6 +46,18 @@ describe Faraday::HttpCache::Middleware do
     client.get('dontstore').body.should == "2"
   end
 
+  it "doesn't sets the 'Date' header for uncached responses" do
+    headers = client.post('post').headers
+    headers.keys.should_not include('Date')
+  end
+
+  it "caches multiple responses when the headers differ" do
+    client.get('get','HTTP_ACCEPT' => 'text/html')
+    client.get('get','HTTP_ACCEPT' => 'text/html').body.should == "1"
+
+    client.get('get', 'HTTP_ACCEPT' => 'application/json').body.should == "2"
+  end
+
   it "caches requests with the 'Expires' header" do
     client.get('expires')
     client.get('expires').body.should == "1"
@@ -49,5 +66,15 @@ describe Faraday::HttpCache::Middleware do
   it "caches GET responses" do
     client.get('get')
     client.get('get').body.should == "1"
+  end
+
+  it "maintains the 'Date' header for cached responses" do
+    date = client.get('get').headers['Date']
+    client.get('get').headers['Date'].should == date
+  end
+
+  it "preserves an old 'Date' header if present" do
+    date = client.get('yesterday').headers['Date']
+    date.should == yesterday
   end
 end
