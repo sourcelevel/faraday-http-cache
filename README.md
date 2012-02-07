@@ -15,7 +15,7 @@ If you're using Faraday 0.8 or higher, you can use the new shortcut using a symb
 
 ```ruby
 client = Faraday.new do |builder|
-  builder.middleware :http_cache
+  builder.use :http_cache
 end
 ```
 
@@ -23,7 +23,7 @@ For previous versions of Faraday, the usage is:
 
 ```ruby
 client = Faraday.new do |builder|
-  builder.middleware Faraday::HttpCache::Middleware
+  builder.use Faraday::HttpCache::Middleware
 end
 ```
 
@@ -32,7 +32,7 @@ The middleware uses the `ActiveSupport::Cache` API to record the responses from 
 ```ruby
 # Connect the middleware to a Memcache instance.
 client = Faraday.new do |builder|
-  builder.middleware :http_cache, :mem_cache_store, "localhost:11211"
+  builder.use :http_cache, :mem_cache_store, "localhost:11211"
 end
 
 # Or use the Rails.cache instance inside your Rails app.
