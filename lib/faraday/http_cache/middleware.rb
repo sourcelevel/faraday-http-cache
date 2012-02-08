@@ -45,7 +45,7 @@ module Faraday
       end
 
       private
-      # Only `GET` and `HEAD` can be cached.
+      # Only `GET` and `HEAD` requests should be cached.
       def can_cache?(method)
         method == :get || method == :head
       end
