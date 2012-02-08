@@ -40,11 +40,11 @@ module Faraday
       alias_method :s_maxage, :shared_max_age
 
       def must_revalidate?
-      @directives['must-revalidate']
+        @directives['must-revalidate']
       end
 
       def proxy_revalidate?
-      @directives['proxy-revalidate']
+        @directives['proxy-revalidate']
       end
 
       def to_s
