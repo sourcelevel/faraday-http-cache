@@ -16,6 +16,7 @@ If you're using Faraday 0.8 or higher, you can use the new shortcut using a symb
 ```ruby
 client = Faraday.new do |builder|
   builder.use :http_cache
+  builder.adapter Faraday.default_adapter
 end
 ```
 
@@ -24,6 +25,7 @@ For previous versions of Faraday, the usage is:
 ```ruby
 client = Faraday.new do |builder|
   builder.use Faraday::HttpCache::Middleware
+  builder.adapter Faraday.default_adapter
 end
 ```
 
@@ -33,11 +35,13 @@ The middleware uses the `ActiveSupport::Cache` API to record the responses from 
 # Connect the middleware to a Memcache instance.
 client = Faraday.new do |builder|
   builder.use :http_cache, :mem_cache_store, "localhost:11211"
+  builder.adapter Faraday.default_adapter
 end
 
 # Or use the Rails.cache instance inside your Rails app.
 client = Faraday.new do |builder|
   builder.use :http_cache, Rails.cache
+  builder.adapter Faraday.default_adapter
 end
 ```
 
@@ -50,6 +54,7 @@ You can provide a `:logger` option that will be receive debug informations based
 ```ruby
 client = Faraday.new do |builder|
   builder.use :http_cache, :logger => Rails.logger
+  builder.adapter Faraday.default_adapter
 end
 
 client.get('http://site/api/users')

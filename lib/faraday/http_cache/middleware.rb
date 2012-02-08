@@ -12,6 +12,7 @@ module Faraday
     #
     #  client = Faraday.new do |builder|
     #    builder.user :http_cache
+    #    builder.adapter Faraday.default_adapter
     #  end
     #
     # The middleware uses an `ActiveSupport` cache store to save the
@@ -22,6 +23,8 @@ module Faraday
     #    builder.use :http_cache, :mem_cache_store
     #    # or
     #    builder.use :http_cache, Rails.cache
+    #    # ...
+    #    builder.adapter Faraday.default_adapter
     #  end
     #
     # You can also provide a `:logger` option that will be used to
@@ -29,6 +32,7 @@ module Faraday
     #
     #  client = Faraday.new do |builder|
     #    builder.use :http_cache, :logger => my_logger_instance
+    #    builder.adapter Faraday.default_adapter
     #  end
     #
     # Cacheable responses will be stored and validated on each new request
