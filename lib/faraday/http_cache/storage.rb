@@ -4,6 +4,12 @@ require 'active_support/core_ext/hash/keys'
 
 module Faraday
   module HttpCache
+    # Storage class that wraps the acess to a `ActiveSupport::Cache::Store` instance
+    # that holds the stored responses for previous requests.
+    #
+    # Request hashes (made of :method, :url and :request_headers keys) will be
+    # encoded as a SHA1 digest of their JSON representation and paired with
+    # their cached responses.
     class Storage
 
       attr_reader :cache

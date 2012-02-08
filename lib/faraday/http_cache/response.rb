@@ -3,7 +3,15 @@ require 'faraday/http_cache/cache_control'
 
 module Faraday
   module HttpCache
+    # Response object that calculates the cache status based
+    # on the stored headers and the `Cache-Control` directives.
+    #
+    # It wraps the general response Hash from `Faraday` responses and
+    # recreates an instance of `Faraday::Response` if necessary.
     class Response
+      # Cacheable status code:
+      #   `OK`, `Non-Authoritative Information`, `Multiple Choices`,
+      #   `Moved Permanently`, `Found`, 'Not Found` and `Gone`.
       CACHEABLE_STATUS_CODES = [200, 203, 300, 301, 302, 404, 410]
 
       attr_reader :payload
@@ -35,6 +43,9 @@ module Faraday
         Time.httpdate(headers['Date'])
       end
 
+      # The `s-maxage` has precedence over the `max-age`
+      # directive. If both are missing, calculates it based
+      # on the `Expires` and `Date` headers.
       def max_age
         cache_control.shared_max_age ||
           cache_control.max_age ||
