@@ -20,7 +20,7 @@ module Faraday
 
       def cacheable?
         return false if cache_control.private? || cache_control.no_store?
-        fresh? && cacheable_status_code?
+        cacheable_status_code? && fresh?
       end
 
       def age
