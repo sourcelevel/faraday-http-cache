@@ -124,7 +124,7 @@ describe Faraday::HttpCache::Response do
     end
 
     it 'merges the headers' do
-      response.headers.should be_a Hash
+      response.headers.should be_a Faraday::Utils::Headers
     end
 
     it 'merges the body' do

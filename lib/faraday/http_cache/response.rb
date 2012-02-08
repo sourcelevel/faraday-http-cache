@@ -19,6 +19,7 @@ module Faraday
       def initialize(payload = {})
         @now = Time.now
         @payload = payload
+        wrap_headers!
         headers['Date'] ||= @now.httpdate
       end
 
@@ -70,8 +71,15 @@ module Faraday
         @cache_control ||= CacheControl.new(headers['Cache-Control'])
       end
 
+      def wrap_headers!
+        headers = @payload[:response_headers]
+
+        @payload[:response_headers] = Faraday::Utils::Headers.new
+        @payload[:response_headers].update(headers) if headers
+      end
+
       def headers
-        @payload[:response_headers] ||= {}
+        @payload[:response_headers]
       end
     end
   end
