@@ -43,6 +43,19 @@ end
 
 The default store provided by ActiveSupport is the `MemoryStore` one, so it's important to configure a proper one for your production environment.
 
+### Logging
+
+You can provide a `:logger` option that will be receive debug informations based on the middleware operations:
+
+```ruby
+client = Faraday.new do |builder|
+  builder.use :http_cache, :logger => Rails.logger
+end
+
+client.get('http://site/api/users')
+# logs "HTTP Cache: [GET users] miss, store"
+```
+
 ## See it live
 
 You can clone this repository, install it's dependencies with Bundler (run `bundle install`) and execute the `examples/twitter.rb` file to see a sample of the middleware usage - it's issuing requests to the Twitter API and caching them, so the Rate limit isn't consumed on every request by the client object.
