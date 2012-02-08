@@ -43,4 +43,8 @@ end
 
 The default store provided by ActiveSupport is the `MemoryStore` one, so it's important to configure a proper one for your production environment.
 
+## See it live
+
+You can clone this repository, install it's dependencies with Bundler (run `bundle install`) and execute the `examples/twitter.rb` file to see a sample of the middleware usage - it's issuing requests to the Twitter API and caching them, so the Rate limit isn't consumed on every request by the client object.
+
 ## License
