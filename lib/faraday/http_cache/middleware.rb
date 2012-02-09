@@ -95,7 +95,14 @@ module Faraday
 
       def validate(entry, env)
         # TODO: Validates freshness with E-Tag and Last-Modified
+        headers = env[:request_headers]
+        headers['If-Modified-Since'] = entry.last_modified
+        headers['If-None-Match'] = entry.etag
         response = Response.new(@app.call(env).marshal_dump)
+
+        if response.not_modified?
+          response = entry
+        end
 
         store(response)
         response

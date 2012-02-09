@@ -14,17 +14,20 @@ module Faraday
       #   `Moved Permanently`, `Found`, 'Not Found` and `Gone`.
       CACHEABLE_STATUS_CODES = [200, 203, 300, 301, 302, 404, 410]
 
-      attr_reader :payload
+      attr_reader :payload, :last_modified, :etag
 
       def initialize(payload = {})
         @now = Time.now
         @payload = payload
         wrap_headers!
         headers['Date'] ||= @now.httpdate
+
+        @last_modified = headers['Last-Modified']
+        @etag = headers['ETag']
       end
 
       def fresh?
-        ttl > 0
+        ttl && ttl > 0
       end
 
       def not_modified?
@@ -33,7 +36,7 @@ module Faraday
 
       def cacheable?
         return false if cache_control.private? || cache_control.no_store?
-        cacheable_status_code? && fresh?
+        cacheable_status_code? && (validateable? || fresh?)
       end
 
       def age
@@ -41,7 +44,7 @@ module Faraday
       end
 
       def ttl
-        max_age - age
+        max_age - age if max_age
       end
 
       def date
@@ -62,6 +65,10 @@ module Faraday
       end
 
       private
+
+      def validateable?
+        headers.key?('Last-Modified') || headers.key?('ETag')
+      end
 
       def cacheable_status_code?
         CACHEABLE_STATUS_CODES.include?(@payload[:status])

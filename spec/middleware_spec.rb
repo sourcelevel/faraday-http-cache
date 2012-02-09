@@ -22,12 +22,36 @@ describe Faraday::HttpCache::Middleware do
         stubs.get('/dontstore') { [200, { 'Cache-Control' => 'no-store' },               "#{@request_count+=1}"] }
         stubs.get('/expires')   { [200, { 'Expires' => (Time.now + 10).httpdate },       "#{@request_count+=1}"] }
         stubs.get('/yesterday') { [200, { 'Date' => yesterday, 'Expires' => yesterday }, "#{@request_count+=1}"] }
+
+        stubs.get('/timestamped') do |env|
+          @counter+= 1
+          header = @counter > 2 ? '1' : '2'
+
+          if env[:request_headers]['If-Modified-Since'] == header
+            [304, {}, ""]
+          else
+            [200, {'Last-Modified' => header}, "#{@request_count+=1}"]
+          end
+        end
+
+        stubs.get('/etag') do |env|
+          @counter+= 1
+          tag = @counter > 2 ? '1' : '2'
+
+          if env[:request_headers]['If-None-Match'] == tag
+            [304, {}, ""]
+          else
+            [200, {'ETag' => tag}, "#{@request_count+=1}"]
+          end
+        end
+
       end
     end
   end
 
   before do
     @request_count = 0
+    @counter = 0
   end
 
   it "doesn't cache POST requests" do
@@ -106,6 +130,16 @@ describe Faraday::HttpCache::Middleware do
     client.get('/get')
     logger.should_receive(:debug).with('HTTP Cache: [GET /get] fresh')
     client.get('/get')
+  end
+
+  it "sends the 'Last-Modified' header on response validation" do
+    client.get('/timestamped')
+    client.get('/timestamped').body.should == "1"
+  end
+
+  it "sends the 'If-None-Match' header on response validation" do
+    client.get('/etag')
+    client.get('/etag').body.should == "1"
   end
 
   it "maintains the 'Date' header for cached responses" do
