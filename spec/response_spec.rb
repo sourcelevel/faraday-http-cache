@@ -58,6 +58,11 @@ describe Faraday::HttpCache::Response do
     response.date.should be_present
   end
 
+  it "the response is not modified if the status code is 304" do
+    response = Faraday::HttpCache::Response.new(:status => 304)
+    response.should be_not_modified
+  end
+
   describe 'max age calculation' do
 
     it 'uses the shared max age directive when present' do
