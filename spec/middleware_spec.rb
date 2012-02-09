@@ -16,12 +16,12 @@ describe Faraday::HttpCache::Middleware do
 
       stack.adapter :test do |stubs|
         stubs.post('post')     { [200, { 'Cache-Control' => 'max-age=400' },           "#{@request_count+=1}"] }
-        stubs.get('broken')    { [500, {'Cache-Control' => 'max-age=400' },            "#{@request_count+=1}"] }
-        stubs.get('get')       { [200, {'Cache-Control' => 'max-age=200' },            "#{@request_count+=1}"] }
-        stubs.get('private')   { [200, {'Cache-Control' => 'private' },                "#{@request_count+=1}"] }
-        stubs.get('dontstore') { [200, {'Cache-Control' => 'no-store' },               "#{@request_count+=1}"] }
-        stubs.get('expires')   { [200, {'Expires' => (Time.now + 10).httpdate },       "#{@request_count+=1}"] }
-        stubs.get('yesterday') { [200, {'Date' => yesterday, 'Expires' => yesterday }, "#{@request_count+=1}"] }
+        stubs.get('broken')    { [500, { 'Cache-Control' => 'max-age=400' },            "#{@request_count+=1}"] }
+        stubs.get('get')       { [200, { 'Cache-Control' => 'max-age=200' },            "#{@request_count+=1}"] }
+        stubs.get('private')   { [200, { 'Cache-Control' => 'private' },                "#{@request_count+=1}"] }
+        stubs.get('dontstore') { [200, { 'Cache-Control' => 'no-store' },               "#{@request_count+=1}"] }
+        stubs.get('expires')   { [200, { 'Expires' => (Time.now + 10).httpdate },       "#{@request_count+=1}"] }
+        stubs.get('yesterday') { [200, { 'Date' => yesterday, 'Expires' => yesterday }, "#{@request_count+=1}"] }
       end
     end
   end
