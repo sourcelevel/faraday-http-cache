@@ -15,7 +15,7 @@ describe Faraday::HttpCache::Middleware do
       stack.use Faraday::HttpCache::Middleware, :logger => logger
 
       stack.adapter :test do |stubs|
-        stubs.post('/post')     { [200, { 'Cache-Control' => 'max-age=400' },           "#{@request_count+=1}"] }
+        stubs.post('/post')     { [200, { 'Cache-Control' => 'max-age=400' },            "#{@request_count+=1}"] }
         stubs.get('/broken')    { [500, { 'Cache-Control' => 'max-age=400' },            "#{@request_count+=1}"] }
         stubs.get('/get')       { [200, { 'Cache-Control' => 'max-age=200' },            "#{@request_count+=1}"] }
         stubs.get('/private')   { [200, { 'Cache-Control' => 'private' },                "#{@request_count+=1}"] }
