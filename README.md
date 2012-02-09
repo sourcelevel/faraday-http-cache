@@ -1,12 +1,12 @@
 # Faraday Http Cache
-a [Faraday](https://github.com/technoweenie/faraday) middleware that respects HTTP cache, by validating expiration headers from stored responses.
+a [Faraday](https://github.com/technoweenie/faraday) middleware that respects HTTP cache, by checking expiration and validation of the stored responses.
 
 ## Installation
 
 Add it to your Gemfile:
 
 ```ruby
-gem 'faraday-http-cache'
+gem 'faraday-http-cache', :require => 'faraday_http_cache'
 ```
 
 ## Usage and configuration
