@@ -5,7 +5,7 @@ Gem::Specification.new do |gem|
   gem.authors       = ["Lucas Mazza"]
   gem.email         = ["contact@plataformatec.com.br"]
   gem.description   = %q{Middleware to handle HTTP caching}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.summary       = %q{A Faraday middleware that stores and validates cache expiration.}
   gem.homepage      = "http://github.com/plataformatec/faraday-cache_store"
 
   gem.files         = `git ls-files`.split("\n")
