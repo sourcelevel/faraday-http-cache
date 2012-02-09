@@ -101,6 +101,7 @@ module Faraday
         response = Response.new(@app.call(env).marshal_dump)
 
         if response.not_modified?
+          trace :valid
           response = entry
         end
 

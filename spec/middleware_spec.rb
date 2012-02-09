@@ -137,8 +137,20 @@ describe Faraday::HttpCache::Middleware do
     client.get('/timestamped').body.should == "1"
   end
 
+  it "logs that the request with 'Last-Modified' was revalidated" do
+    client.get('/timestamped')
+    logger.should_receive(:debug).with('HTTP Cache: [GET /timestamped] valid, store')
+    client.get('/timestamped').body.should == "1"
+  end
+
   it "sends the 'If-None-Match' header on response validation" do
     client.get('/etag')
+    client.get('/etag').body.should == "1"
+  end
+
+  it "logs that the request with 'ETag' was revalidated" do
+    client.get('/etag')
+    logger.should_receive(:debug).with('HTTP Cache: [GET /etag] valid, store')
     client.get('/etag').body.should == "1"
   end
 
