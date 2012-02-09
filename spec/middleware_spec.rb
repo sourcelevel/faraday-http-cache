@@ -104,7 +104,7 @@ describe Faraday::HttpCache::Middleware do
 
   it "logs that a stored GET response is fresh" do
     client.get('/get')
-    logger.should_receive(:debug).with('HTTP Cache: [GET /get] fresh, store')
+    logger.should_receive(:debug).with('HTTP Cache: [GET /get] fresh')
     client.get('/get')
   end
 

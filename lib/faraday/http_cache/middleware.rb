@@ -53,15 +53,15 @@ module Faraday
       def call(env)
         @trace = []
 
-        request = env.slice(:method, :url, :request_headers)
+        @request = env.slice(:method, :url, :request_headers)
         response = nil
-        if can_cache?(request[:method])
-          response = fetch(request) { @app.call(env) }
+        if can_cache?(@request[:method])
+          response = fetch(env)
         else
           trace :unacceptable
           response = @app.call(env)
         end
-        log(request)
+        log_request
         response
       end
 
@@ -78,24 +78,25 @@ module Faraday
       # Before serving the response back to the stack, the response will
       # be stored (or updated, if already present) inside the cache store if
       # the response can be cached.
-      def fetch(request)
-        entry = @storage.read(request)
+      def fetch(env)
+        entry = @storage.read(@request)
 
         if entry && entry.fresh?
           response = entry
           trace :fresh
         else
-          response = Response.new(yield.marshal_dump)
-          trace :miss
+          response = validate(env)
         end
 
-        if response.cacheable?
-          @storage.write(request, response)
-          trace :store
-        else
-          trace :invalid
-        end
         response.to_response
+      end
+
+      def validate(env)
+        response = Response.new(@app.call(env).marshal_dump)
+        trace :miss
+
+        store(response)
+        response
       end
 
       # Records a step from the middleware's operation
@@ -104,14 +105,23 @@ module Faraday
         @trace << operation
       end
 
+      def store(response)
+        if response.cacheable?
+          trace :store
+          @storage.write(@request, response)
+        else
+          trace :invalid
+        end
+      end
+
 
       # Logs the HTTP method, request path and which
       # steps were executed during the middleware operation.
-      def log(request)
+      def log_request
         return unless @logger
 
-        method = request[:method].to_s.upcase
-        path = request[:url].path
+        method = @request[:method].to_s.upcase
+        path = @request[:url].path
         line = "HTTP Cache: [#{method} #{path}] #{@trace.join(', ')}"
         @logger.debug(line)
       end
