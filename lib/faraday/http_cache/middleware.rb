@@ -56,7 +56,7 @@ module Faraday
         @request = env.slice(:method, :url, :request_headers)
         response = nil
         if can_cache?(@request[:method])
-          response = fetch(env)
+          response = call!(env)
         else
           trace :unacceptable
           response = @app.call(env)
@@ -78,22 +78,24 @@ module Faraday
       # Before serving the response back to the stack, the response will
       # be stored (or updated, if already present) inside the cache store if
       # the response can be cached.
-      def fetch(env)
+      def call!(env)
         entry = @storage.read(@request)
 
-        if entry && entry.fresh?
+        return fetch(env) if entry.nil?
+
+        if entry.fresh?
           response = entry
           trace :fresh
         else
-          response = validate(env)
+          response = validate(entry, env)
         end
 
         response.to_response
       end
 
-      def validate(env)
+      def validate(entry, env)
+        # TODO: Validates freshness with E-Tag and Last-Modified
         response = Response.new(@app.call(env).marshal_dump)
-        trace :miss
 
         store(response)
         response
@@ -105,6 +107,7 @@ module Faraday
         @trace << operation
       end
 
+      # Stores a cacheable response into the current storage.
       def store(response)
         if response.cacheable?
           trace :store
@@ -114,6 +117,13 @@ module Faraday
         end
       end
 
+      # Forwards the missing response to the underlying application.
+      def fetch(env)
+        response = Response.new(@app.call(env).marshal_dump)
+        trace :miss
+        store(response)
+        response.to_response
+      end
 
       # Logs the HTTP method, request path and which
       # steps were executed during the middleware operation.
