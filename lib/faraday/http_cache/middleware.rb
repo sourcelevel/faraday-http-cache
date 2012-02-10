@@ -52,8 +52,8 @@ module Faraday
 
       def call(env)
         @trace = []
+        @request = create_request(env)
 
-        @request = env.slice(:method, :url, :request_headers)
         response = nil
         if can_cache?(@request[:method])
           response = call!(env)
@@ -94,7 +94,6 @@ module Faraday
       end
 
       def validate(entry, env)
-        # TODO: Validates freshness with E-Tag and Last-Modified
         headers = env[:request_headers]
         headers['If-Modified-Since'] = entry.last_modified
         headers['If-None-Match'] = entry.etag
@@ -131,6 +130,14 @@ module Faraday
         trace :miss
         store(response)
         response.to_response
+      end
+
+      # Copies the `url` and `method` from the Faraday env
+      # and dups the headers hash to avoid .
+      def create_request(env)
+        @request = env.slice(:method, :url)
+        @request[:request_headers] = env[:request_headers].dup
+        @request
       end
 
       # Logs the HTTP method, request path and which

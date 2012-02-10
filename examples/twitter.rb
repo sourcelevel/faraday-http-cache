@@ -2,6 +2,7 @@ require 'rubygems'
 $:.unshift File.expand_path('../lib', File.dirname(__FILE__))
 require 'faraday/http_cache'
 
+# Twitter says we can cache their response for 5 minutes.
 maxage = 300
 
 @client = Faraday.new('http://api.twitter.com') do |builder|
@@ -28,3 +29,4 @@ end
 puts "\nRequesting 'http://api.twitter.com/1/trends/daily.json' again...\n"
 puts "   1 - #{make_request} requests remaining."
 puts "   2 - #{make_request} requests remaining."
+puts "   3 - #{make_request} requests remaining."
