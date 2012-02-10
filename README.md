@@ -63,6 +63,6 @@ client.get('http://site/api/users')
 
 ## See it live
 
-You can clone this repository, install it's dependencies with Bundler (run `bundle install`) and execute the `examples/twitter.rb` file to see a sample of the middleware usage - it's issuing requests to the Twitter API and caching them, so the Rate limit isn't consumed on every request by the client object.
+You can clone this repository, install it's dependencies with Bundler (run `bundle install`) and execute the `examples/twitter.rb` file to see a sample of the middleware usage - it's issuing requests to the Twitter API and caching them, so the rate limit isn't reduced on every request by the client object. After sleeping for 5 3minutes the cache will expire and the client will hit the Twitter API again.
 
 ## License
