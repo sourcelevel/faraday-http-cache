@@ -1,5 +1,6 @@
 # Faraday Http Cache
-a [Faraday](https://github.com/technoweenie/faraday) middleware that respects HTTP cache, by checking expiration and validation of the stored responses.
+a [Faraday](https://github.com/technoweenie/faraday) middleware that respects HTTP cache,
+by checking expiration and validation of the stored responses.
 
 ## Installation
 
@@ -29,7 +30,8 @@ client = Faraday.new do |builder|
 end
 ```
 
-The middleware uses the `ActiveSupport::Cache` API to record the responses from the targeted endpoints, and any extra configuration option will be used to setup the cache store.
+The middleware uses the `ActiveSupport::Cache` API to record the responses from the targeted
+endpoints, and any extra configuration option will be used to setup the cache store.
 
 ```ruby
 # Connect the middleware to a Memcache instance.
@@ -45,11 +47,13 @@ client = Faraday.new do |builder|
 end
 ```
 
-The default store provided by ActiveSupport is the `MemoryStore` one, so it's important to configure a proper one for your production environment.
+The default store provided by ActiveSupport is the `MemoryStore` one, so it's important to
+configure a proper one for your production environment.
 
 ### Logging
 
-You can provide a `:logger` option that will be receive debug informations based on the middleware operations:
+You can provide a `:logger` option that will be receive debug informations based on the middleware
+operations:
 
 ```ruby
 client = Faraday.new do |builder|
@@ -63,7 +67,11 @@ client.get('http://site/api/users')
 
 ## See it live
 
-You can clone this repository, install it's dependencies with Bundler (run `bundle install`) and execute the `examples/twitter.rb` file to see a sample of the middleware usage - it's issuing requests to the Twitter API and caching them, so the rate limit isn't reduced on every request by the client object. After sleeping for 5 3minutes the cache will expire and the client will hit the Twitter API again.
+You can clone this repository, install it's dependencies with Bundler (run `bundle install`) and
+execute the `examples/twitter.rb` file to see a sample of the middleware usage - it's issuing
+requests to the Twitter API and caching them, so the rate limit isn't reduced on every request by
+the client object. After sleeping for 5 3minutes the cache will expire and the client will hit the
+Twitter API again.
 
 ## License
 
