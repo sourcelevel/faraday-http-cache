@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe Faraday::HttpCache::CacheControl do
-
   it 'takes a String with multiple name=value pairs' do
     instance = Faraday::HttpCache::CacheControl.new('max-age=600, max-stale=300, min-fresh=570')
     instance['max-age'].should == '600'

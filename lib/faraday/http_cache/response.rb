@@ -36,6 +36,7 @@ module Faraday
 
       def cacheable?
         return false if cache_control.private? || cache_control.no_store?
+
         cacheable_status_code? && (validateable? || fresh?)
       end
 

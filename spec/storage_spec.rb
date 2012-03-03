@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe Faraday::HttpCache::Storage do
-
   let(:request) do
     { :method => :get, :request_headers => {}, :url => URI.parse("http://foo.bar/") }
   end
@@ -20,7 +19,6 @@ describe Faraday::HttpCache::Storage do
   end
 
   describe 'storing responses' do
-
     it 'writes the response json to the underlying cache using a digest as the key' do
       json = MultiJson.encode(response.payload)
 

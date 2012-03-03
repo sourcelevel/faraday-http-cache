@@ -50,6 +50,7 @@ module Faraday
 
       def to_s
         booleans, values = [], []
+
         @directives.each do |key, value|
           if value == true
             booleans << key
@@ -57,17 +58,20 @@ module Faraday
             values << "#{key}=#{value}"
           end
         end
+
         (booleans.sort + values.sort).join(', ')
       end
 
-
       private
+
       def parse(string)
         string = string.to_s
+
         return if string.empty?
 
         string.delete(' ').split(',').each do |part|
           next if part.empty?
+
           name, value = part.split('=', 2)
           @directives[name.downcase] = (value || true) unless name.empty?
         end

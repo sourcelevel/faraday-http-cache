@@ -11,7 +11,6 @@ module Faraday
     # encoded as a SHA1 digest of their JSON representation and paired with
     # their cached responses.
     class Storage
-
       attr_reader :cache
 
       def initialize(store = nil, options = {})
@@ -27,6 +26,7 @@ module Faraday
       def read(request, klass = Faraday::HttpCache::Response)
         key = cache_key_for(request)
         value = cache.read(key)
+
         if value
           payload = MultiJson.decode(value).symbolize_keys
           klass.new(payload)
@@ -34,6 +34,7 @@ module Faraday
       end
 
       private
+
       def cache_key_for(object)
         array = object.stringify_keys.to_a.sort
         Digest::SHA1.hexdigest(MultiJson.encode(array))

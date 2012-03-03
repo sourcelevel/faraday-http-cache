@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe Faraday::HttpCache::Response do
-
   describe 'cacheable?' do
     it "the response isn't' cacheable if the response is marked as private" do
       headers  = { 'Cache-Control' => 'private' }

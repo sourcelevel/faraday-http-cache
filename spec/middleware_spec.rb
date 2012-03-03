@@ -1,50 +1,44 @@
 require 'spec_helper'
 
 describe Faraday::HttpCache::Middleware do
+  let(:yesterday) { 1.day.ago.httpdate }
 
-  let(:yesterday) {
-    1.day.ago.httpdate
-  }
-
-  let(:logger) {
-    double('a Logger object', :debug => nil)
-  }
+  let(:logger) { double('a Logger object', :debug => nil) }
 
   let(:client) do
     Faraday.new do |stack|
       stack.use Faraday::HttpCache::Middleware, :logger => logger
 
       stack.adapter :test do |stubs|
-        stubs.post('/post')     { [200, { 'Cache-Control' => 'max-age=400' },            "#{@request_count+=1}"] }
-        stubs.get('/broken')    { [500, { 'Cache-Control' => 'max-age=400' },            "#{@request_count+=1}"] }
-        stubs.get('/get')       { [200, { 'Cache-Control' => 'max-age=200' },            "#{@request_count+=1}"] }
-        stubs.get('/private')   { [200, { 'Cache-Control' => 'private' },                "#{@request_count+=1}"] }
-        stubs.get('/dontstore') { [200, { 'Cache-Control' => 'no-store' },               "#{@request_count+=1}"] }
-        stubs.get('/expires')   { [200, { 'Expires' => (Time.now + 10).httpdate },       "#{@request_count+=1}"] }
-        stubs.get('/yesterday') { [200, { 'Date' => yesterday, 'Expires' => yesterday }, "#{@request_count+=1}"] }
+        stubs.post('/post')     { [200, { 'Cache-Control' => 'max-age=400' },            "#{@request_count += 1}"] }
+        stubs.get('/broken')    { [500, { 'Cache-Control' => 'max-age=400' },            "#{@request_count += 1}"] }
+        stubs.get('/get')       { [200, { 'Cache-Control' => 'max-age=200' },            "#{@request_count += 1}"] }
+        stubs.get('/private')   { [200, { 'Cache-Control' => 'private' },                "#{@request_count += 1}"] }
+        stubs.get('/dontstore') { [200, { 'Cache-Control' => 'no-store' },               "#{@request_count += 1}"] }
+        stubs.get('/expires')   { [200, { 'Expires' => (Time.now + 10).httpdate },       "#{@request_count += 1}"] }
+        stubs.get('/yesterday') { [200, { 'Date' => yesterday, 'Expires' => yesterday }, "#{@request_count += 1}"] }
 
         stubs.get('/timestamped') do |env|
-          @counter+= 1
+          @counter += 1
           header = @counter > 2 ? '1' : '2'
 
           if env[:request_headers]['If-Modified-Since'] == header
             [304, {}, ""]
           else
-            [200, {'Last-Modified' => header}, "#{@request_count+=1}"]
+            [200, {'Last-Modified' => header}, "#{@request_count += 1}"]
           end
         end
 
         stubs.get('/etag') do |env|
-          @counter+= 1
+          @counter += 1
           tag = @counter > 2 ? '1' : '2'
 
           if env[:request_headers]['If-None-Match'] == tag
             [304, {}, ""]
           else
-            [200, {'ETag' => tag}, "#{@request_count+=1}"]
+            [200, {'ETag' => tag}, "#{@request_count += 1}"]
           end
         end
-
       end
     end
   end

@@ -40,9 +40,9 @@ module Faraday
     # `max-age` directive. Fresh responses will be updated and served instead
     # of issuing a new request to the targeted endpoint.
     class Middleware < Faraday::Middleware
-
       def initialize(app, *arguments)
         super(app)
+
         options = arguments.extract_options!
 
         @logger = options.delete(:logger)
@@ -55,17 +55,20 @@ module Faraday
         @request = create_request(env)
 
         response = nil
+
         if can_cache?(@request[:method])
           response = call!(env)
         else
           trace :unacceptable
           response = @app.call(env)
         end
+
         log_request
         response
       end
 
       private
+
       # Only `GET` and `HEAD` requests should be cached.
       def can_cache?(method)
         method == :get || method == :head
