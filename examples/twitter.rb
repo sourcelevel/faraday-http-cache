@@ -1,5 +1,6 @@
 require 'rubygems'
-$:.unshift File.expand_path('../lib', File.dirname(__FILE__))
+require 'bundler/setup'
+
 require 'faraday/http_cache'
 
 # Twitter says we can cache their response for 5 minutes.
