@@ -7,7 +7,7 @@ by checking expiration and validation of the stored responses.
 Add it to your Gemfile:
 
 ```ruby
-gem 'faraday-http-cache', :require => 'faraday_http_cache'
+gem 'faraday-http-cache'
 ```
 
 ## Usage and configuration
