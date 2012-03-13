@@ -4,25 +4,46 @@ require 'active_support/core_ext/hash/keys'
 
 module Faraday
   module HttpCache
-    # Storage class that wraps the acess to a `ActiveSupport::Cache::Store` instance
-    # that holds the stored responses for previous requests.
+    # Internal: A Wrapper around a ActiveSupport::CacheStore to store responses.
     #
-    # Request hashes (made of :method, :url and :request_headers keys) will be
-    # encoded as a SHA1 digest of their JSON representation and paired with
-    # their cached responses.
+    # Examples
+    #  # Creates a new Storage using a MemCached backend from ActiveSupport.
+    #  Faraday::HttpCache::Storage.new(:mem_cache_store)
+    #
+    #  # Reuse some other instance of a ActiveSupport::CacheStore object.
+    #  Faraday::HttpCache::Storage.new(Rails.cache)
     class Storage
       attr_reader :cache
 
+      # Internal: Instantiates a new Storage object with a cache backend.
+      #
+      # store - An ActiveSupport::CacheStore identifier to
+      # options - The Hash options for the CacheStore backend.
+      #
       def initialize(store = nil, options = {})
         @cache = ActiveSupport::Cache.lookup_store(store, options)
       end
 
+      # Internal: Writes a response with a key based on the given request.
+      #
+      # request - The Hash containing the request information.
+      #           :method          - The HTTP Method used for the request.
+      #           :url             - The requested URL.
+      #           :request_headers - The custom headers for the request.
+      # response - The Faraday::HttpCache::Response instance to be stored.
       def write(request, response)
         key = cache_key_for(request)
         value = MultiJson.encode(response.payload)
         cache.write(key, value)
       end
 
+      # Internal: Reads a key based on the given request from the underlying cache.
+      #
+      # request - The Hash containing the request information.
+      #           :method          - The HTTP Method used for the request.
+      #           :url             - The requested URL.
+      #           :request_headers - The custom headers for the request.
+      # klass - The Class to be instantiated with the recovered informations.
       def read(request, klass = Faraday::HttpCache::Response)
         key = cache_key_for(request)
         value = cache.read(key)
