@@ -3,11 +3,10 @@ require 'faraday/http_cache/cache_control'
 
 module Faraday
   module HttpCache
-    # Response object that calculates the cache status based
-    # on the stored headers and the 'Cache-Control' directives.
-    #
-    # It wraps the general response Hash from 'Faraday' responses and
-    # recreates an instance of 'Faraday::Response' if necessary.
+    # Internal: a class to represent a response from a Faraday request.
+    #  It decorates the response hash into a smarter object that queries
+    #  the response headers and status informations about how the caching
+    #  middleware should handle this specific response.
     class Response
       # Internal: List of status codes that can be cached:
       #           'OK', 'Non-Authoritative Information', 'Multiple Choices',
@@ -23,6 +22,13 @@ module Faraday
       # Internal: Gets the 'ETag' header from the headers Hash.
       attr_reader :etag
 
+      # Internal: Initialize a new Response with the responsde payload from
+      #  a Faraday request.
+      #
+      #  payload - the response Hash returned by a Faraday request.
+      #            :status - the status code from the response.
+      #            :response_headers - a 'Hash' like object with the headers.
+      #            :body - the response body.
       def initialize(payload = {})
         @now = Time.now
         @payload = payload
@@ -69,7 +75,6 @@ module Faraday
         (headers['Age'] || (@now - date)).to_i
       end
 
-
       # Internal: Calculates the 'Time to live' left on the Response.
       #
       # Returns the remaining seconds for the response, or nil the 'max_age'
@@ -79,6 +84,8 @@ module Faraday
       end
 
       # Internal: Parses the 'Date' header back into a Time instance.
+      #
+      # Returns the Time object.
       def date
         Time.httpdate(headers['Date'])
       end
@@ -98,29 +105,47 @@ module Faraday
       end
 
       # Internal: Creates a new 'Faraday::Response'.
+      #
       # Returns a new instance of a 'Faraday::Response' with the payload.
       def to_response
         Faraday::Response.new(@payload)
       end
 
       private
-
+      # Internal: Checks if this response can be revalidated.
+      #
+      # Returns true if the 'headers' contains a 'Last-Modified' or an 'ETag'
+      #   entry.
       def validateable?
         headers.key?('Last-Modified') || headers.key?('ETag')
       end
 
+      # Internal: Validates the response status against the
+      #   `CACHEABLE_STATUS_CODES' constant.
+      # Returns true if the constant includes the response status code.
       def cacheable_status_code?
         CACHEABLE_STATUS_CODES.include?(@payload[:status])
       end
 
+      # Internal: Gets the 'Expires' in a Time object.
+      # Returns the Time object, or nil if the header isn't present.
       def expires
         headers['Expires'] && Time.httpdate(headers['Expires'])
       end
 
+      # Internal: Gets the 'CacheControl' object.
       def cache_control
         @cache_control ||= CacheControl.new(headers['Cache-Control'])
       end
 
+      # Internal: Converts the headers 'Hash' into 'Faraday::Utils::Headers'.
+      #  Faraday actually uses a Hash subclass, `Faraday::Utils::Headers` to
+      #  store the headers hash. When retrieving a serialized response,
+      #  the headers object is decoded as a 'Hash' instead of the actual
+      #  'Faraday::Utils::Headers' object, so we need to ensure that the
+      #  'response_headers' is always a 'Headers' instead of a plain 'Hash'.
+      #
+      # Returns nothing.
       def wrap_headers!
         headers = @payload[:response_headers]
 
@@ -128,6 +153,7 @@ module Faraday
         @payload[:response_headers].update(headers) if headers
       end
 
+      # Internal: Gets the headers 'Hash' from the payload.
       def headers
         @payload[:response_headers]
       end
