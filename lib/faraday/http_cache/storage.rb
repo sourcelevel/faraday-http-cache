@@ -55,9 +55,14 @@ module Faraday
       end
 
       private
-
-      def cache_key_for(object)
-        array = object.stringify_keys.to_a.sort
+      # Internal: Generates a String key for a given request object.
+      #  The request object is folded into a sorted Array (since we can't count
+      #  on hashes order on Ruby 1.8), encoded as JSON and digested as a `SHA1`
+      #  string.
+      #
+      # Returns the encoded String.
+      def cache_key_for(request)
+        array = request.stringify_keys.to_a.sort
         Digest::SHA1.hexdigest(MultiJson.encode(array))
       end
     end
