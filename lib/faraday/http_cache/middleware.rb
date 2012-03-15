@@ -45,10 +45,15 @@ module Faraday
       #    Middleware.new(app, :file_store, 'tmp')
       def initialize(app, *arguments)
         super(app)
-        options = arguments.extract_options!
 
-        @logger = options.delete(:logger)
-        store = arguments.pop
+        if arguments.last.is_a? Hash
+          options = arguments.pop
+          @logger = options.delete(:logger)
+        else
+          options = arguments
+        end
+        store = arguments.shift
+
         @storage = Storage.new(store, options)
       end
 
