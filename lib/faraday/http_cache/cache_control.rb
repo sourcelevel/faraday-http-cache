@@ -1,5 +1,3 @@
-require 'forwardable'
-
 module Faraday
   module HttpCache
     # Internal: a class to represent the 'Cache-Control' header options.
@@ -7,9 +5,6 @@ module Faraday
     #  It breaks the several directives into keys/values and stores them into a
     #  a Hash.
     class CacheControl
-      extend Forwardable
-
-      def_delegators :@directives, :[], :[]=, :include?
 
       # Internal: Initialize a new CacheControl.
       def initialize(string)

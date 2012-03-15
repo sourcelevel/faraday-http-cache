@@ -3,38 +3,31 @@ require 'spec_helper'
 describe Faraday::HttpCache::CacheControl do
   it 'takes a String with multiple name=value pairs' do
     instance = Faraday::HttpCache::CacheControl.new('max-age=600, max-stale=300, min-fresh=570')
-    instance['max-age'].should == '600'
-    instance['max-stale'].should == '300'
-    instance['min-fresh'].should == '570'
+    instance.max_age.should == 600
   end
 
   it 'takes a String with a single flag value' do
     instance = Faraday::HttpCache::CacheControl.new('no-cache')
-    instance.should include('no-cache')
-    instance['no-cache'].should be_true
+    instance.should be_no_cache
   end
 
   it 'takes a String with a bunch of all kinds of stuff' do
     instance =
       Faraday::HttpCache::CacheControl.new('max-age=600,must-revalidate,min-fresh=3000,foo=bar,baz')
-    instance['max-age'].should == '600'
-    instance['must-revalidate'].should be_true
-    instance['min-fresh'].should == '3000'
-    instance['foo'].should == 'bar'
-    instance['baz'].should be_true
+    instance.max_age.should == 600
+    instance.should be_must_revalidate
   end
 
   it 'strips leading and trailing spaces' do
     instance = Faraday::HttpCache::CacheControl.new('   public,   max-age =   600  ')
-    instance.should include 'public'
-    instance.should include 'max-age'
-    instance['max-age'].should == '600'
+    instance.should be_public
+    instance.max_age.should == 600
   end
 
   it 'ignores blank segments' do
-    instance = Faraday::HttpCache::CacheControl.new('max-age=600,,max-stale=300')
-    instance['max-age'].should == '600'
-    instance['max-stale'].should == '300'
+    instance = Faraday::HttpCache::CacheControl.new('max-age=600,,s-maxage=300')
+    instance.max_age.should == 600
+    instance.shared_max_age.should == 300
   end
 
   it 'sorts alphabetically with boolean directives before value directives' do
