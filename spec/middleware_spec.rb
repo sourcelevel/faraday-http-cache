@@ -168,7 +168,7 @@ describe Faraday::HttpCache::Middleware do
     end
 
     it 'accepts a Hash option' do
-      ActiveSupport::Cache.should_receive(:lookup_store).with(:memory_store, { :size => 1024})
+      ActiveSupport::Cache.should_receive(:lookup_store).with(:memory_store, { :size => 1024 })
       Faraday::HttpCache::Middleware.new(app, :memory_store, :size => 1024)
     end
 
