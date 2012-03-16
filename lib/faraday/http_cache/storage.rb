@@ -7,19 +7,18 @@ module Faraday
     # Internal: A Wrapper around a ActiveSupport::CacheStore to store responses.
     #
     # Examples
-    #  # Creates a new Storage using a MemCached backend from ActiveSupport.
-    #  Faraday::HttpCache::Storage.new(:mem_cache_store)
+    #   # Creates a new Storage using a MemCached backend from ActiveSupport.
+    #   Faraday::HttpCache::Storage.new(:mem_cache_store)
     #
-    #  # Reuse some other instance of a ActiveSupport::CacheStore object.
-    #  Faraday::HttpCache::Storage.new(Rails.cache)
+    #   # Reuse some other instance of a ActiveSupport::CacheStore object.
+    #   Faraday::HttpCache::Storage.new(Rails.cache)
     class Storage
       attr_reader :cache
 
-      # Internal: Instantiates a new Storage object with a cache backend.
+      # Internal: Initialize a new Storage object with a cache backend.
       #
-      # store - An ActiveSupport::CacheStore identifier to
-      # options - The Hash options for the CacheStore backend.
-      #
+      # store - An ActiveSupport::CacheStore identifier (default: nil).
+      # options - The Hash options for the CacheStore backend (default: {}).
       def initialize(store = nil, options = {})
         @cache = ActiveSupport::Cache.lookup_store(store, options)
       end
@@ -55,10 +54,11 @@ module Faraday
       end
 
       private
+
       # Internal: Generates a String key for a given request object.
-      #  The request object is folded into a sorted Array (since we can't count
-      #  on hashes order on Ruby 1.8), encoded as JSON and digested as a `SHA1`
-      #  string.
+      # The request object is folded into a sorted Array (since we can't count
+      # on hashes order on Ruby 1.8), encoded as JSON and digested as a `SHA1`
+      # string.
       #
       # Returns the encoded String.
       def cache_key_for(request)
