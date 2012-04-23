@@ -10,6 +10,4 @@ module Faraday
   end
 end
 
-if Faraday.respond_to?(:register_middleware)
-  Faraday.register_middleware :http_cache => lambda { Faraday::HttpCache::Middleware }
-end
+Faraday.register_middleware :http_cache => lambda { Faraday::HttpCache::Middleware }

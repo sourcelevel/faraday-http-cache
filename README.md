@@ -21,15 +21,6 @@ client = Faraday.new do |builder|
 end
 ```
 
-For previous versions of Faraday, the usage is:
-
-```ruby
-client = Faraday.new do |builder|
-  builder.use Faraday::HttpCache::Middleware
-  builder.adapter Faraday.default_adapter
-end
-```
-
 The middleware uses the `ActiveSupport::Cache` API to record the responses from the targeted
 endpoints, and any extra configuration option will be used to setup the cache store.
 
