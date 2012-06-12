@@ -12,11 +12,15 @@ gem 'faraday-http-cache'
 
 ## Usage and configuration
 
-If you're using Faraday 0.8 or higher, you can use the new shortcut using a symbol:
+You have to use the middleware in the Faraday instance that you want to. You can use the new
+shortcut using a symbol or passing the middleware class
 
 ```ruby
 client = Faraday.new do |builder|
   builder.use :http_cache
+  # or
+  builder.use Faraday::HttpCache::Middleware
+
   builder.adapter Faraday.default_adapter
 end
 ```
