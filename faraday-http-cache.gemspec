@@ -1,9 +1,7 @@
 # -*- encoding: utf-8 -*-
-require File.expand_path('../lib/faraday/http_cache/version', __FILE__)
-
 Gem::Specification.new do |gem|
   gem.name          = "faraday-http-cache"
-  gem.version       = Faraday::HttpCache::VERSION
+  gem.version       = "0.0.1.dev"
   gem.description   = %q{Middleware to handle HTTP caching}
   gem.summary       = %q{A Faraday middleware that stores and validates cache expiration.}
   gem.authors       = ["Lucas Mazza"]
