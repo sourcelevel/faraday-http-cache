@@ -19,7 +19,7 @@ shortcut using a symbol or passing the middleware class
 client = Faraday.new do |builder|
   builder.use :http_cache
   # or
-  builder.use Faraday::HttpCache::Middleware
+  builder.use Faraday::HttpCache
 
   builder.adapter Faraday.default_adapter
 end

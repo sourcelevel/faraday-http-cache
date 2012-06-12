@@ -36,18 +36,18 @@ module Faraday
   #   end
   class HttpCache < Faraday::Middleware
 
-    # Public: Initializes a new Middleware.
+    # Public: Initializes a new HttpCache middleware.
     #
     # app - the next endpoint on the 'Faraday' stack.
     # arguments - aditional options to setup the logger and the storage.
     #
     # Examples:
     #
-    #   # Initialize the Middleware with a logger.
-    #   Middleware.new(app, :logger => my_logger)
+    #   # Initialize the middleware with a logger.
+    #   Faraday::HttpCache.new(app, :logger => my_logger)
     #
-    #   # Initialize the Middleware with a FileStore at the 'tmp' dir.
-    #   Middleware.new(app, :file_store, 'tmp')
+    #   # Initialize the middleware with a FileStore at the 'tmp' dir.
+    #   Faraday::HttpCache.new(app, :file_store, 'tmp')
     def initialize(app, *arguments)
       super(app)
 
@@ -64,8 +64,8 @@ module Faraday
     end
 
     # Internal: Process the stack request to try to serve a cache response.
-    # On a cacheable request, the Middleware will attempt to locate a
-    # valid stored response to serve. On a cache miss, the Middleware will
+    # On a cacheable request, the middleware will attempt to locate a
+    # valid stored response to serve. On a cache miss, the middleware will
     # forward the request and try to store the response for future requests.
     # If the request can't be cached, the request will be delegated directly
     # to the underlying app and does nothing to the response.
@@ -102,9 +102,9 @@ module Faraday
     # Internal: Tries to located a valid response or forwards the call to the stack.
     # * If no entry is present on the storage, the 'fetch' method will forward
     # the call to the remaining stack and return the new response.
-    # * If a fresh response is found, the Middleware will abort the remaining
+    # * If a fresh response is found, the middleware will abort the remaining
     # stack calls and return the stored response back to the client.
-    # * If a response is found but isn't fresh anymore, the Middleware will
+    # * If a response is found but isn't fresh anymore, the middleware will
     # revalidate the response back to the server.
     #
     # env - the environment 'Hash' provided from the 'Faraday' stack.
