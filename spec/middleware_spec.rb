@@ -1,13 +1,13 @@
 require 'spec_helper'
 
-describe Faraday::HttpCache::Middleware do
+describe Faraday::HttpCache do
   let(:yesterday) { 1.day.ago.httpdate }
 
   let(:logger) { double('a Logger object', :debug => nil) }
 
   let(:client) do
     Faraday.new do |stack|
-      stack.use Faraday::HttpCache::Middleware, :logger => logger
+      stack.use Faraday::HttpCache, :logger => logger
 
       stack.adapter :test do |stubs|
         stubs.post('/post')     { [200, { 'Cache-Control' => 'max-age=400' },            "#{@request_count += 1}"] }
@@ -164,18 +164,18 @@ describe Faraday::HttpCache::Middleware do
 
     it 'uses the options to create a Cache Store' do
       ActiveSupport::Cache.should_receive(:lookup_store).with(:file_store, ['tmp'])
-      Faraday::HttpCache::Middleware.new(app, :file_store, 'tmp')
+      Faraday::HttpCache.new(app, :file_store, 'tmp')
     end
 
     it 'accepts a Hash option' do
       ActiveSupport::Cache.should_receive(:lookup_store).with(:memory_store, { :size => 1024 })
-      Faraday::HttpCache::Middleware.new(app, :memory_store, :size => 1024)
+      Faraday::HttpCache.new(app, :memory_store, :size => 1024)
     end
 
     it "consumes the 'logger' key" do
       logger = double('a logger object')
       ActiveSupport::Cache.should_receive(:lookup_store).with(:memory_store, {})
-      Faraday::HttpCache::Middleware.new(app, :memory_store, :logger => logger)
+      Faraday::HttpCache.new(app, :memory_store, :logger => logger)
     end
   end
 end
