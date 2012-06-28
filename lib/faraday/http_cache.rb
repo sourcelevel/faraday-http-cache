@@ -122,13 +122,13 @@ module Faraday
       return fetch(env) if entry.nil?
 
       if entry.fresh?
-        response = entry
+        response = entry.to_response
         trace :fresh
       else
         response = validate(entry, env)
       end
 
-      response.to_response
+      response
     end
 
     # Internal: Tries to validated a stored entry back to it's origin server
@@ -146,12 +146,13 @@ module Faraday
       headers = env[:request_headers]
       headers['If-Modified-Since'] = entry.last_modified
       headers['If-None-Match'] = entry.etag
-      response = Response.new(@app.call(env).marshal_dump)
-      result = @app.call(env).on_complete do |env|
-        response = Response.new(result)
-        if response.not_modified?
+
+      @app.call(env).on_complete do |env|
+        candidate = Response.new(env)
+        if candidate.not_modified?
           trace :valid
-          result.marshal_load(result.to_response.marshal_dump)
+          env.merge!(entry.payload)
+          response = entry
         end
         store(response)
       end
@@ -189,13 +190,11 @@ module Faraday
     #
     # Returns the fresh 'Faraday::Response' instance.
     def fetch(env)
-      result = @app.call(env)
       trace :miss
-      result.on_complete do
-        response = Response.new(result.marshal_dump)
+      @app.call(env).on_complete do |env|
+        response = Response.new(env)
         store(response)
       end
-      result
     end
 
     # Internal: Creates a new 'Hash' containing the request information.

@@ -44,7 +44,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  em-http-request
+  em-http-request (~> 1.0.2)
   faraday-http-cache!
   rake
   rspec (~> 2.0)
