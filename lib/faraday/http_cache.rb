@@ -63,6 +63,12 @@ module Faraday
       @storage = Storage.new(store, options)
     end
 
+    # Public: Process the request into a duplicate of this instance to
+    # ensure that the internal state is preserved.
+    def call(env)
+      dup.call!(env)
+    end
+
     # Internal: Process the stack request to try to serve a cache response.
     # On a cacheable request, the middleware will attempt to locate a
     # valid stored response to serve. On a cache miss, the middleware will
@@ -73,14 +79,14 @@ module Faraday
     # process is finished.
     #
     # Returns a 'Faraday::Response' instance.
-    def call(env)
+    def call!(env)
       @trace = []
       @request = create_request(env)
 
       response = nil
 
       if can_cache?(@request[:method])
-        response = call!(env)
+        response = process(env)
       else
         trace :unacceptable
         response = @app.call(env)
@@ -92,7 +98,6 @@ module Faraday
     end
 
     private
-
     # Internal: Validates if the current request method is valid for caching.
     #
     # Returns true if the method is ':get' or ':head'.
@@ -111,7 +116,7 @@ module Faraday
     # env - the environment 'Hash' provided from the 'Faraday' stack.
     #
     # Returns the actual 'Faraday::Response' instance to be served.
-    def call!(env)
+    def process(env)
       entry = @storage.read(@request)
 
       return fetch(env) if entry.nil?
