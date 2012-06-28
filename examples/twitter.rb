@@ -7,7 +7,7 @@ require 'faraday/http_cache'
 maxage = 300
 
 @client = Faraday.new('http://api.twitter.com') do |builder|
-  builder.use Faraday::HttpCache::Middleware
+  builder.use Faraday::HttpCache
   builder.adapter Faraday.default_adapter
 end
 

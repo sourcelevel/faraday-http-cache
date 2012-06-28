@@ -3,7 +3,7 @@ require 'active_support/cache'
 require 'active_support/core_ext/hash/keys'
 
 module Faraday
-  module HttpCache
+  class HttpCache < Faraday::Middleware
     # Internal: A Wrapper around a ActiveSupport::CacheStore to store responses.
     #
     # Examples
