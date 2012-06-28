@@ -86,8 +86,9 @@ module Faraday
         response = @app.call(env)
       end
 
-      log_request
-      response
+      response.on_complete do
+        log_request
+      end
     end
 
     private
@@ -141,14 +142,14 @@ module Faraday
       headers['If-Modified-Since'] = entry.last_modified
       headers['If-None-Match'] = entry.etag
       response = Response.new(@app.call(env).marshal_dump)
-
-      if response.not_modified?
-        trace :valid
-        response = entry
+      result = @app.call(env).on_complete do |env|
+        response = Response.new(result)
+        if response.not_modified?
+          trace :valid
+          result.marshal_load(result.to_response.marshal_dump)
+        end
+        store(response)
       end
-
-      store(response)
-      response
     end
 
     # Internal: Records a traced action to be used by the logger once the
@@ -183,10 +184,13 @@ module Faraday
     #
     # Returns the fresh 'Faraday::Response' instance.
     def fetch(env)
-      response = Response.new(@app.call(env).marshal_dump)
+      result = @app.call(env)
       trace :miss
-      store(response)
-      response.to_response
+      result.on_complete do
+        response = Response.new(result.marshal_dump)
+        store(response)
+      end
+      result
     end
 
     # Internal: Creates a new 'Hash' containing the request information.
