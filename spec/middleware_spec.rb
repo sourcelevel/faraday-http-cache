@@ -59,11 +59,6 @@ describe Faraday::HttpCache do
     client.get('/dontstore')
   end
 
-  it "doesn't sets the 'Date' header for uncached responses" do
-    headers = client.post('/post').headers
-    headers.keys.should_not include('Date')
-  end
-
   it "caches multiple responses when the headers differ" do
     client.get('/get', nil, 'HTTP_ACCEPT' => 'text/html')
     client.get('/get', nil, 'HTTP_ACCEPT' => 'text/html').body.should == "1"
