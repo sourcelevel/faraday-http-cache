@@ -8,9 +8,9 @@ describe Faraday::HttpCache do
   let(:client) do
     Faraday.new(:url => ENV['FARADAY_SERVER']) do |stack|
       stack.use Faraday::HttpCache, :logger => logger
-      adapter = :net_http
-      stack.headers['X-Faraday-Adapter'] = adapter.to_s
-      stack.adapter adapter
+      adapter = ENV['FARADAY_ADAPTER']
+      stack.headers['X-Faraday-Adapter'] = adapter
+      stack.adapter adapter.to_sym
     end
   end
 

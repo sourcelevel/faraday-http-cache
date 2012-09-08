@@ -4,6 +4,7 @@ require 'faraday-http-cache'
 require 'active_support/core_ext/date/calculations'
 require 'active_support/core_ext/numeric/time'
 require 'yajl'
+require 'em-http-request'
 
 require 'server'
 
@@ -18,6 +19,7 @@ end
 
 
 ENV['FARADAY_SERVER'] = "http://#{host}:#{port}"
+ENV['FARADAY_ADAPTER'] ||= 'net_http'
 
 pid = fork do
   logfile   = 'log/test.log'
