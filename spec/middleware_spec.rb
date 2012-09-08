@@ -6,51 +6,21 @@ describe Faraday::HttpCache do
   let(:logger) { double('a Logger object', :debug => nil) }
 
   let(:client) do
-    Faraday.new do |stack|
+    Faraday.new(:url => ENV['FARADAY_SERVER']) do |stack|
       stack.use Faraday::HttpCache, :logger => logger
-
-      stack.adapter :test do |stubs|
-        stubs.post('/post')     { [200, { 'Cache-Control' => 'max-age=400' },            "#{@request_count += 1}"] }
-        stubs.get('/broken')    { [500, { 'Cache-Control' => 'max-age=400' },            "#{@request_count += 1}"] }
-        stubs.get('/get')       { [200, { 'Cache-Control' => 'max-age=200' },            "#{@request_count += 1}"] }
-        stubs.get('/private')   { [200, { 'Cache-Control' => 'private' },                "#{@request_count += 1}"] }
-        stubs.get('/dontstore') { [200, { 'Cache-Control' => 'no-store' },               "#{@request_count += 1}"] }
-        stubs.get('/expires')   { [200, { 'Expires' => (Time.now + 10).httpdate },       "#{@request_count += 1}"] }
-        stubs.get('/yesterday') { [200, { 'Date' => yesterday, 'Expires' => yesterday }, "#{@request_count += 1}"] }
-
-        stubs.get('/timestamped') do |env|
-          @counter += 1
-          header = @counter > 2 ? '1' : '2'
-
-          if env[:request_headers]['If-Modified-Since'] == header
-            [304, {}, ""]
-          else
-            [200, {'Last-Modified' => header}, "#{@request_count += 1}"]
-          end
-        end
-
-        stubs.get('/etag') do |env|
-          @counter += 1
-          tag = @counter > 2 ? '1' : '2'
-
-          if env[:request_headers]['If-None-Match'] == tag
-            [304, {}, ""]
-          else
-            [200, {'ETag' => tag}, "#{@request_count += 1}"]
-          end
-        end
-      end
+      adapter = :net_http
+      stack.headers['X-Faraday-Adapter'] = adapter.to_s
+      stack.adapter adapter
     end
   end
 
   before do
-    @request_count = 0
-    @counter = 0
+    client.get('clear')
   end
 
   it "doesn't cache POST requests" do
-    client.post('/post').body
-    client.post('/post').body.should == "2"
+    client.post('post').body
+    client.post('post').body.should == "2"
   end
 
   it "logs that a POST request is unacceptable" do
@@ -59,8 +29,8 @@ describe Faraday::HttpCache do
   end
 
   it "doesn't cache responses with invalid status code" do
-    client.get('/broken')
-    client.get('/broken').body.should == "2"
+    client.get('broken')
+    client.get('broken').body.should == "2"
   end
 
   it "logs that a response with a bad status code is invalid" do
@@ -94,10 +64,10 @@ describe Faraday::HttpCache do
   end
 
   it "caches multiple responses when the headers differ" do
-    client.get('/get','HTTP_ACCEPT' => 'text/html')
-    client.get('/get','HTTP_ACCEPT' => 'text/html').body.should == "1"
+    client.get('/get', nil, 'HTTP_ACCEPT' => 'text/html')
+    client.get('/get', nil, 'HTTP_ACCEPT' => 'text/html').body.should == "1"
 
-    client.get('/get', 'HTTP_ACCEPT' => 'application/json').body.should == "2"
+    client.get('/get', nil, 'HTTP_ACCEPT' => 'application/json').body.should == "2"
   end
 
   it "caches requests with the 'Expires' header" do
@@ -111,8 +81,8 @@ describe Faraday::HttpCache do
   end
 
   it "caches GET responses" do
-    client.get('/get')
-    client.get('/get').body.should == "1"
+    client.get('get')
+    client.get('get').body.should == "1"
   end
 
   it "logs that a GET response is stored" do
@@ -155,7 +125,7 @@ describe Faraday::HttpCache do
 
   it "preserves an old 'Date' header if present" do
     date = client.get('/yesterday').headers['Date']
-    date.should == yesterday
+    date.should =~ /^\w{3}, \d{2} \w{3} \d{4} \d{2}:\d{2}:\d{2} GMT$/
   end
 
   describe 'Configuration options' do
