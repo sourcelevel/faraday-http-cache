@@ -144,12 +144,12 @@ module Faraday
     # Returns the 'Faraday::HttpCache::Response' to be forwarded into the stack.
     def validate(entry, env)
       headers = env[:request_headers]
-      headers['If-Modified-Since'] = entry.last_modified
-      headers['If-None-Match'] = entry.etag
+      headers['If-Modified-Since'] = entry.last_modified if entry.last_modified
+      headers['If-None-Match'] = entry.etag if entry.etag
 
       @app.call(env).on_complete do |env|
-        candidate = Response.new(env)
-        if candidate.not_modified?
+        response = Response.new(env)
+        if response.not_modified?
           trace :valid
           env.merge!(entry.payload)
           response = entry

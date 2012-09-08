@@ -51,7 +51,8 @@ class Server < Sinatra::Base
   get '/timestamped' do
     settings.counter += 1
     header = settings.counter > 2 ? '1' : '2'
-    if headers['If-Modified-Since'] == header
+
+    if env['HTTP_IF_MODIFIED_SINCE'] == header
       [304, {}, ""]
     else
       [200, { 'Last-Modified' => header }, "#{settings.requests += 1}"]
@@ -62,7 +63,7 @@ class Server < Sinatra::Base
     settings.counter += 1
     tag = settings.counter > 2 ? '1' : '2'
 
-    if headers['If-None-Match'] == tag
+    if env['HTTP_IF_NONE_MATCH'] == tag
       [304, { 'ETag' => tag }, ""]
     else
       [200, { 'ETag' => tag }, "#{settings.requests += 1}"]
