@@ -97,8 +97,7 @@ describe Faraday::HttpCache do
   it "logs that the request with 'Last-Modified' was revalidated" do
     client.get('/timestamped')
     logger.should_receive(:debug).with('HTTP Cache: [GET /timestamped] valid, store')
-    client.get('/timestamped')
-    #.body.should == "1"
+    client.get('/timestamped').body.should == "1"
   end
 
   it "sends the 'If-None-Match' header on response validation" do
