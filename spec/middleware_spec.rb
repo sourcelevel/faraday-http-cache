@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 describe Faraday::HttpCache do
-  let(:yesterday) { 1.day.ago.httpdate }
-
   let(:logger) { double('a Logger object', :debug => nil) }
 
   let(:client) do
@@ -10,7 +8,6 @@ describe Faraday::HttpCache do
       stack.use Faraday::HttpCache, :logger => logger
       adapter = ENV['FARADAY_ADAPTER']
       stack.headers['X-Faraday-Adapter'] = adapter
-      # stack.response :logger
       stack.adapter adapter.to_sym
     end
   end
