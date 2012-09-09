@@ -36,9 +36,6 @@ end
 require 'net/http'
 conn = Net::HTTP.new host, port
 conn.open_timeout = conn.read_timeout = 0.1
-conn.use_ssl      = false
-conn.verify_mode  = OpenSSL::SSL::VERIFY_NONE
-
 # test if test server is accepting requests
 responsive = lambda { |path|
   begin
