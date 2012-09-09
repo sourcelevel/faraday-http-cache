@@ -1,4 +1,5 @@
 require 'uri'
+require 'socket'
 
 require 'faraday-http-cache'
 require 'active_support/core_ext/date/calculations'
@@ -8,7 +9,6 @@ require 'em-http-request'
 
 require 'server'
 
-require 'socket'
 host = 'localhost'
 port = begin
   server = TCPServer.new(host, 0)
@@ -22,13 +22,12 @@ ENV['FARADAY_SERVER'] = "http://#{host}:#{port}"
 ENV['FARADAY_ADAPTER'] ||= 'net_http'
 
 pid = fork do
-  logfile   = 'log/test.log'
   require 'webrick'
-  log_io = File.open logfile, 'w'
-  log_io.sync = true
+  log = File.open('log/test.log', 'w')
+  log.sync = true
   webrick_opts = {
-   :Port => port, :Logger => WEBrick::Log::new(log_io),
-   :AccessLog => [[log_io, "[%{X-Faraday-Adapter}i] %m  %U  ->  %s %b"]]
+   :Port => port, :Logger => WEBrick::Log::new(log),
+   :AccessLog => [[log, "[%{X-Faraday-Adapter}i] %m  %U  ->  %s %b"]]
   }
   Rack::Handler::WEBrick.run(Server, webrick_opts)
 end
@@ -36,7 +35,7 @@ end
 require 'net/http'
 conn = Net::HTTP.new host, port
 conn.open_timeout = conn.read_timeout = 0.1
-# test if test server is accepting requests
+
 responsive = lambda { |path|
   begin
     res = conn.start { conn.get(path) }
