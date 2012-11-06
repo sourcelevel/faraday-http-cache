@@ -22,7 +22,7 @@ ENV['FARADAY_ADAPTER'] ||= 'net_http'
 
 pid = fork do
   require 'webrick'
-  log = File.open('log/test.log', 'w')
+  log = File.open('log/test.log', 'w+')
   log.sync = true
   webrick_opts = {
    :Port => port, :Logger => WEBrick::Log::new(log),
