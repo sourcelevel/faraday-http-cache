@@ -1,6 +1,6 @@
 require 'sinatra/base'
 
-class Server < Sinatra::Base
+class TestApp < Sinatra::Base
 
   set :environment, :test
   set :server, 'webrick'
@@ -69,10 +69,4 @@ class Server < Sinatra::Base
       [200, { 'ETag' => tag }, "#{settings.requests += 1}"]
     end
   end
-end
-
-trap("INT") { exit }
-
-if $0 == __FILE__
-  Server.run!
 end
