@@ -23,7 +23,7 @@ describe Faraday::HttpCache do
 
   it "logs that a POST request is unacceptable" do
     logger.should_receive(:debug).with('HTTP Cache: [POST /post] unacceptable')
-    client.post('/post').body
+    client.post('post').body
   end
 
   it "doesn't cache responses with invalid status code" do
@@ -33,44 +33,44 @@ describe Faraday::HttpCache do
 
   it "logs that a response with a bad status code is invalid" do
     logger.should_receive(:debug).with('HTTP Cache: [GET /broken] miss, invalid')
-    client.get('/broken')
+    client.get('broken')
   end
 
   it "doesn't cache requests with a private cache control" do
-    client.get('/private')
-    client.get('/private').body.should == "2"
+    client.get('private')
+    client.get('private').body.should == "2"
   end
 
   it "logs that a private response is invalid" do
     logger.should_receive(:debug).with('HTTP Cache: [GET /private] miss, invalid')
-    client.get('/private')
+    client.get('private')
   end
 
   it "doesn't cache requests with a explicit no-store directive" do
-    client.get('/dontstore')
-    client.get('/dontstore').body.should == "2"
+    client.get('dontstore')
+    client.get('dontstore').body.should == "2"
   end
 
   it "logs that a response with a no-store directive is invalid" do
     logger.should_receive(:debug).with('HTTP Cache: [GET /dontstore] miss, invalid')
-    client.get('/dontstore')
+    client.get('dontstore')
   end
 
   it "caches multiple responses when the headers differ" do
-    client.get('/get', nil, 'HTTP_ACCEPT' => 'text/html')
-    client.get('/get', nil, 'HTTP_ACCEPT' => 'text/html').body.should == "1"
+    client.get('get', nil, 'HTTP_ACCEPT' => 'text/html')
+    client.get('get', nil, 'HTTP_ACCEPT' => 'text/html').body.should == "1"
 
-    client.get('/get', nil, 'HTTP_ACCEPT' => 'application/json').body.should == "2"
+    client.get('get', nil, 'HTTP_ACCEPT' => 'application/json').body.should == "2"
   end
 
   it "caches requests with the 'Expires' header" do
-    client.get('/expires')
-    client.get('/expires').body.should == "1"
+    client.get('expires')
+    client.get('expires').body.should == "1"
   end
 
   it "logs that a request with the 'Expires' is fresh and stored" do
     logger.should_receive(:debug).with('HTTP Cache: [GET /expires] miss, store')
-    client.get('/expires')
+    client.get('expires')
   end
 
   it "caches GET responses" do
@@ -80,49 +80,48 @@ describe Faraday::HttpCache do
 
   it "logs that a GET response is stored" do
     logger.should_receive(:debug).with('HTTP Cache: [GET /get] miss, store')
-    client.get('/get')
+    client.get('get')
   end
 
   it "logs that a stored GET response is fresh" do
-    client.get('/get')
+    client.get('get')
     logger.should_receive(:debug).with('HTTP Cache: [GET /get] fresh')
-    client.get('/get')
+    client.get('get')
   end
 
   it "sends the 'Last-Modified' header on response validation" do
-    client.get('/timestamped')
-    client.get('/timestamped').body.should == "1"
+    client.get('timestamped')
+    client.get('timestamped').body.should == "1"
   end
 
   it "logs that the request with 'Last-Modified' was revalidated" do
-    client.get('/timestamped')
+    client.get('timestamped')
     logger.should_receive(:debug).with('HTTP Cache: [GET /timestamped] valid, store')
-    client.get('/timestamped').body.should == "1"
+    client.get('timestamped').body.should == "1"
   end
 
   it "sends the 'If-None-Match' header on response validation" do
-    client.get('/etag')
-    client.get('/etag').body.should == "1"
+    client.get('etag')
+    client.get('etag').body.should == "1"
   end
 
   it "logs that the request with 'ETag' was revalidated" do
-    client.get('/etag')
+    client.get('etag')
     logger.should_receive(:debug).with('HTTP Cache: [GET /etag] valid, store')
-    client.get('/etag').body.should == "1"
+    client.get('etag').body.should == "1"
   end
 
   it "maintains the 'Date' header for cached responses" do
-    date = client.get('/get').headers['Date']
-    client.get('/get').headers['Date'].should == date
+    date = client.get('get').headers['Date']
+    client.get('get').headers['Date'].should == date
   end
 
   it "preserves an old 'Date' header if present" do
-    date = client.get('/yesterday').headers['Date']
+    date = client.get('yesterday').headers['Date']
     date.should =~ /^\w{3}, \d{2} \w{3} \d{4} \d{2}:\d{2}:\d{2} GMT$/
   end
 
   describe 'Configuration options' do
-
     let(:app) { double("it's an app!") }
 
     it 'uses the options to create a Cache Store' do

@@ -22,6 +22,6 @@ RSpec.configure do |config|
   config.filter_run :focus
 
   config.after(:suite) do
-    `kill -9 #{server.pid}`
+    server.stop
   end
 end

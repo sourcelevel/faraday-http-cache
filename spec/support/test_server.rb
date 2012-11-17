@@ -1,7 +1,7 @@
 require 'net/http'
 
 class TestServer
-  attr_reader :pid, :endpoint
+  attr_reader :endpoint
 
   def initialize
     @host = 'localhost'
@@ -12,6 +12,10 @@ class TestServer
   def start
     @pid = run!
     wait
+  end
+
+  def stop
+    `kill -9 #{@pid}`
   end
 
   private
