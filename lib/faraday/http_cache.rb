@@ -63,6 +63,12 @@ module Faraday
       @storage = Storage.new(store, options)
     end
 
+    # Public: Process the request into a duplicate of this instance to
+    # ensure that the internal state is preserved.
+    def call(env)
+      dup.call!(env)
+    end
+
     # Internal: Process the stack request to try to serve a cache response.
     # On a cacheable request, the middleware will attempt to locate a
     # valid stored response to serve. On a cache miss, the middleware will
@@ -73,25 +79,25 @@ module Faraday
     # process is finished.
     #
     # Returns a 'Faraday::Response' instance.
-    def call(env)
+    def call!(env)
       @trace = []
       @request = create_request(env)
 
       response = nil
 
       if can_cache?(@request[:method])
-        response = call!(env)
+        response = process(env)
       else
         trace :unacceptable
         response = @app.call(env)
       end
 
-      log_request
-      response
+      response.on_complete do
+        log_request
+      end
     end
 
     private
-
     # Internal: Validates if the current request method is valid for caching.
     #
     # Returns true if the method is ':get' or ':head'.
@@ -110,19 +116,19 @@ module Faraday
     # env - the environment 'Hash' provided from the 'Faraday' stack.
     #
     # Returns the actual 'Faraday::Response' instance to be served.
-    def call!(env)
+    def process(env)
       entry = @storage.read(@request)
 
       return fetch(env) if entry.nil?
 
       if entry.fresh?
-        response = entry
+        response = entry.to_response
         trace :fresh
       else
         response = validate(entry, env)
       end
 
-      response.to_response
+      response
     end
 
     # Internal: Tries to validated a stored entry back to it's origin server
@@ -138,17 +144,18 @@ module Faraday
     # Returns the 'Faraday::HttpCache::Response' to be forwarded into the stack.
     def validate(entry, env)
       headers = env[:request_headers]
-      headers['If-Modified-Since'] = entry.last_modified
-      headers['If-None-Match'] = entry.etag
-      response = Response.new(@app.call(env).marshal_dump)
+      headers['If-Modified-Since'] = entry.last_modified if entry.last_modified
+      headers['If-None-Match'] = entry.etag if entry.etag
 
-      if response.not_modified?
-        trace :valid
-        response = entry
+      @app.call(env).on_complete do |env|
+        response = Response.new(env)
+        if response.not_modified?
+          trace :valid
+          env.merge!(entry.payload)
+          response = entry
+        end
+        store(response)
       end
-
-      store(response)
-      response
     end
 
     # Internal: Records a traced action to be used by the logger once the
@@ -183,10 +190,11 @@ module Faraday
     #
     # Returns the fresh 'Faraday::Response' instance.
     def fetch(env)
-      response = Response.new(@app.call(env).marshal_dump)
       trace :miss
-      store(response)
-      response.to_response
+      @app.call(env).on_complete do |env|
+        response = Response.new(env)
+        store(response)
+      end
     end
 
     # Internal: Creates a new 'Hash' containing the request information.
