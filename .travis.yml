@@ -1,0 +1,13 @@
+language: ruby
+script: "bundle exec rspec"
+rvm:
+  - 1.8.7
+  - 1.9.2
+  - 1.9.3
+  - ree
+env:
+  - FARADAY_ADAPTER=net_http
+  - FARADAY_ADAPTER=em_http
+notifications:
+  recipients:
+    - lucas.mazza@plataformatec.com.br
