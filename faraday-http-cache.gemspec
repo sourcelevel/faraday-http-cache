@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 Gem::Specification.new do |gem|
   gem.name          = "faraday-http-cache"
-  gem.version       = "0.0.1.dev"
+  gem.version       = "0.1.0"
   gem.description   = %q{Middleware to handle HTTP caching}
   gem.summary       = %q{A Faraday middleware that stores and validates cache expiration.}
   gem.authors       = ["Lucas Mazza"]
