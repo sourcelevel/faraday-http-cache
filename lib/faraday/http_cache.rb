@@ -214,9 +214,9 @@ module Faraday
     # Returns a 'Hash' containing the ':method', ':url' and 'request_headers'
     # entries.
     def create_request(env)
-      @request = env.slice(:method, :url)
-      @request[:request_headers] = env[:request_headers].dup
-      @request
+      request = env.slice(:method, :url)
+      request[:request_headers] = env[:request_headers].dup
+      request
     end
 
     # Internal: Logs the trace info about the incoming request
