@@ -2,6 +2,7 @@ require 'uri'
 require 'socket'
 
 require 'faraday-http-cache'
+require 'faraday_middleware'
 require 'active_support/core_ext/date/calculations'
 require 'active_support/core_ext/numeric/time'
 require 'yajl'

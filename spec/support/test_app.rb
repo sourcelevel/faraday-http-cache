@@ -20,6 +20,11 @@ class TestApp < Sinatra::Base
     status 204
   end
 
+  get '/json' do
+    json = MultiJson.encode(:count => settings.requests += 1)
+    [200, { 'Cache-Control' => 'max-age=400', 'Content-Type' => 'application/json' }, json]
+  end
+
   post '/post' do
     [200, { 'Cache-Control' => 'max-age=400' }, "#{settings.requests += 1}"]
   end

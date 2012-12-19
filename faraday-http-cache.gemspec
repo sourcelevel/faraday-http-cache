@@ -20,4 +20,5 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency 'em-http-request', '~> 1.0.2'
   gem.add_development_dependency 'sinatra'
   gem.add_development_dependency 'yajl-ruby'
+  gem.add_development_dependency 'faraday_middleware'
 end
