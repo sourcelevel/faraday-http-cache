@@ -192,9 +192,19 @@ module Faraday
     def fetch(env)
       trace :miss
       @app.call(env).on_complete do |env|
-        response = Response.new(env)
+        response = Response.new(create_response(env))
         store(response)
       end
+    end
+
+    # Internal: Creates a new 'Hash' containing the response information.
+    #
+    # env - the environment 'Hash' from the Faraday stack.
+    #
+    # Returns a 'Hash' containing the ':status', ':body' and 'response_headers'
+    # entries.
+    def create_response(env)
+      env.slice(:status, :body, :response_headers)
     end
 
     # Internal: Creates a new 'Hash' containing the request information.
