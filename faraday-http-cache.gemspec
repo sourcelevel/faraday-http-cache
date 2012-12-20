@@ -15,10 +15,4 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'activesupport', '~> 3.0'
   gem.add_dependency 'faraday', '~> 0.8'
   gem.add_dependency 'multi_json', '~> 1.3'
-  gem.add_development_dependency 'rake'
-  gem.add_development_dependency 'rspec', '~> 2.0'
-  gem.add_development_dependency 'em-http-request', '~> 1.0.2'
-  gem.add_development_dependency 'sinatra'
-  gem.add_development_dependency 'yajl-ruby'
-  gem.add_development_dependency 'faraday_middleware'
 end
