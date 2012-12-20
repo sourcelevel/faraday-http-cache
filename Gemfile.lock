@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    faraday-http-cache (0.1.0)
+    faraday-http-cache (0.1.1)
       activesupport (~> 3.0)
       faraday (~> 0.8)
       multi_json (~> 1.3)
