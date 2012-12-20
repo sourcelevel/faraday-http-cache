@@ -115,14 +115,14 @@ module Faraday
     #
     # env - the environment 'Hash' provided from the 'Faraday' stack.
     #
-    # Returns the actual 'Faraday::Response' instance to be served.
+    # Returns the 'Faraday::Response' instance to be served.
     def process(env)
       entry = @storage.read(@request)
 
       return fetch(env) if entry.nil?
 
       if entry.fresh?
-        response = entry.to_response
+        response = entry.to_response(env)
         trace :fresh
       else
         response = validate(entry, env)

@@ -109,11 +109,12 @@ module Faraday
           (expires && (expires - date))
       end
 
-      # Internal: Creates a new 'Faraday::Response'.
+      # Internal: Creates a new 'Faraday::Response', merging the stored
+      # response with the supplied 'env' object.
       #
       # Returns a new instance of a 'Faraday::Response' with the payload.
-      def to_response
-        Faraday::Response.new(@payload)
+      def to_response(env)
+        Faraday::Response.new(env.merge(@payload))
       end
 
       private

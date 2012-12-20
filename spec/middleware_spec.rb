@@ -135,7 +135,6 @@ describe Faraday::HttpCache do
     end
 
     it "consumes the 'logger' key" do
-      logger = double('a logger object')
       ActiveSupport::Cache.should_receive(:lookup_store).with(:memory_store, {})
       Faraday::HttpCache.new(app, :memory_store, :logger => logger)
     end

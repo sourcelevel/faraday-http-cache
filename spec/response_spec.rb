@@ -1,30 +1,30 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Faraday::HttpCache::Response do
-  describe 'cacheable?' do
-    it "the response isn't' cacheable if the response is marked as private" do
-      headers  = { 'Cache-Control' => 'private' }
+  describe "cacheable?" do
+    it "the response isn't cacheable if the response is marked as private" do
+      headers  = { "Cache-Control" => "private" }
       response = Faraday::HttpCache::Response.new(:response_headers => headers)
 
       response.should_not be_cacheable
     end
 
-    it "the response isn't' cacheable if it shouldn't be stored" do
-      headers  = { 'Cache-Control' => 'no-store' }
+    it "the response isn't cacheable if it shouldn't be stored" do
+      headers  = { "Cache-Control" => "no-store" }
       response = Faraday::HttpCache::Response.new(:response_headers => headers)
 
       response.should_not be_cacheable
     end
 
     it "the response isn't cacheable when the status code isn't acceptable" do
-      headers  = { 'Cache-Control' => 'max-age=400' }
+      headers  = { "Cache-Control" => "max-age=400" }
       response = Faraday::HttpCache::Response.new(:status => 503, :response_headers => headers)
       response.should_not be_cacheable
     end
 
     [200, 203, 300, 301, 302, 404, 410].each do |status|
       it "the response is cacheable if the status code is #{status} and the response is fresh" do
-        headers  = { 'Cache-Control' => 'max-age=400' }
+        headers  = { "Cache-Control" => "max-age=400" }
         response = Faraday::HttpCache::Response.new(:status => status, :response_headers => headers)
 
         response.should be_cacheable
@@ -32,10 +32,10 @@ describe Faraday::HttpCache::Response do
     end
   end
 
-  describe 'freshness' do
+  describe "freshness" do
     it "is fresh if the response still has some time to live" do
       date = 200.seconds.ago.httpdate
-      headers = { 'Cache-Control' => 'max-age=400', 'Date' => date }
+      headers = { "Cache-Control" => "max-age=400", 'Date' => date }
       response = Faraday::HttpCache::Response.new(:response_headers => headers)
 
       response.should be_fresh
@@ -43,7 +43,7 @@ describe Faraday::HttpCache::Response do
 
     it "isn't fresh when the ttl has expired" do
       date = 500.seconds.ago.httpdate
-      headers = { 'Cache-Control' => 'max-age=400', 'Date' => date }
+      headers = { "Cache-Control" => "max-age=400", 'Date' => date }
       response = Faraday::HttpCache::Response.new(:response_headers => headers)
 
       response.should_not be_fresh
@@ -63,33 +63,32 @@ describe Faraday::HttpCache::Response do
   end
 
   it "returns the 'Last-Modified' header on the #last_modified method" do
-    headers = { 'Last-Modified' => '123'}
+    headers = { "Last-Modified" => "123"}
     response = Faraday::HttpCache::Response.new(:response_headers => headers)
-    response.last_modified.should == '123'
+    response.last_modified.should == "123"
   end
 
   it "returns the 'ETag' header on the #etag method" do
-    headers = { 'ETag' => 'tag'}
+    headers = { "ETag" => "tag"}
     response = Faraday::HttpCache::Response.new(:response_headers => headers)
-    response.etag.should == 'tag'
+    response.etag.should == "tag"
   end
 
-  describe 'max age calculation' do
-
-    it 'uses the shared max age directive when present' do
-      headers = { 'Cache-Control' => 's-maxage=200, max-age=0'}
+  describe "max age calculation" do
+    it "uses the shared max age directive when present" do
+      headers = { "Cache-Control" => "s-maxage=200, max-age=0"}
       response = Faraday::HttpCache::Response.new(:response_headers => headers)
       response.max_age.should == 200
     end
 
-    it 'uses the max age directive when present' do
-      headers = { 'Cache-Control' => 'max-age=200'}
+    it "uses the max age directive when present" do
+      headers = { "Cache-Control" => "max-age=200"}
       response = Faraday::HttpCache::Response.new(:response_headers => headers)
       response.max_age.should == 200
     end
 
     it "fallsback to the expiration date leftovers" do
-      headers = { 'Expires' => (Time.now + 100).httpdate, 'Date' => Time.now.httpdate }
+      headers = { "Expires" => (Time.now + 100).httpdate, 'Date' => Time.now.httpdate }
       response = Faraday::HttpCache::Response.new(:response_headers => headers)
       response.max_age.should == 100
     end
@@ -100,9 +99,9 @@ describe Faraday::HttpCache::Response do
     end
   end
 
-  describe 'age calculation' do
+  describe "age calculation" do
     it "uses the 'Age' header if it's present" do
-      response = Faraday::HttpCache::Response.new(:response_headers => { 'Age' => '3' })
+      response = Faraday::HttpCache::Response.new(:response_headers => { "Age" => "3" })
       response.age.should == 3
     end
 
@@ -118,32 +117,38 @@ describe Faraday::HttpCache::Response do
     end
   end
 
-  describe 'time to live calculation' do
+  describe "time to live calculation" do
     it "returns the time to live based on the max age limit" do
       date = 200.seconds.ago.httpdate
-      headers = { 'Cache-Control' => 'max-age=400', 'Date' => date }
+      headers = { "Cache-Control" => "max-age=400", 'Date' => date }
       response = Faraday::HttpCache::Response.new(:response_headers => headers)
       response.ttl.should == 200
     end
   end
 
   describe "response unboxing" do
-    subject { described_class.new(:status => 200, :response_headers => {}, :body => 'Hi!') }
-    let(:response) { subject.to_response }
+    subject { described_class.new(:status => 200, :response_headers => {}, :body => "Hi!") }
+    let(:env) { { :resquest => mock } }
 
-    it 'returns a Faraday::Response' do
+    let(:response) { subject.to_response(env) }
+
+    it "merges the supplied env object with the response data" do
+      response.env[:resquest].should be
+    end
+
+    it "returns a Faraday::Response" do
       response.should be_a Faraday::Response
     end
 
-    it 'merges the status code' do
+    it "merges the status code" do
       response.status.should == 200
     end
 
-    it 'merges the headers' do
+    it "merges the headers" do
       response.headers.should be_a Faraday::Utils::Headers
     end
 
-    it 'merges the body' do
+    it "merges the body" do
       response.body.should == "Hi!"
     end
   end
