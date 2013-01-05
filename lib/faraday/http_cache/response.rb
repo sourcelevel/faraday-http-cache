@@ -114,7 +114,8 @@ module Faraday
       #
       # Returns a new instance of a 'Faraday::Response' with the payload.
       def to_response(env)
-        Faraday::Response.new(env.merge(@payload))
+        env.update(@payload)
+        Faraday::Response.new(env)
       end
 
       private
