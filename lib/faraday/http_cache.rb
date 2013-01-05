@@ -1,6 +1,7 @@
 require 'faraday'
 require 'multi_json'
 
+require 'active_support/core_ext/hash/keys'
 require 'active_support/core_ext/hash/slice'
 
 require 'faraday/http_cache/storage'
@@ -143,7 +144,7 @@ module Faraday
     #
     # Returns the 'Faraday::HttpCache::Response' to be forwarded into the stack.
     def validate(entry, env)
-      headers = env[:request_headers]
+      headers = env.request_headers
       headers['If-Modified-Since'] = entry.last_modified if entry.last_modified
       headers['If-None-Match'] = entry.etag if entry.etag
 
@@ -204,7 +205,7 @@ module Faraday
     # Returns a 'Hash' containing the ':status', ':body' and 'response_headers'
     # entries.
     def create_response(env)
-      env.to_hash.slice(:status, :body, :response_headers)
+      env.to_hash.symbolize_keys.slice(:status, :body, :response_headers)
     end
 
     # Internal: Creates a new 'Hash' containing the request information.
@@ -214,8 +215,8 @@ module Faraday
     # Returns a 'Hash' containing the ':method', ':url' and 'request_headers'
     # entries.
     def create_request(env)
-      request = env.to_hash.slice(:method, :url)
-      request[:request_headers] = env[:request_headers].dup
+      request = env.to_hash.symbolize_keys.slice(:method, :url)
+      request[:request_headers] = env.request_headers.dup
       request
     end
 
