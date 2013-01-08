@@ -144,7 +144,7 @@ module Faraday
     #
     # Returns the 'Faraday::HttpCache::Response' to be forwarded into the stack.
     def validate(entry, env)
-      headers = env.request_headers
+      headers = env[:request_headers]
       headers['If-Modified-Since'] = entry.last_modified if entry.last_modified
       headers['If-None-Match'] = entry.etag if entry.etag
 
@@ -215,8 +215,8 @@ module Faraday
     # Returns a 'Hash' containing the ':method', ':url' and 'request_headers'
     # entries.
     def create_request(env)
-      request = env.to_hash.symbolize_keys.slice(:method, :url)
-      request[:request_headers] = env.request_headers.dup
+      request = env.to_hash.symbolize_keys.slice(:method, :url, :request_headers)
+      request[:request_headers] = request[:request_headers].dup
       request
     end
 
