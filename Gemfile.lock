@@ -1,10 +1,3 @@
-GIT
-  remote: git://github.com/lostisland/faraday.git
-  revision: 2793e2ae91213a63dee779e41b7350acff9e4970
-  specs:
-    faraday (0.9.0.pre)
-      multipart-post (~> 1.1)
-
 PATH
   remote: .
   specs:
@@ -31,6 +24,8 @@ GEM
     em-socksify (0.2.1)
       eventmachine (>= 1.0.0.beta.4)
     eventmachine (1.0.0)
+    faraday (0.8.4)
+      multipart-post (~> 1.1)
     faraday_middleware (0.9.0)
       faraday (>= 0.7.4, < 0.9)
     http_parser.rb (0.5.3)
@@ -61,7 +56,6 @@ PLATFORMS
 
 DEPENDENCIES
   em-http-request (~> 1.0)
-  faraday!
   faraday-http-cache!
   faraday_middleware (~> 0.9)
   json (~> 1.7)

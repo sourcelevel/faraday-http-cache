@@ -11,3 +11,6 @@ env:
 notifications:
   recipients:
     - lucas.mazza@plataformatec.com.br
+gemfile:
+  - gemfiles/Gemfile.faraday-head
+  - Gemfile

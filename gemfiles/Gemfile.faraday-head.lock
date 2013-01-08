@@ -1,0 +1,16 @@
+GIT
+  remote: git://github.com/lostisland/faraday.git
+  revision: d5afe2b4c0898301f845dc1719667f7d05dcb778
+  specs:
+    faraday (0.9.0.pre)
+      multipart-post (~> 1.1)
+
+GEM
+  specs:
+    multipart-post (1.1.5)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  faraday!
