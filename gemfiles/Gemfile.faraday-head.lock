@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/lostisland/faraday.git
-  revision: d5afe2b4c0898301f845dc1719667f7d05dcb778
+  revision: b9e89c75629d82771898c9b6ac2d5dc2fba291ce
   specs:
     faraday (0.9.0.pre)
       multipart-post (~> 1.1)
