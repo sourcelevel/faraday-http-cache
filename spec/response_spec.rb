@@ -129,7 +129,7 @@ describe Faraday::HttpCache::Response do
   describe "response unboxing" do
     subject { described_class.new(:status => 200, :response_headers => {}, :body => "Hi!") }
 
-    let(:env)  { { :method => :get } }
+    let(:env) { { :method => :get } }
     let(:response) { subject.to_response(env) }
 
     it "merges the supplied env object with the response data" do
