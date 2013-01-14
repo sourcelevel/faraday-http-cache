@@ -151,7 +151,7 @@ module Faraday
         response = Response.new(env)
         if response.not_modified?
           trace :valid
-          env.merge!(entry.payload)
+          env.update(entry.payload)
           response = entry
         end
         store(response)
@@ -204,7 +204,7 @@ module Faraday
     # Returns a 'Hash' containing the ':status', ':body' and 'response_headers'
     # entries.
     def create_response(env)
-      env.slice(:status, :body, :response_headers)
+      env.to_hash.slice(:status, :body, :response_headers)
     end
 
     # Internal: Creates a new 'Hash' containing the request information.
@@ -214,8 +214,8 @@ module Faraday
     # Returns a 'Hash' containing the ':method', ':url' and 'request_headers'
     # entries.
     def create_request(env)
-      request = env.slice(:method, :url)
-      request[:request_headers] = env[:request_headers].dup
+      request = env.to_hash.slice(:method, :url, :request_headers)
+      request[:request_headers] = request[:request_headers].dup
       request
     end
 
@@ -235,4 +235,8 @@ module Faraday
   end
 end
 
-Faraday.register_middleware :http_cache => lambda { Faraday::HttpCache }
+if Faraday.respond_to?(:register_middleware)
+  Faraday.register_middleware :http_cache => Faraday::HttpCache
+else
+  Faraday::Request.register_middleware :http_cache => Faraday::HttpCache
+end

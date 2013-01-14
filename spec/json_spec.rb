@@ -13,11 +13,12 @@ describe Faraday::HttpCache do
     end
   end
 
-  before do
-    client.get('clear')
-  end
-
   it "works fine with other middlewares" do
+    if Faraday::VERSION =~ %r[0.9]
+      pending "Json middleware isn't compatible with faraday 0.9"
+    end
+
+    client.get('clear')
     client.get('json').body['count'].should == 1
     client.get('json').body['count'].should == 1
   end
