@@ -2,7 +2,7 @@
 
 [![Build Status](https://secure.travis-ci.org/plataformatec/faraday-http-cache.png)](https://travis-ci.org/plataformatec/faraday-http-cache)
 
-a [Faraday](https://github.com/technoweenie/faraday) middleware that respects HTTP cache,
+a [Faraday](https://github.com/lostisland/faraday) middleware that respects HTTP cache,
 by checking expiration and validation of the stored responses.
 
 ## Installation

@@ -1,8 +1,6 @@
 language: ruby
 script: "bundle exec rspec"
 rvm:
-  - 1.8.7
-  - 1.9.2
   - 1.9.3
   - ree
 env:
@@ -15,3 +13,6 @@ notifications:
     on_failure: always
     rooms:
       - secure: "T/4OBF4yj6MjbmDbDw3/NE5RnsBjACxktWUAinzu8kT00JBOkLerhYwAMZUi\nRIvjk2nm0226oXAHyU9phgqinnMu06Rry4D9u7lNT7lfNOzDajByOUCwQ3tY\nMi7pPF8H/sRhfwtW9/WjCLMh/DXHv5GawafhjjWZ8AF35A/3pmE="
+gemfile:
+  - gemfiles/Gemfile.faraday-head
+  - Gemfile
