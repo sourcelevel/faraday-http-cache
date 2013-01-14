@@ -7,8 +7,12 @@ env:
   - FARADAY_ADAPTER=net_http
   - FARADAY_ADAPTER=em_http
 notifications:
-  recipients:
-    - lucas.mazza@plataformatec.com.br
+  email: false
+  campfire:
+    on_success: change
+    on_failure: always
+    rooms:
+      - secure: "T/4OBF4yj6MjbmDbDw3/NE5RnsBjACxktWUAinzu8kT00JBOkLerhYwAMZUi\nRIvjk2nm0226oXAHyU9phgqinnMu06Rry4D9u7lNT7lfNOzDajByOUCwQ3tY\nMi7pPF8H/sRhfwtW9/WjCLMh/DXHv5GawafhjjWZ8AF35A/3pmE="
 gemfile:
   - gemfiles/Gemfile.faraday-head
   - Gemfile
