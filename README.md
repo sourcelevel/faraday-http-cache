@@ -73,4 +73,4 @@ Twitter API again.
 
 ## License
 
-Copyright (c) 2012 Plataformatec. See LICENSE file.
+Copyright (c) 2012-2013 Plataformatec. See LICENSE file.
