@@ -228,7 +228,7 @@ module Faraday
       return unless @logger
 
       method = @request[:method].to_s.upcase
-      path = @request[:url].path
+      path = @request[:url].request_uri
       line = "HTTP Cache: [#{method} #{path}] #{@trace.join(', ')}"
       @logger.debug(line)
     end

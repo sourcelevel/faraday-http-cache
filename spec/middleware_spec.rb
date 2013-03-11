@@ -83,6 +83,13 @@ describe Faraday::HttpCache do
     client.get('get')
   end
 
+  it "differs requests with different query strings in the log" do
+    logger.should_receive(:debug).with('HTTP Cache: [GET /get] miss, store')
+    logger.should_receive(:debug).with('HTTP Cache: [GET /get?q=what] miss, store')
+    client.get('get')
+    client.get('get', :q => "what")
+  end
+
   it "logs that a stored GET response is fresh" do
     client.get('get')
     logger.should_receive(:debug).with('HTTP Cache: [GET /get] fresh')
