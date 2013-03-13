@@ -7,9 +7,8 @@ module Faraday
     class CacheControl
 
       # Internal: Initialize a new CacheControl.
-      def initialize(string)
-        @directives = {}
-        parse(string)
+      def initialize(header)
+        @directives = parse(header.to_s)
       end
 
       # Internal: Checks if the 'public' directive is present.
@@ -79,7 +78,7 @@ module Faraday
 
       private
 
-      # Internal: Parses the Cache Control string into the directives Hash.
+      # Internal: Parses the Cache Control string to a Hash.
       # Existing whitespaces are removed, and the string is splited on commas.
       # For each segment, everything before a '=' will be treated as the key
       # and the excedding will be treated as the value. If only the key is
@@ -87,25 +86,23 @@ module Faraday
       #
       # Examples:
       #   parse("max-age=600")
-      #   @directives
-      #    # => { "max-age" => "600"}
+      #   # => { "max-age" => "600"}
       #
       #   parse("max-age")
-      #   @directives
-      #    # => { "max-age" => true }
+      #   # => { "max-age" => true }
       #
-      # Returns nothing.
-      def parse(string)
-        string = string.to_s
+      # Returns a Hash.
+      def parse(header)
+        directives = {}
 
-        return if string.empty?
-
-        string.delete(' ').split(',').each do |part|
+        header.delete(' ').split(',').each do |part|
           next if part.empty?
 
           name, value = part.split('=', 2)
-          @directives[name.downcase] = (value || true) unless name.empty?
+          directives[name.downcase] = (value || true) unless name.empty?
         end
+
+        directives
       end
     end
   end
