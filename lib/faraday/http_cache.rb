@@ -105,7 +105,7 @@ module Faraday
       method == :get || method == :head
     end
 
-    # Internal: Tries to located a valid response or forwards the call to the stack.
+    # Internal: Tries to locate a valid response or forwards the call to the stack.
     # * If no entry is present on the storage, the 'fetch' method will forward
     # the call to the remaining stack and return the new response.
     # * If a fresh response is found, the middleware will abort the remaining
