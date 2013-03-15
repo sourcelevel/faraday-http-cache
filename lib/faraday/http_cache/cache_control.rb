@@ -79,10 +79,10 @@ module Faraday
       private
 
       # Internal: Parses the Cache Control string to a Hash.
-      # Existing whitespaces are removed, and the string is splited on commas.
-      # For each segment, everything before a '=' will be treated as the key
-      # and the excedding will be treated as the value. If only the key is
-      # present the assigned value will defaults to true.
+      # Existing whitespace will be removed and the string is split on commas.
+      # For each part everything before a '=' will be treated as the key
+      # and the exceeding will be treated as the value. If only the key is
+      # present then the assigned value will default to true.
       #
       # Examples:
       #   parse("max-age=600")
