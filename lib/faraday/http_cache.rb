@@ -237,6 +237,6 @@ end
 
 if Faraday.respond_to?(:register_middleware)
   Faraday.register_middleware :http_cache => Faraday::HttpCache
-else
-  Faraday::Request.register_middleware :http_cache => Faraday::HttpCache
+elsif Faraday::Middleware.respond_to?(:register_middleware)
+  Faraday::Middleware.register_middleware :http_cache => Faraday::HttpCache
 end
