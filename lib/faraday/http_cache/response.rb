@@ -118,6 +118,14 @@ module Faraday
         Faraday::Response.new(env)
       end
 
+      # Internal: Exposes a representation of the current
+      # payload that we can serialize and cache properly.
+      #
+      # Returns a 'Hash'.
+      def serializeable_hash
+        @payload.slice(:status, :body, :response_headers)
+      end
+
       private
 
       # Internal: Checks if this response can be revalidated.

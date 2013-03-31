@@ -5,7 +5,7 @@ describe Faraday::HttpCache::Storage do
     { :method => :get, :request_headers => {}, :url => URI.parse("http://foo.bar/") }
   end
 
-  let(:response) { double(:payload => {}) }
+  let(:response) { double(:serializeable_hash => {}) }
 
   let(:cache) { ActiveSupport::Cache.lookup_store }
 
