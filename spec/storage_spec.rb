@@ -5,7 +5,7 @@ describe Faraday::HttpCache::Storage do
     { :method => :get, :request_headers => {}, :url => URI.parse("http://foo.bar/") }
   end
 
-  let(:response) { double(:serializeable_hash => {}) }
+  let(:response) { double(:serializable_hash => {}) }
 
   let(:cache) { ActiveSupport::Cache.lookup_store }
 
@@ -20,7 +20,7 @@ describe Faraday::HttpCache::Storage do
 
   describe 'storing responses' do
     it 'writes the response json to the underlying cache using a digest as the key' do
-      json = MultiJson.dump(response.payload)
+      json = MultiJson.dump(response.serializable_hash)
 
       cache.should_receive(:write).with('503ac9f7180ca1cdec49e8eb73a9cc0b47c27325', json)
       subject.write(request, response)

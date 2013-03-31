@@ -122,7 +122,7 @@ module Faraday
       # payload that we can serialize and cache properly.
       #
       # Returns a 'Hash'.
-      def serializeable_hash
+      def serializable_hash
         @payload.slice(:status, :body, :response_headers)
       end
 
