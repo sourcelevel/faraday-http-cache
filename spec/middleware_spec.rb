@@ -116,6 +116,11 @@ describe Faraday::HttpCache do
     client.get('etag')
     client.get('etag').headers['Cache-Control'].should == 'max-age=200'
   end
+  
+  it "updates the 'Date' header when a response is validated" do
+    date = client.get('etag').headers['Date']
+    client.get('etag').headers['Date'].should_not == date
+  end
 
   it "logs that the request with 'ETag' was revalidated" do
     client.get('etag')

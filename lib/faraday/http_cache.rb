@@ -152,6 +152,7 @@ module Faraday
         if response.not_modified?
           trace :valid
           entry.payload[:response_headers]['Cache-Control'] = response.payload[:response_headers]['Cache-Control']
+          entry.payload[:response_headers]['Date'] = response.payload[:response_headers]['Date']
           env.update(entry.payload)
           response = entry
         end
