@@ -69,9 +69,9 @@ class TestApp < Sinatra::Base
     tag = settings.counter > 2 ? '1' : '2'
 
     if env['HTTP_IF_NONE_MATCH'] == tag
-      [304, { 'ETag' => tag }, ""]
+      [304, { 'ETag' => tag, 'Cache-Control' => 'max-age=200' }, ""]
     else
-      [200, { 'ETag' => tag }, "#{settings.requests += 1}"]
+      [200, { 'ETag' => tag, 'Cache-Control' => 'max-age=0' }, "#{settings.requests += 1}"]
     end
   end
 end

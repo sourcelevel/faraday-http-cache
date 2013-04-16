@@ -111,6 +111,11 @@ describe Faraday::HttpCache do
     client.get('etag')
     client.get('etag').body.should == "1"
   end
+  
+  it "updates the 'Cache-Control' header when a response is validated" do
+    client.get('etag')
+    client.get('etag').headers['Cache-Control'].should == 'max-age=200'
+  end
 
   it "logs that the request with 'ETag' was revalidated" do
     client.get('etag')
