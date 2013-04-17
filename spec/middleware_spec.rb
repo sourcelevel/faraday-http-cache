@@ -121,6 +121,11 @@ describe Faraday::HttpCache do
     date = client.get('etag').headers['Date']
     client.get('etag').headers['Date'].should_not == date
   end
+  
+  it "updates the 'Expires' header when a response is validated" do
+    expires = client.get('etag').headers['Expires']
+    client.get('etag').headers['Expires'].should_not == expires
+  end
 
   it "logs that the request with 'ETag' was revalidated" do
     client.get('etag')
