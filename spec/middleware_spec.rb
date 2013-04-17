@@ -128,9 +128,24 @@ describe Faraday::HttpCache do
     date.should =~ /^\w{3}, \d{2} \w{3} \d{4} \d{2}:\d{2}:\d{2} GMT$/
   end
 
-  it "updates the headers when a response is validated" do
-    headers = client.get('etag').headers
-    client.get('etag').headers.should_not == headers
+  it "updates the 'Cache-Control' header when a response is validated" do
+    cache_control = client.get('etag')
+    client.get('etag').headers['Cache-Control'].should_not == cache_control
+  end
+
+  it "updates the 'Date' header when a response is validated" do
+    date = client.get('etag').headers['Date']
+    client.get('etag').headers['Date'].should_not == date
+  end
+
+  it "updates the 'Expires' header when a response is validated" do
+    expires = client.get('etag').headers['Expires']
+    client.get('etag').headers['Expires'].should_not == expires
+  end
+  
+  it "updates the 'Vary' header when a response is validated" do
+    vary = client.get('etag').headers['Vary']
+    client.get('etag').headers['Vary'].should_not == vary
   end
 
   describe 'Configuration options' do
