@@ -111,21 +111,6 @@ describe Faraday::HttpCache do
     client.get('etag')
     client.get('etag').body.should == "1"
   end
-  
-  it "updates the 'Cache-Control' header when a response is validated" do
-    client.get('etag')
-    client.get('etag').headers['Cache-Control'].should == 'max-age=200'
-  end
-  
-  it "updates the 'Date' header when a response is validated" do
-    date = client.get('etag').headers['Date']
-    client.get('etag').headers['Date'].should_not == date
-  end
-  
-  it "updates the 'Expires' header when a response is validated" do
-    expires = client.get('etag').headers['Expires']
-    client.get('etag').headers['Expires'].should_not == expires
-  end
 
   it "logs that the request with 'ETag' was revalidated" do
     client.get('etag')
@@ -141,6 +126,21 @@ describe Faraday::HttpCache do
   it "preserves an old 'Date' header if present" do
     date = client.get('yesterday').headers['Date']
     date.should =~ /^\w{3}, \d{2} \w{3} \d{4} \d{2}:\d{2}:\d{2} GMT$/
+  end
+
+  it "updates the 'Cache-Control' header when a response is validated" do
+    cache_control = client.get('etag')
+    client.get('etag').headers['Cache-Control'].should_not == cache_control
+  end
+
+  it "updates the 'Date' header when a response is validated" do
+    date = client.get('etag').headers['Date']
+    client.get('etag').headers['Date'].should_not == date
+  end
+
+  it "updates the 'Expires' header when a response is validated" do
+    expires = client.get('etag').headers['Expires']
+    client.get('etag').headers['Expires'].should_not == expires
   end
 
   describe 'Configuration options' do
