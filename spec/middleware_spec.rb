@@ -142,6 +142,11 @@ describe Faraday::HttpCache do
     expires = client.get('etag').headers['Expires']
     client.get('etag').headers['Expires'].should_not == expires
   end
+  
+  it "updates the 'Vary' header when a response is validated" do
+    vary = client.get('etag').headers['Vary']
+    client.get('etag').headers['Vary'].should_not == vary
+  end
 
   describe 'Configuration options' do
     let(:app) { double("it's an app!") }
