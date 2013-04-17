@@ -151,12 +151,10 @@ module Faraday
         response = Response.new(env)
         if response.not_modified?
           trace :valid
-          entry.payload[:response_headers]['Cache-Control'] = response.payload[:response_headers]['Cache-Control']
-          entry.payload[:response_headers]['Date'] = response.payload[:response_headers]['Date']
-          entry.payload[:response_headers]['Expires'] = response.payload[:response_headers]['Expires']
-          entry.payload[:response_headers]['Vary'] = response.payload[:response_headers]['Vary']
-          env.update(entry.payload)
-          response = entry
+          updated_payload = entry.payload
+          updated_payload[:response_headers].update(response.payload[:response_headers])
+          env.update(updated_payload)
+          response = Response.new(updated_payload)
         end
         store(response)
       end
