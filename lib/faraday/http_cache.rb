@@ -151,8 +151,10 @@ module Faraday
         response = Response.new(env)
         if response.not_modified?
           trace :valid
-          env.update(entry.payload)
-          response = entry
+          updated_payload = entry.payload
+          updated_payload[:response_headers].update(response.payload[:response_headers])
+          env.update(updated_payload)
+          response = Response.new(updated_payload)
         end
         store(response)
       end
