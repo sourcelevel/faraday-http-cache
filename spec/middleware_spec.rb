@@ -129,7 +129,7 @@ describe Faraday::HttpCache do
   end
 
   it "updates the 'Cache-Control' header when a response is validated" do
-    cache_control = client.get('etag')
+    cache_control = client.get('etag').headers['Cache-Control']
     client.get('etag').headers['Cache-Control'].should_not == cache_control
   end
 
