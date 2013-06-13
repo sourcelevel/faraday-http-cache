@@ -38,6 +38,17 @@ module Faraday
         @directives['max-age'].to_i if @directives.key?('max-age')
       end
 
+      # Internal: Gets the 'max-age' directive as an Integer.
+      #
+      # takes the age header integer value and reduces the max-age and s-maxage
+      # if present to account for having to remove static age header when caching responses
+      def normalize_max_ages(age)
+        if age > 0
+          @directives['max-age'] = @directives['max-age'].to_i-age if @directives.key?('max-age')
+          @directives['s-maxage'] = @directives['s-maxage'].to_i-age if @directives.key?('s-maxage')
+        end
+      end
+
       # Internal: Gets the 's-maxage' directive as an Integer.
       #
       # Returns nil if the 's-maxage' directive isn't present.

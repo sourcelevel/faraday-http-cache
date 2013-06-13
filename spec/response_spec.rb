@@ -152,4 +152,23 @@ describe Faraday::HttpCache::Response do
       response.body.should == "Hi!"
     end
   end
+
+  describe 'remove age before caching and normalize max-age if non-zero age present' do
+    it 'is fresh if the response still has some time to live' do
+      headers = {
+          'Age' => 6,
+          'Cache-Control' => 'public, max-age=40',
+          'Date' => 38.seconds.ago.httpdate,
+          'Expires' => 37.seconds.from_now.httpdate,
+          'Last-Modified' => 300.seconds.ago.httpdate
+      }
+      response = Faraday::HttpCache::Response.new(:response_headers => headers)
+      response.should be_fresh
+
+      response.prepare_to_cache
+      response.max_age.should == 34
+      response.should_not be_fresh
+    end
+  end
+
 end

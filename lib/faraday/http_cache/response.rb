@@ -80,6 +80,18 @@ module Faraday
         (headers['Age'] || (@now - date)).to_i
       end
 
+      # Internal: prepares the response headers ready to be cached
+      #
+      # removes the age header if present to allow cached responses to continue aging while cached
+      # also normalizes the max age headers if age header provided to ensure accuracy once age header removed
+      def prepare_to_cache
+        if headers.key? 'Age'
+          cache_control.normalize_max_ages(headers['Age'].to_i)
+          headers.delete 'Age'
+          headers['Cache-Control'] = cache_control.to_s
+        end
+      end
+
       # Internal: Calculates the 'Time to live' left on the Response.
       #
       # Returns the remaining seconds for the response, or nil the 'max_age'
@@ -123,6 +135,7 @@ module Faraday
       #
       # Returns a 'Hash'.
       def serializable_hash
+        prepare_to_cache
         @payload.slice(:status, :body, :response_headers)
       end
 
