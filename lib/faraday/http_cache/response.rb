@@ -118,7 +118,7 @@ module Faraday
       def max_age
         cache_control.shared_max_age ||
           cache_control.max_age ||
-          (expires && (expires - date))
+          (expires && (expires - @now))
       end
 
       # Internal: Creates a new 'Faraday::Response', merging the stored

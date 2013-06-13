@@ -56,6 +56,20 @@ describe Faraday::HttpCache::Storage do
       cached_response.max_age.should == 34
       cached_response.should_not be_fresh
     end
+
+    it 'is fresh until cached and that 1 second elapses then the response is no longer fresh' do
+      headers = {
+          'Date' => 39.seconds.ago.httpdate,
+          'Expires' => 40.seconds.from_now.httpdate,
+      }
+      response = Faraday::HttpCache::Response.new(:response_headers => headers)
+      response.should be_fresh
+      subject.write(request, response)
+
+      sleep(1)
+      cached_response = subject.read(request)
+      cached_response.should_not be_fresh
+    end
   end
 
 end

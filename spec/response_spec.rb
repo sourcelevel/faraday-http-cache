@@ -90,7 +90,8 @@ describe Faraday::HttpCache::Response do
     it "fallsback to the expiration date leftovers" do
       headers = { "Expires" => (Time.now + 100).httpdate, 'Date' => Time.now.httpdate }
       response = Faraday::HttpCache::Response.new(:response_headers => headers)
-      response.max_age.should == 100
+      response.max_age.should < 100
+      response.max_age.should > 98
     end
 
     it "returns nil when there's no information to calculate the max age" do
