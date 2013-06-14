@@ -166,7 +166,7 @@ describe Faraday::HttpCache::Response do
       response = Faraday::HttpCache::Response.new(:response_headers => headers)
       response.should be_fresh
 
-      response.prepare_to_cache
+      response.serializable_hash
       response.max_age.should == 34
       response.should_not be_fresh
     end

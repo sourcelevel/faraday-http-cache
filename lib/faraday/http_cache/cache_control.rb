@@ -44,8 +44,8 @@ module Faraday
       # if present to account for having to remove static age header when caching responses
       def normalize_max_ages(age)
         if age > 0
-          @directives['max-age'] = @directives['max-age'].to_i-age if @directives.key?('max-age')
-          @directives['s-maxage'] = @directives['s-maxage'].to_i-age if @directives.key?('s-maxage')
+          @directives['max-age'] = @directives['max-age'].to_i - age if @directives.key?('max-age')
+          @directives['s-maxage'] = @directives['s-maxage'].to_i - age if @directives.key?('s-maxage')
         end
       end
 
