@@ -106,7 +106,7 @@ module Faraday
       def max_age
         cache_control.shared_max_age ||
           cache_control.max_age ||
-          (expires && (expires - date))
+          (expires && (expires - @now))
       end
 
       # Internal: Creates a new 'Faraday::Response', merging the stored
@@ -123,6 +123,7 @@ module Faraday
       #
       # Returns a 'Hash'.
       def serializable_hash
+        prepare_to_cache
         @payload.slice(:status, :body, :response_headers)
       end
 
@@ -175,6 +176,19 @@ module Faraday
       def headers
         @payload[:response_headers]
       end
+
+      # Internal: prepares the response headers ready to be cached
+      #
+      # removes the age header if present to allow cached responses to continue aging while cached
+      # also normalizes the max age headers if age header provided to ensure accuracy once age header removed
+      def prepare_to_cache
+        if headers.key? 'Age'
+          cache_control.normalize_max_ages(headers['Age'].to_i)
+          headers.delete 'Age'
+          headers['Cache-Control'] = cache_control.to_s
+        end
+      end
+
     end
   end
 end
