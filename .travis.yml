@@ -1,7 +1,6 @@
 language: ruby
 script: "bundle exec rspec"
 rvm:
-  - ree
   - 1.9.3
   - 2.0.0
 env:
