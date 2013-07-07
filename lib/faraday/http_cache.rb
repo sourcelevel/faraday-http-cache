@@ -147,8 +147,8 @@ module Faraday
       headers['If-Modified-Since'] = entry.last_modified if entry.last_modified
       headers['If-None-Match'] = entry.etag if entry.etag
 
-      @app.call(env).on_complete do |env|
-        response = Response.new(env)
+      @app.call(env).on_complete do |fresh_env|
+        response = Response.new(fresh_env)
         if response.not_modified?
           trace :valid
           updated_payload = entry.payload
@@ -193,8 +193,8 @@ module Faraday
     # Returns the fresh 'Faraday::Response' instance.
     def fetch(env)
       trace :miss
-      @app.call(env).on_complete do |env|
-        response = Response.new(create_response(env))
+      @app.call(env).on_complete do |fresh_env|
+        response = Response.new(create_response(fresh_env))
         store(response)
       end
     end
