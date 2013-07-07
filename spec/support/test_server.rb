@@ -26,9 +26,9 @@ class TestServer
       log = File.open('log/test.log', 'w+')
       log.sync = true
       webrick_opts = {
-       :Port => @port,
-       :Logger => WEBrick::Log::new(log),
-       :AccessLog => [[log, "[%{X-Faraday-Adapter}i] %m  %U  ->  %s %b"]]
+       Port: @port,
+       Logger:  WEBrick::Log::new(log),
+       AccessLog: [[log, '[%{X-Faraday-Adapter}i] %m  %U  ->  %s %b']]
       }
       Rack::Handler::WEBrick.run(TestApp, webrick_opts)
     end
@@ -51,7 +51,7 @@ class TestServer
     begin
       server_pings += 1
       sleep 0.05
-      abort "test server didn't manage to start" if server_pings >= 50
+      abort 'test server did not managed to start' if server_pings >= 50
     end until responsive.call('/ping')
   end
 
