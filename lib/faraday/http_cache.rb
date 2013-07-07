@@ -50,6 +50,7 @@ module Faraday
     #   Faraday::HttpCache.new(app, :file_store, 'tmp')
     def initialize(app, *arguments)
       super(app)
+      @logger = nil
 
       if arguments.last.is_a? Hash
         options = arguments.pop
