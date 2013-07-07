@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Faraday::HttpCache::Storage do
   let(:request) do
-    { method: :get, request_headers: {}, url: URI.parse("http://foo.bar/") }
+    { method: :get, request_headers: {}, url: URI.parse('http://foo.bar/') }
   end
 
   let(:response) { double(serializable_hash: {}) }
@@ -28,7 +28,7 @@ describe Faraday::HttpCache::Storage do
   end
 
   describe 'reading responses' do
-    it "returns nil if the response isn't cached" do
+    it 'returns nil if the response is not cached' do
       expect(subject.read(request)).to be_nil
     end
 

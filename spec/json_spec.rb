@@ -11,7 +11,7 @@ describe Faraday::HttpCache do
     end
   end
 
-  it "works fine with other middlewares" do
+  it 'works fine with other middlewares' do
     client.get('clear')
     expect(client.get('json').body['count']).to eq(1)
     expect(client.get('json').body['count']).to eq(1)
