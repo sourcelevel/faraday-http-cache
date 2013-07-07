@@ -63,26 +63,26 @@ describe Faraday::HttpCache::Response do
   end
 
   it 'returns the "Last-Modified" header on the #last_modified method' do
-    headers = { 'Last-Modified' => '123'}
+    headers = { 'Last-Modified' => '123' }
     response = Faraday::HttpCache::Response.new(response_headers: headers)
     expect(response.last_modified).to eq('123')
   end
 
   it 'returns the "ETag" header on the #etag method' do
-    headers = { 'ETag' => 'tag'}
+    headers = { 'ETag' => 'tag' }
     response = Faraday::HttpCache::Response.new(response_headers: headers)
     expect(response.etag).to eq('tag')
   end
 
   describe 'max age calculation' do
     it 'uses the shared max age directive when present' do
-      headers = { 'Cache-Control' => 's-maxage=200, max-age=0'}
+      headers = { 'Cache-Control' => 's-maxage=200, max-age=0' }
       response = Faraday::HttpCache::Response.new(response_headers: headers)
       expect(response.max_age).to be(200)
     end
 
     it 'uses the max age directive when present' do
-      headers = { 'Cache-Control' => 'max-age=200'}
+      headers = { 'Cache-Control' => 'max-age=200' }
       response = Faraday::HttpCache::Response.new(response_headers: headers)
       expect(response.max_age).to be(200)
     end
