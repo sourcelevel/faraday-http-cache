@@ -15,7 +15,7 @@ describe Faraday::HttpCache do
 
   it "works fine with other middlewares" do
     client.get('clear')
-    client.get('json').body['count'].should == 1
-    client.get('json').body['count'].should == 1
+    expect(client.get('json').body['count']).to eq(1)
+    expect(client.get('json').body['count']).to eq(1)
   end
 end
