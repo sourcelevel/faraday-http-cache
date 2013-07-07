@@ -188,7 +188,6 @@ module Faraday
           headers['Cache-Control'] = cache_control.to_s
         end
       end
-
     end
   end
 end
