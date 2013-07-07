@@ -148,13 +148,13 @@ module Faraday
       headers['If-Modified-Since'] = entry.last_modified if entry.last_modified
       headers['If-None-Match'] = entry.etag if entry.etag
 
-      @app.call(env).on_complete do |fresh_env|
-        response = Response.new(fresh_env)
+      @app.call(env).on_complete do |requested_env|
+        response = Response.new(requested_env)
         if response.not_modified?
           trace :valid
           updated_payload = entry.payload
           updated_payload[:response_headers].update(response.payload[:response_headers])
-          env.update(updated_payload)
+          requested_env.update(updated_payload)
           response = Response.new(updated_payload)
         end
         store(response)
