@@ -1,12 +1,10 @@
 require 'spec_helper'
 
 describe Faraday::HttpCache do
-  let(:logger) { double('a Logger object', :debug => nil) }
-
   let(:client) do
-    Faraday.new(:url => ENV['FARADAY_SERVER']) do |stack|
-      stack.response :json, :content_type => /\bjson$/
-      stack.use :http_cache, :logger => logger
+    Faraday.new(url: ENV['FARADAY_SERVER']) do |stack|
+      stack.response :json, content_type: /\bjson$/
+      stack.use :http_cache
       adapter = ENV['FARADAY_ADAPTER']
       stack.headers['X-Faraday-Adapter'] = adapter
       stack.adapter adapter.to_sym

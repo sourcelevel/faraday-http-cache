@@ -1,11 +1,11 @@
 require 'spec_helper'
 
 describe Faraday::HttpCache do
-  let(:logger) { double('a Logger object', :debug => nil) }
+  let(:logger) { double('a Logger object', debug: nil) }
 
   let(:client) do
-    Faraday.new(:url => ENV['FARADAY_SERVER']) do |stack|
-      stack.use Faraday::HttpCache, :logger => logger
+    Faraday.new(url: ENV['FARADAY_SERVER']) do |stack|
+      stack.use Faraday::HttpCache, logger: logger
       adapter = ENV['FARADAY_ADAPTER']
       stack.headers['X-Faraday-Adapter'] = adapter
       stack.adapter adapter.to_sym
@@ -86,7 +86,7 @@ describe Faraday::HttpCache do
     expect(logger).to receive(:debug).with('HTTP Cache: [GET /get] miss, store')
     expect(logger).to receive(:debug).with('HTTP Cache: [GET /get?q=what] miss, store')
     client.get('get')
-    client.get('get', :q => "what")
+    client.get('get', q: "what")
   end
 
   it "logs that a stored GET response is fresh" do
@@ -161,13 +161,13 @@ describe Faraday::HttpCache do
     end
 
     it 'accepts a Hash option' do
-      expect(ActiveSupport::Cache).to receive(:lookup_store).with(:memory_store, { :size => 1024 })
-      Faraday::HttpCache.new(app, :memory_store, :size => 1024)
+      expect(ActiveSupport::Cache).to receive(:lookup_store).with(:memory_store, { size: 1024 })
+      Faraday::HttpCache.new(app, :memory_store, size: 1024)
     end
 
     it "consumes the 'logger' key" do
       expect(ActiveSupport::Cache).to receive(:lookup_store).with(:memory_store, {})
-      Faraday::HttpCache.new(app, :memory_store, :logger => logger)
+      Faraday::HttpCache.new(app, :memory_store, logger: logger)
     end
   end
 end

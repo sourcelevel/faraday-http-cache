@@ -11,7 +11,7 @@ class TestApp < Sinatra::Base
   set :yesterday, 1.day.ago.httpdate
 
   get '/ping' do
-    "PONG"
+    'PONG'
   end
 
   get '/clear' do
@@ -21,7 +21,7 @@ class TestApp < Sinatra::Base
   end
 
   get '/json' do
-    json = MultiJson.encode(:count => settings.requests += 1)
+    json = MultiJson.encode(count: settings.requests += 1)
     [200, { 'Cache-Control' => 'max-age=400', 'Content-Type' => 'application/json' }, json]
   end
 
@@ -58,7 +58,7 @@ class TestApp < Sinatra::Base
     header = settings.counter > 2 ? '1' : '2'
 
     if env['HTTP_IF_MODIFIED_SINCE'] == header
-      [304, {}, ""]
+      [304, {}, '']
     else
       [200, { 'Last-Modified' => header }, "#{settings.requests += 1}"]
     end

@@ -2,10 +2,10 @@ require 'spec_helper'
 
 describe Faraday::HttpCache::Storage do
   let(:request) do
-    { :method => :get, :request_headers => {}, :url => URI.parse("http://foo.bar/") }
+    { method: :get, request_headers: {}, url: URI.parse("http://foo.bar/") }
   end
 
-  let(:response) { double(:serializable_hash => {}) }
+  let(:response) { double(serializable_hash: {}) }
 
   let(:cache) { ActiveSupport::Cache.lookup_store }
 
@@ -48,7 +48,7 @@ describe Faraday::HttpCache::Storage do
           'Expires' => 37.seconds.from_now.httpdate,
           'Last-Modified' => 300.seconds.ago.httpdate
       }
-      response = Faraday::HttpCache::Response.new(:response_headers => headers)
+      response = Faraday::HttpCache::Response.new(response_headers: headers)
       expect(response).to be_fresh
       subject.write(request, response)
 
@@ -62,7 +62,7 @@ describe Faraday::HttpCache::Storage do
           'Date' => 39.seconds.ago.httpdate,
           'Expires' => 40.seconds.from_now.httpdate,
       }
-      response = Faraday::HttpCache::Response.new(:response_headers => headers)
+      response = Faraday::HttpCache::Response.new(response_headers: headers)
       expect(response).to be_fresh
       subject.write(request, response)
 
