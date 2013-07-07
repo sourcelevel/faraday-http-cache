@@ -63,6 +63,11 @@ client.get('http://site/api/users')
 # logs "HTTP Cache: [GET users] miss, store"
 ```
 
+## See it live
+
+You can clone this repository, install it's dependencies with Bundler (run `bundle install`) and
+execute the files under the `examples` directory to see a sample of the middleware usage.
+
 ## License
 
 Copyright (c) 2012-2013 Plataformatec. See LICENSE file.
