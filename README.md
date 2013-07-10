@@ -53,7 +53,7 @@ with images, you can use [Marshal][marshal] instead.
 
 ```ruby
 client = Faraday.new do |builder|
-  builder.use :http_cache, :serializer => Marshal
+  builder.use :http_cache, serializer: Marshal
   builder.adapter Faraday.default_adapter
 end
 ```

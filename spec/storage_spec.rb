@@ -34,7 +34,7 @@ describe Faraday::HttpCache::Storage do
     end
 
     context 'with Marshal serializer' do
-      let(:storage) { Faraday::HttpCache::Storage.new cache, :serializer => Marshal }
+      let(:storage) { Faraday::HttpCache::Storage.new cache, serializer: Marshal }
       let(:serialized) { Marshal.dump(response.serializable_hash) }
       it_behaves_like 'serialization'
     end
