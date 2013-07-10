@@ -37,7 +37,10 @@ describe Faraday::HttpCache::Storage do
     context 'with Marshal serializer' do
       let(:storage) { Faraday::HttpCache::Storage.new cache, serializer: Marshal }
       let(:serialized) { Marshal.dump(response.serializable_hash) }
-      let(:cache_key)  { '8f3b2af2aaf49d18d0ca652c7c566953c6f5aed9' }
+      let(:cache_key)  do
+        array = request.stringify_keys.to_a.sort
+        Digest::SHA1.hexdigest(Marshal.dump(array))
+      end
       it_behaves_like 'serialization'
     end
 
