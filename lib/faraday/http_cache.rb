@@ -34,6 +34,11 @@ module Faraday
   #   client = Faraday.new do |builder|
   #     builder.use :http_cache, Rails.cache
   #   end
+  #
+  #   # Use Marshal for serialization
+  #   client = Faraday.new do |builder|
+  #     builder.use :http_cache, serializer: Marshal
+  #   end
   class HttpCache < Faraday::Middleware
 
     # Public: Initializes a new HttpCache middleware.
