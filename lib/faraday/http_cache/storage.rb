@@ -12,14 +12,22 @@ module Faraday
     #
     #   # Reuse some other instance of a ActiveSupport::CacheStore object.
     #   Faraday::HttpCache::Storage.new(Rails.cache)
+    #
+    #   # Creates a new Storage using Marshal for serialization.
+    #   Faraday::HttpCache::Storage.new(:memory_store, serializer: Marshal)
     class Storage
-      attr_reader :cache
+      attr_reader :cache, :serializer
 
       # Internal: Initialize a new Storage object with a cache backend.
       #
       # store - An ActiveSupport::CacheStore identifier (default: nil).
       # options - The Hash options for the CacheStore backend (default: {}).
+      #   :serializer - duck type with #load and #dump
       def initialize(store = nil, options = {})
+        @serializer = MultiJson
+        if options.is_a? Hash
+          @serializer = options.delete(:serializer) || MultiJson
+        end
         @cache = ActiveSupport::Cache.lookup_store(store, options)
       end
 
@@ -32,7 +40,7 @@ module Faraday
       # response - The Faraday::HttpCache::Response instance to be stored.
       def write(request, response)
         key = cache_key_for(request)
-        value = MultiJson.dump(response.serializable_hash)
+        value = serializer.dump(response.serializable_hash)
         cache.write(key, value)
       end
 
@@ -48,7 +56,7 @@ module Faraday
         value = cache.read(key)
 
         if value
-          payload = MultiJson.load(value).symbolize_keys
+          payload = serializer.load(value).symbolize_keys
           klass.new(payload)
         end
       end
@@ -63,7 +71,7 @@ module Faraday
       # Returns the encoded String.
       def cache_key_for(request)
         array = request.stringify_keys.to_a.sort
-        Digest::SHA1.hexdigest(MultiJson.dump(array))
+        Digest::SHA1.hexdigest(serializer.dump(array))
       end
     end
   end

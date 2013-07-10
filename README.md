@@ -48,6 +48,16 @@ end
 The default store provided by ActiveSupport is the `MemoryStore` one, so it's important to
 configure a proper one for your production environment.
 
+MultiJson is used for serialization by default. If you expect to be dealing
+with images, you can use [Marshal][marshal] instead.
+
+```ruby
+client = Faraday.new do |builder|
+  builder.use :http_cache, serializer: Marshal
+  builder.adapter Faraday.default_adapter
+end
+```
+
 ### Logging
 
 You can provide a `:logger` option that will be receive debug informations based on the middleware
@@ -71,3 +81,5 @@ execute the files under the `examples` directory to see a sample of the middlewa
 ## License
 
 Copyright (c) 2012-2013 Plataformatec. See LICENSE file.
+
+  [marshal]: http://www.ruby-doc.org/core-2.0/Marshal.html
