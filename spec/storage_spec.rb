@@ -9,7 +9,8 @@ describe Faraday::HttpCache::Storage do
 
   let(:cache) { ActiveSupport::Cache.lookup_store }
 
-  subject { Faraday::HttpCache::Storage.new(cache) }
+  let(:storage) { Faraday::HttpCache::Storage.new(cache) }
+  subject { storage }
 
   describe 'Cache configuration' do
     it 'lookups a ActiveSupport cache store' do
@@ -19,12 +20,25 @@ describe Faraday::HttpCache::Storage do
   end
 
   describe 'storing responses' do
-    it 'writes the response json to the underlying cache using a digest as the key' do
-      json = MultiJson.dump(response.serializable_hash)
 
-      expect(cache).to receive(:write).with('503ac9f7180ca1cdec49e8eb73a9cc0b47c27325', json)
-      subject.write(request, response)
+    shared_examples 'serialization' do
+      it 'writes the response json to the underlying cache using a digest as the key' do
+        expect(cache).to receive(:write).with('503ac9f7180ca1cdec49e8eb73a9cc0b47c27325', serialized)
+        subject.write(request, response)
+      end
     end
+
+    context 'with default serializer' do
+      let(:serialized) { MultiJson.dump(response.serializable_hash) }
+      it_behaves_like 'serialization'
+    end
+
+    context 'with Marshal serializer' do
+      let(:storage) { Faraday::HttpCache::Storage.new cache, :serializer => Marshal }
+      let(:serialized) { Marshal.dump(response.serializable_hash) }
+      it_behaves_like 'serialization'
+    end
+
   end
 
   describe 'reading responses' do
