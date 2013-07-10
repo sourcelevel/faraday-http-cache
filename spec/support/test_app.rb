@@ -25,6 +25,12 @@ class TestApp < Sinatra::Base
     [200, { 'Cache-Control' => 'max-age=400', 'Content-Type' => 'application/json' }, json]
   end
 
+  get '/image' do
+    image = File.expand_path('../empty.png', __FILE__)
+    data  = IO.binread(image)
+    [200, { 'Cache-Control' => 'max-age=400', 'Content-Type' => 'image/png' }, data]
+  end
+
   post '/post' do
     [200, { 'Cache-Control' => 'max-age=400' }, increment_counter]
   end

@@ -32,7 +32,7 @@ module Faraday
       # response - The Faraday::HttpCache::Response instance to be stored.
       def write(request, response)
         key = cache_key_for(request)
-        value = MultiJson.dump(response.serializable_hash)
+        value = Marshal.dump(response.serializable_hash)
         cache.write(key, value)
       end
 
@@ -48,7 +48,7 @@ module Faraday
         value = cache.read(key)
 
         if value
-          payload = MultiJson.load(value).symbolize_keys
+          payload = Marshal.load(value).symbolize_keys
           klass.new(payload)
         end
       end
