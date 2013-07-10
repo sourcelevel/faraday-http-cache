@@ -23,19 +23,21 @@ describe Faraday::HttpCache::Storage do
 
     shared_examples 'serialization' do
       it 'writes the response json to the underlying cache using a digest as the key' do
-        expect(cache).to receive(:write).with('503ac9f7180ca1cdec49e8eb73a9cc0b47c27325', serialized)
+        expect(cache).to receive(:write).with(cache_key, serialized)
         subject.write(request, response)
       end
     end
 
     context 'with default serializer' do
       let(:serialized) { MultiJson.dump(response.serializable_hash) }
+      let(:cache_key)  { '503ac9f7180ca1cdec49e8eb73a9cc0b47c27325' }
       it_behaves_like 'serialization'
     end
 
     context 'with Marshal serializer' do
       let(:storage) { Faraday::HttpCache::Storage.new cache, serializer: Marshal }
       let(:serialized) { Marshal.dump(response.serializable_hash) }
+      let(:cache_key)  { '8f3b2af2aaf49d18d0ca652c7c566953c6f5aed9' }
       it_behaves_like 'serialization'
     end
 

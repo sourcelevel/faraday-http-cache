@@ -71,7 +71,7 @@ module Faraday
       # Returns the encoded String.
       def cache_key_for(request)
         array = request.stringify_keys.to_a.sort
-        Digest::SHA1.hexdigest(MultiJson.dump(array))
+        Digest::SHA1.hexdigest(serializer.dump(array))
       end
     end
   end
