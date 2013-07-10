@@ -26,13 +26,18 @@ module Faraday
   #
   #   # Attach a Logger to the middleware.
   #   client = Faraday.new do |builder|
-  #     builder.use :http_cache, :logger => my_logger_instance
+  #     builder.use :http_cache, logger: my_logger_instance
   #     builder.adapter Faraday.default_adapter
   #   end
   #
   #   # Provide an existing CacheStore (for instance, from a Rails app)
   #   client = Faraday.new do |builder|
   #     builder.use :http_cache, Rails.cache
+  #   end
+  #
+  #   # Use Marshal for serialization
+  #   client = Faraday.new do |builder|
+  #     builder.use :http_cache, serializer: Marshal
   #   end
   class HttpCache < Faraday::Middleware
 
@@ -44,7 +49,7 @@ module Faraday
     # Examples:
     #
     #   # Initialize the middleware with a logger.
-    #   Faraday::HttpCache.new(app, :logger => my_logger)
+    #   Faraday::HttpCache.new(app, logger: my_logger)
     #
     #   # Initialize the middleware with a FileStore at the 'tmp' dir.
     #   Faraday::HttpCache.new(app, :file_store, 'tmp')
