@@ -20,9 +20,9 @@ module Faraday
 
       # Internal: Initialize a new Storage object with a cache backend.
       #
-      # store - An ActiveSupport::CacheStore identifier (default: nil).
+      # store   - An ActiveSupport::CacheStore identifier (default: nil).
       # options - The Hash options for the CacheStore backend (default: {}).
-      #   :serializer - duck type with #load and #dump
+      #           :serializer - duck type with #load and #dump
       def initialize(store = nil, options = {})
         @serializer = MultiJson
         if options.is_a? Hash
