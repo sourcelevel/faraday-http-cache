@@ -2,6 +2,7 @@ require 'faraday'
 require 'multi_json'
 
 require 'active_support/core_ext/hash/slice'
+require 'active_support/deprecation'
 
 require 'faraday/http_cache/storage'
 require 'faraday/http_cache/response'
@@ -51,22 +52,25 @@ module Faraday
     #   # Initialize the middleware with a logger.
     #   Faraday::HttpCache.new(app, logger: my_logger)
     #
+    #   # Initialize the middleware with a logger and Marshal as a serializer
+    #   Faraday:HttpCache.new(app, logger: my_logger, serializer: Marshal)
+    #
     #   # Initialize the middleware with a FileStore at the 'tmp' dir.
-    #   Faraday::HttpCache.new(app, :file_store, 'tmp')
-    def initialize(app, *arguments)
+    #   Faraday::HttpCache.new(app, store: :file_store, store_options: ['tmp'])
+    #
+    #   # Initialize the middleware with a MemoryStore and logger
+    #   Faraday::HttpCache.new(app, store: :memory_store, logger: my_logger, store_options: [size: 1024])
+    def initialize(app,  *args)
       super(app)
-      @logger = nil
 
-      if arguments.last.is_a? Hash
-        options = arguments.pop
-        @logger = options.delete(:logger)
+      if args.first.is_a? Hash
+        options = args.first
+        @logger = options[:logger]
       else
-        options = arguments
+        options = parse_old_api(args)
       end
 
-      store = arguments.shift
-
-      @storage = Storage.new(store, options)
+      @storage = Storage.new(options)
     end
 
     # Public: Process the request into a duplicate of this instance to
@@ -104,6 +108,61 @@ module Faraday
     end
 
     private
+    # Internal: Receive the deprecated arguments to initialize the old API
+    # and returns a Hash compatible with the new API
+    #
+    # Examples:
+    #
+    #   parse_old_api()
+    #   # => {}
+    #
+    #   parse_old_api([Rails.cache])
+    #   # => { store: Rails.cache }
+    #
+    #   parse_old_api([:mem_cache_store])
+    #   # => { store: :mem_cache_store }
+    #
+    #   parse_old_api([:mem_cache_store, logger: Rails.logger])
+    #   # => { store: :mem_cache_store, logger: Rails.logger }
+    #
+    #   parse_old_api(:mem_cache_store, 'localhost:11211')
+    #   # => { store: :mem_cache_store, store_options: ['localhost:11211] }
+    #
+    #   parse_old_api(:mem_cache_store, logger: Rails.logger, serializer: Marshal)
+    #   # => { store: :mem_cache_store, logger: Rails.logger, serializer: Marshal }
+    #
+    #   parse_old_api(serializer: Marshal)
+    #   # => { serializer: Marshal }
+    #
+    #   parse_old_api(:file_store, 'tmp')
+    #   # => { store: :file_store, store_options: ['tmp'] }
+    #
+    #   parse_old_api(:file_store, { serializer: Marshal }, 'tmp')
+    #   # => { store: :file_store, serializer: Marshal, store_options: ['tmp'] }
+    #
+    #   parse_old_api(:memory_store, size: 1024)
+    #   # => { store: :memory_store, store_options: [size: 1024] }
+    #
+    # Returns a hash like { store: xx, serializer: xx, logger: xx, store_options: xx}
+    def parse_old_api(args)
+      ActiveSupport::Deprecation.warn('This api is deprecated, refer to the documentation for the new one', caller)
+
+      @logger = nil
+
+      options = {}
+      options[:store] = args.shift
+
+      if args.first.is_a? Hash
+        hash_params = args.first
+        options[:serializer] = hash_params.delete(:serializer)
+
+        @logger = hash_params.delete(:logger)
+      end
+
+      options[:store_options] = args
+      options
+    end
+
     # Internal: Validates if the current request method is valid for caching.
     #
     # Returns true if the method is ':get' or ':head'.

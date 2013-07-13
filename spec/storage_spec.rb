@@ -9,13 +9,13 @@ describe Faraday::HttpCache::Storage do
 
   let(:cache) { ActiveSupport::Cache.lookup_store }
 
-  let(:storage) { Faraday::HttpCache::Storage.new(cache) }
+  let(:storage) { Faraday::HttpCache::Storage.new(store: cache) }
   subject { storage }
 
   describe 'Cache configuration' do
     it 'lookups a ActiveSupport cache store' do
-      expect(ActiveSupport::Cache).to receive(:lookup_store).with(:file_store, '/tmp')
-      Faraday::HttpCache::Storage.new(:file_store, '/tmp')
+      expect(ActiveSupport::Cache).to receive(:lookup_store).with(:file_store, ['/tmp'])
+      Faraday::HttpCache::Storage.new({ store: :file_store, store_options: ['/tmp'] })
     end
   end
 
@@ -35,7 +35,7 @@ describe Faraday::HttpCache::Storage do
     end
 
     context 'with Marshal serializer' do
-      let(:storage)    { Faraday::HttpCache::Storage.new cache, serializer: Marshal }
+      let(:storage)    { Faraday::HttpCache::Storage.new store: cache, serializer: Marshal }
       let(:serialized) { Marshal.dump(response.serializable_hash) }
       let(:cache_key) do
         array = request.stringify_keys.to_a.sort
