@@ -60,7 +60,7 @@ module Faraday
     #
     #   # Initialize the middleware with a MemoryStore and logger
     #   Faraday::HttpCache.new(app, store: :memory_store, logger: my_logger, store_options: [size: 1024])
-    def initialize(app,  *args)
+    def initialize(app, *args)
       super(app)
 
       if args.first.is_a? Hash
@@ -113,9 +113,6 @@ module Faraday
     #
     # Examples:
     #
-    #   parse_old_api()
-    #   # => {}
-    #
     #   parse_old_api([Rails.cache])
     #   # => { store: Rails.cache }
     #
@@ -134,16 +131,19 @@ module Faraday
     #   parse_old_api(serializer: Marshal)
     #   # => { serializer: Marshal }
     #
-    #   parse_old_api(:file_store, 'tmp')
-    #   # => { store: :file_store, store_options: ['tmp'] }
-    #
     #   parse_old_api(:file_store, { serializer: Marshal }, 'tmp')
     #   # => { store: :file_store, serializer: Marshal, store_options: ['tmp'] }
     #
     #   parse_old_api(:memory_store, size: 1024)
     #   # => { store: :memory_store, store_options: [size: 1024] }
     #
-    # Returns a hash like { store: xx, serializer: xx, logger: xx, store_options: xx}
+    # Returns a hash with the following keys:
+    #   - store
+    #   - serializer
+    #   - logger
+    #   - store_options
+    #
+    # In order to check what each key means, check `Storage#initialize` description.
     def parse_old_api(args)
       ActiveSupport::Deprecation.warn('This api is deprecated, refer to the documentation for the new one', caller)
 

@@ -155,7 +155,7 @@ describe Faraday::HttpCache do
   describe 'Configuration options' do
     let(:app) { double('it is an app!') }
 
-    context "with old api" do
+    context 'with old api' do
       it 'uses the options to create a Cache Store' do
         expect(ActiveSupport::Cache).to receive(:lookup_store).with(:file_store, ['tmp'])
         Faraday::HttpCache.new(app, :file_store, 'tmp')
@@ -172,7 +172,7 @@ describe Faraday::HttpCache do
       end
     end
 
-    context "with new api" do
+    context 'with new api' do
       it 'uses the options to create a Cache Store' do
         expect(ActiveSupport::Cache).to receive(:lookup_store).with(:file_store, ['tmp'])
         Faraday::HttpCache.new(app, store: :file_store, store_options: ['tmp'])
