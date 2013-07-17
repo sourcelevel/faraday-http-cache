@@ -67,7 +67,7 @@ module Faraday
         options = args.first
         @logger = options[:logger]
       else
-        options = parse_old_api(args)
+        options = parse_deprecated(*args)
       end
 
       @storage = Storage.new(options)
@@ -113,28 +113,28 @@ module Faraday
     #
     # Examples:
     #
-    #   parse_old_api([Rails.cache])
+    #   parse_deprecated(Rails.cache)
     #   # => { store: Rails.cache }
     #
-    #   parse_old_api([:mem_cache_store])
+    #   parse_deprecated(:mem_cache_store)
     #   # => { store: :mem_cache_store }
     #
-    #   parse_old_api([:mem_cache_store, logger: Rails.logger])
+    #   parse_deprecated(:mem_cache_store, logger: Rails.logger)
     #   # => { store: :mem_cache_store, logger: Rails.logger }
     #
-    #   parse_old_api(:mem_cache_store, 'localhost:11211')
+    #   parse_deprecated(:mem_cache_store, 'localhost:11211')
     #   # => { store: :mem_cache_store, store_options: ['localhost:11211] }
     #
-    #   parse_old_api(:mem_cache_store, logger: Rails.logger, serializer: Marshal)
+    #   parse_deprecated(:mem_cache_store, logger: Rails.logger, serializer: Marshal)
     #   # => { store: :mem_cache_store, logger: Rails.logger, serializer: Marshal }
     #
-    #   parse_old_api(serializer: Marshal)
+    #   parse_deprecated(serializer: Marshal)
     #   # => { serializer: Marshal }
     #
-    #   parse_old_api(:file_store, { serializer: Marshal }, 'tmp')
+    #   parse_deprecated(:file_store, { serializer: Marshal }, 'tmp')
     #   # => { store: :file_store, serializer: Marshal, store_options: ['tmp'] }
     #
-    #   parse_old_api(:memory_store, size: 1024)
+    #   parse_deprecated(:memory_store, size: 1024)
     #   # => { store: :memory_store, store_options: [size: 1024] }
     #
     # Returns a hash with the following keys:
@@ -144,7 +144,7 @@ module Faraday
     #   - store_options
     #
     # In order to check what each key means, check `Storage#initialize` description.
-    def parse_old_api(args)
+    def parse_deprecated(*args)
       ActiveSupport::Deprecation.warn('This api is deprecated, refer to the documentation for the new one', caller)
 
       @logger = nil

@@ -170,7 +170,7 @@ describe Faraday::HttpCache do
       Faraday::HttpCache.new(app, store: :memory_store, logger: logger)
     end
 
-    context 'with deprecated options' do
+    context 'with deprecated options format' do
       it 'uses the options to create a Cache Store' do
         expect(ActiveSupport::Cache).to receive(:lookup_store).with(:file_store, ['tmp'])
         Faraday::HttpCache.new(app, :file_store, 'tmp')
