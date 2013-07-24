@@ -33,7 +33,7 @@ module Faraday
   #
   #   # Provide an existing CacheStore (for instance, from a Rails app)
   #   client = Faraday.new do |builder|
-  #     builder.use :http_cache, Rails.cache
+  #     builder.use :http_cache, store: Rails.cache
   #   end
   #
   #   # Use Marshal for serialization
