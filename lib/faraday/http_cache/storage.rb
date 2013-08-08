@@ -1,6 +1,7 @@
 require 'digest/sha1'
 require 'active_support/cache'
 require 'active_support/core_ext/hash/keys'
+require 'active_support/core_ext/class/attribute_accessors'
 
 module Faraday
   class HttpCache < Faraday::Middleware
