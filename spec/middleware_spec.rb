@@ -157,17 +157,40 @@ describe Faraday::HttpCache do
 
     it 'uses the options to create a Cache Store' do
       expect(ActiveSupport::Cache).to receive(:lookup_store).with(:file_store, ['tmp'])
-      Faraday::HttpCache.new(app, :file_store, 'tmp')
+      Faraday::HttpCache.new(app, store: :file_store, store_options: ['tmp'])
     end
 
     it 'accepts a Hash option' do
-      expect(ActiveSupport::Cache).to receive(:lookup_store).with(:memory_store, { size: 1024 })
-      Faraday::HttpCache.new(app, :memory_store, size: 1024)
+      expect(ActiveSupport::Cache).to receive(:lookup_store).with(:memory_store, [{ size: 1024 }])
+      Faraday::HttpCache.new(app, store: :memory_store, store_options: [size: 1024])
     end
 
     it 'consumes the "logger" key' do
-      expect(ActiveSupport::Cache).to receive(:lookup_store).with(:memory_store, {})
-      Faraday::HttpCache.new(app, :memory_store, logger: logger)
+      expect(ActiveSupport::Cache).to receive(:lookup_store).with(:memory_store, nil)
+      Faraday::HttpCache.new(app, store: :memory_store, logger: logger)
+    end
+
+    context 'with deprecated options format' do
+      it 'uses the options to create a Cache Store' do
+        expect(ActiveSupport::Cache).to receive(:lookup_store).with(:file_store, ['tmp'])
+        Faraday::HttpCache.new(app, :file_store, 'tmp')
+      end
+
+      it 'accepts a Hash option' do
+        expect(ActiveSupport::Cache).to receive(:lookup_store).with(:memory_store, [{ size: 1024 }])
+        Faraday::HttpCache.new(app, :memory_store, size: 1024)
+      end
+
+      it 'consumes the "logger" key' do
+        expect(ActiveSupport::Cache).to receive(:lookup_store).with(:memory_store, [{}])
+        Faraday::HttpCache.new(app, :memory_store, logger: logger)
+      end
+
+      it 'warns the user about the deprecated options' do
+        expect(ActiveSupport::Deprecation).to receive(:warn)
+
+        Faraday::HttpCache.new(app, :memory_store, logger: logger)
+      end
     end
   end
 end
