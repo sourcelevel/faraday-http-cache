@@ -78,6 +78,22 @@ client.get('http://site/api/users')
 You can clone this repository, install it's dependencies with Bundler (run `bundle install`) and
 execute the files under the `examples` directory to see a sample of the middleware usage.
 
+## What get's cached?
+
+The middleware will use the following headers to make caching decisions:
+- Cache-Control
+- Age
+- Last-Modified
+- ETag
+- Expires
+
+### Cache-Control
+
+The max-age, must-revalidate, proxy-revalidate and s-maxage are checked.
+
+Note: private caches are ignored.
+
+
 ## License
 
 Copyright (c) 2012-2013 Plataformatec. See LICENSE file.
