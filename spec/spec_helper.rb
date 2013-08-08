@@ -27,3 +27,5 @@ RSpec.configure do |config|
     server.stop
   end
 end
+
+ActiveSupport::Deprecation.silenced = true

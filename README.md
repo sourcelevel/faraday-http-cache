@@ -34,13 +34,13 @@ endpoints, and any extra configuration option will be used to setup the cache st
 ```ruby
 # Connect the middleware to a Memcache instance.
 client = Faraday.new do |builder|
-  builder.use :http_cache, :mem_cache_store, 'localhost:11211'
+  builder.use :http_cache, store: :mem_cache_store, store_options: ['localhost:11211']
   builder.adapter Faraday.default_adapter
 end
 
 # Or use the Rails.cache instance inside your Rails app.
 client = Faraday.new do |builder|
-  builder.use :http_cache, Rails.cache
+  builder.use :http_cache, store: Rails.cache
   builder.adapter Faraday.default_adapter
 end
 ```
