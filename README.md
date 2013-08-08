@@ -89,10 +89,9 @@ The middleware will use the following headers to make caching decisions:
 
 ### Cache-Control
 
-The max-age, must-revalidate, proxy-revalidate and s-maxage are checked.
+The `max-age`, `must-revalidate`, `proxy-revalidate` and `s-maxage` directives are checked.
 
 Note: private caches are ignored.
-
 
 ## License
 
