@@ -57,7 +57,7 @@ module Faraday
         value = cache.read(key)
 
         if value
-          payload = @serializer.load(value).symbolize_keys
+          payload = @serializer.load(value).deep_symbolize_keys
           klass.new(payload)
         end
       end
