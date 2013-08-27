@@ -62,7 +62,7 @@ module Faraday
     #   Faraday::HttpCache.new(app, store: :memory_store, logger: my_logger, store_options: [size: 1024])
     def initialize(app, *args)
       super(app)
-
+      @logger = nil
       if args.first.is_a? Hash
         options = args.first
         @logger = options[:logger]
@@ -145,11 +145,11 @@ module Faraday
     #
     # In order to check what each key means, check `Storage#initialize` description.
     def parse_deprecated_options(*args)
-      ActiveSupport::Deprecation.warn('This api is deprecated, refer to the documentation for the new one', caller)
-
-      @logger = nil
-
       options = {}
+      if args.length > 0
+        ActiveSupport::Deprecation.warn('This api is deprecated, refer to the documentation for the new one', caller)
+      end
+
       options[:store] = args.shift
 
       if args.first.is_a? Hash
