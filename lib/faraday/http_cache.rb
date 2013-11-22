@@ -21,13 +21,13 @@ module Faraday
   #
   #   # Using the middleware with a simple client:
   #   client = Faraday.new do |builder|
-  #     builder.user :http_cache
+  #     builder.user :http_cache, store: :memory_store
   #     builder.adapter Faraday.default_adapter
   #   end
   #
   #   # Attach a Logger to the middleware.
   #   client = Faraday.new do |builder|
-  #     builder.use :http_cache, logger: my_logger_instance
+  #     builder.use :http_cache, logger: my_logger_instance, store: :memory_store
   #     builder.adapter Faraday.default_adapter
   #   end
   #
@@ -38,9 +38,11 @@ module Faraday
   #
   #   # Use Marshal for serialization
   #   client = Faraday.new do |builder|
-  #     builder.use :http_cache, serializer: Marshal
+  #     builder.use :http_cache, store: Rails.cache, serializer: Marshal
   #   end
   class HttpCache < Faraday::Middleware
+    # Internal: valid options for the 'initialize' configuration Hash.
+    VALID_OPTIONS = [:store, :serializer, :logger, :store_options]
 
     # Public: Initializes a new HttpCache middleware.
     #
@@ -70,6 +72,7 @@ module Faraday
         options = parse_deprecated_options(*args)
       end
 
+      assert_valid_options!(options)
       @storage = Storage.new(options)
     end
 
@@ -156,7 +159,7 @@ module Faraday
         hash_params = args.first
         options[:serializer] = hash_params.delete(:serializer)
 
-        @logger = hash_params.delete(:logger)
+        @logger = hash_params[:logger]
       end
 
       options[:store_options] = args
@@ -298,6 +301,21 @@ module Faraday
       path = @request[:url].request_uri
       line = "HTTP Cache: [#{method} #{path}] #{@trace.join(', ')}"
       @logger.debug(line)
+    end
+
+    # Internal: Checks if the given 'options' Hash contains only
+    # valid keys. Please see the 'VALID_OPTIONS' constant for the
+    # acceptable keys.
+    #
+    # Raises an 'ArgumentError'.
+    #
+    # Returns nothing.
+    def assert_valid_options!(options)
+      options.each_key do |key|
+        unless VALID_OPTIONS.include?(key)
+          raise ArgumentError.new("Unknown option: #{key}. Valid options are :#{VALID_OPTIONS.join(', ')}")
+        end
+      end
     end
   end
 end

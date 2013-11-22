@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Faraday::HttpCache do
-  let(:logger) { double('a Logger object', debug: nil) }
+  let(:logger) { double('a Logger object', debug: nil, warn: nil) }
 
   let(:client) do
     Faraday.new(url: ENV['FARADAY_SERVER']) do |stack|
@@ -152,6 +152,16 @@ describe Faraday::HttpCache do
     expect(first_vary).not_to eql(second_vary)
   end
 
+  it 'raises an error when misconfigured' do
+    expect {
+      client = Faraday.new(url: ENV['FARADAY_SERVER']) do |stack|
+        stack.use Faraday::HttpCache, i_have_no_idea: true
+      end
+
+      client.get('get')
+    }.to raise_error(ArgumentError)
+  end
+
   describe 'Configuration options' do
     let(:app) { double('it is an app!') }
 
@@ -179,11 +189,6 @@ describe Faraday::HttpCache do
       it 'accepts a Hash option' do
         expect(ActiveSupport::Cache).to receive(:lookup_store).with(:memory_store, [{ size: 1024 }])
         Faraday::HttpCache.new(app, :memory_store, size: 1024)
-      end
-
-      it 'consumes the "logger" key' do
-        expect(ActiveSupport::Cache).to receive(:lookup_store).with(:memory_store, [{}])
-        Faraday::HttpCache.new(app, :memory_store, logger: logger)
       end
 
       it 'warns the user about the deprecated options' do
