@@ -21,11 +21,12 @@ module Faraday
       # Internal: Initialize a new Storage object with a cache backend.
       #
       # options      - Storage options (default: {}).
+      #                :logger        - A Logger object to be used to emit warnings.
       #                :store         - An ActiveSupport::CacheStore identifier.
       #                :serializer    - A serializer class for the body.
       #                                 Should respond to #dump and #load.
       #                :store_options - An array containg the options for
-      #                                 the cache store
+      #                                 the cache store.
       def initialize(options = {})
         store = options[:store]
         @serializer = options[:serializer] || MultiJson
