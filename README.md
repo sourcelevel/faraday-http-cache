@@ -15,14 +15,15 @@ gem 'faraday-http-cache'
 
 ## Usage and configuration
 
-You have to use the middleware in the Faraday instance that you want to. You can use the new
+You have to use the middleware in the Faraday instance that you want to,
+along with a suitable `store` to cache the responses. You can use the new
 shortcut using a symbol or passing the middleware class
 
 ```ruby
 client = Faraday.new do |builder|
-  builder.use :http_cache
+  builder.use :http_cache, store: :memory_store
   # or
-  builder.use Faraday::HttpCache
+  builder.use Faraday::HttpCache, store: :memory_store
 
   builder.adapter Faraday.default_adapter
 end
@@ -53,7 +54,7 @@ with images, you can use [Marshal][marshal] instead.
 
 ```ruby
 client = Faraday.new do |builder|
-  builder.use :http_cache, serializer: Marshal
+  builder.use :http_cache, store: Rails.cache, serializer: Marshal
   builder.adapter Faraday.default_adapter
 end
 ```
@@ -65,7 +66,7 @@ operations:
 
 ```ruby
 client = Faraday.new do |builder|
-  builder.use :http_cache, logger: Rails.logger
+  builder.use :http_cache, store: Rails.cache, logger: Rails.logger
   builder.adapter Faraday.default_adapter
 end
 

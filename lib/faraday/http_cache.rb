@@ -21,13 +21,13 @@ module Faraday
   #
   #   # Using the middleware with a simple client:
   #   client = Faraday.new do |builder|
-  #     builder.user :http_cache
+  #     builder.user :http_cache, store: :memory_store
   #     builder.adapter Faraday.default_adapter
   #   end
   #
   #   # Attach a Logger to the middleware.
   #   client = Faraday.new do |builder|
-  #     builder.use :http_cache, logger: my_logger_instance
+  #     builder.use :http_cache, logger: my_logger_instance, store: :memory_store
   #     builder.adapter Faraday.default_adapter
   #   end
   #
@@ -38,7 +38,7 @@ module Faraday
   #
   #   # Use Marshal for serialization
   #   client = Faraday.new do |builder|
-  #     builder.use :http_cache, serializer: Marshal
+  #     builder.use :http_cache, store: Rails.cache, serializer: Marshal
   #   end
   class HttpCache < Faraday::Middleware
 
