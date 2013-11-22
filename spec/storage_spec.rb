@@ -15,7 +15,13 @@ describe Faraday::HttpCache::Storage do
   describe 'Cache configuration' do
     it 'lookups a ActiveSupport cache store' do
       expect(ActiveSupport::Cache).to receive(:lookup_store).with(:file_store, ['/tmp'])
-      Faraday::HttpCache::Storage.new({ store: :file_store, store_options: ['/tmp'] })
+      Faraday::HttpCache::Storage.new(store: :file_store, store_options: ['/tmp'])
+    end
+
+    it 'emits a warning when using the "MemoryStore"' do
+      logger = double
+      expect(logger).to receive(:warn).with(/using a MemoryStore is not advised/)
+      Faraday::HttpCache::Storage.new(logger: logger)
     end
   end
 

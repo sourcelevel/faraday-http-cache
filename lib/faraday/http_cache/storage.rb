@@ -29,7 +29,9 @@ module Faraday
       def initialize(options = {})
         store = options[:store]
         @serializer = options[:serializer] || MultiJson
+
         @cache = ActiveSupport::Cache.lookup_store(store, options[:store_options])
+        notify_memory_store_usage(options[:logger])
       end
 
       # Internal: Writes a response with a key based on the given request.
@@ -73,6 +75,19 @@ module Faraday
       def cache_key_for(request)
         array = request.stringify_keys.to_a.sort
         Digest::SHA1.hexdigest(@serializer.dump(array))
+      end
+
+      # Internal: Logs a warning when the 'cache' implementation
+      # isn't suitable for production use.
+      #
+      # Returns nothing.
+      def notify_memory_store_usage(logger)
+        return if logger.nil?
+
+        kind = cache.class.name.split('::').last.sub('Store', '').downcase
+        if kind == 'memory'
+          logger.warn 'HTTP Cache: using a MemoryStore is not advised as the cache might not be persisted across multiple processes or connection instances.'
+        end
       end
     end
   end
