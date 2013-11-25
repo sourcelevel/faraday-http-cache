@@ -5,7 +5,6 @@ require 'faraday-http-cache'
 require 'faraday_middleware'
 require 'active_support/core_ext/date/calculations'
 require 'active_support/core_ext/numeric/time'
-require 'json'
 
 require 'support/test_app'
 require 'support/test_server'

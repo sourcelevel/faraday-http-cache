@@ -1,4 +1,5 @@
 require 'sinatra/base'
+require 'json'
 
 class TestApp < Sinatra::Base
 
@@ -21,7 +22,7 @@ class TestApp < Sinatra::Base
   end
 
   get '/json' do
-    json = MultiJson.encode(count: increment_counter.to_i)
+    json = JSON.dump(count: increment_counter.to_i)
     [200, { 'Cache-Control' => 'max-age=400', 'Content-Type' => 'application/json' }, json]
   end
 

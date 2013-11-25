@@ -1,3 +1,4 @@
+require 'json'
 require 'digest/sha1'
 require 'active_support/cache'
 require 'active_support/core_ext/hash/keys'
@@ -23,13 +24,13 @@ module Faraday
       # options      - Storage options (default: {}).
       #                :logger        - A Logger object to be used to emit warnings.
       #                :store         - An ActiveSupport::CacheStore identifier.
-      #                :serializer    - A serializer class for the body.
-      #                                 Should respond to #dump and #load.
+      #                :serializer    - A serializer object that should
+      #                                 respond to 'dump' and 'load'.
       #                :store_options - An array containg the options for
       #                                 the cache store.
       def initialize(options = {})
         store = options[:store]
-        @serializer = options[:serializer] || MultiJson
+        @serializer = options[:serializer] || JSON
 
         @cache = ActiveSupport::Cache.lookup_store(store, options[:store_options])
         notify_memory_store_usage(options[:logger])

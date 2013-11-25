@@ -49,8 +49,9 @@ end
 The default store provided by ActiveSupport is the `MemoryStore` one, so it's important to
 configure a proper one for your production environment.
 
-MultiJson is used for serialization by default. If you expect to be dealing
-with images, you can use [Marshal][marshal] instead.
+the stdlib `JSON` module is used for serialization by default.
+If you expect to be dealing with images, you can use [Marshal][marshal] instead, or
+if you want to use another json library like `oj` or `yajl-ruby`.
 
 ```ruby
 client = Faraday.new do |builder|

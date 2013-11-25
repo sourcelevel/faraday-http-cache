@@ -35,7 +35,7 @@ describe Faraday::HttpCache::Storage do
     end
 
     context 'with default serializer' do
-      let(:serialized) { MultiJson.dump(response.serializable_hash) }
+      let(:serialized) { JSON.dump(response.serializable_hash) }
       let(:cache_key)  { '503ac9f7180ca1cdec49e8eb73a9cc0b47c27325' }
       it_behaves_like 'serialization'
     end
