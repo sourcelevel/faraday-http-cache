@@ -1,5 +1,4 @@
 require 'faraday'
-require 'multi_json'
 
 require 'active_support/core_ext/hash/slice'
 require 'active_support/deprecation'
