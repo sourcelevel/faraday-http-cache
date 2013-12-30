@@ -3,6 +3,7 @@ script: "bundle exec rspec"
 rvm:
   - 1.9.3
   - 2.0.0
+  - 2.1.0
 env:
   - FARADAY_ADAPTER=net_http
   - FARADAY_ADAPTER=em_http
