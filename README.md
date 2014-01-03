@@ -97,6 +97,6 @@ Note: private caches are ignored.
 
 ## License
 
-Copyright (c) 2012-2013 Plataformatec. See LICENSE file.
+Copyright (c) 2012-2014 Plataformatec. See LICENSE file.
 
   [marshal]: http://www.ruby-doc.org/core-2.0/Marshal.html
