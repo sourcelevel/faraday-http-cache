@@ -19,3 +19,6 @@ notifications:
 gemfile:
   - gemfiles/Gemfile.faraday-head
   - Gemfile
+matrix:
+  allow_failures:
+    - gemfile: gemfiles/Gemfile.faraday-head
