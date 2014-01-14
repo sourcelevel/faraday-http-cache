@@ -93,7 +93,20 @@ The middleware will use the following headers to make caching decisions:
 
 The `max-age`, `must-revalidate`, `proxy-revalidate` and `s-maxage` directives are checked.
 
-Note: private caches are ignored.
+### Shared vs. non-shared caches
+
+By default, the middleware acts as a "shared cache" per RFC 2616. This means it does not cache
+responses with `Cache-Control: private`. This behavior can be changed by passing in the
+`:act_as_shared_cache` configuration option:
+
+```ruby
+client = Faraday.new do |builder|
+  builder.use :http_cache, act_as_shared_cache: false
+  builder.adapter Faraday.default_adapter
+end
+
+client.get('http://site/api/some-private-resource') # => will be cached
+```
 
 ## License
 
