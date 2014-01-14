@@ -41,7 +41,7 @@ module Faraday
   #   end
   class HttpCache < Faraday::Middleware
     # Internal: valid options for the 'initialize' configuration Hash.
-    VALID_OPTIONS = [:store, :serializer, :logger, :store_options]
+    VALID_OPTIONS = [:store, :serializer, :logger, :store_options, :act_as_shared_cache]
 
     # Public: Initializes a new HttpCache middleware.
     #
@@ -64,9 +64,11 @@ module Faraday
     def initialize(app, *args)
       super(app)
       @logger = nil
+      @act_as_shared_cache = nil
       if args.first.is_a? Hash
         options = args.first
         @logger = options[:logger]
+        @act_as_shared_cache = options[:act_as_shared_cache]
       else
         options = parse_deprecated_options(*args)
       end
@@ -107,6 +109,12 @@ module Faraday
       response.on_complete do
         log_request
       end
+    end
+
+    # Internal: Should this cache instance act like a "shared cache" according
+    # to the the definition in RFC 2616?
+    def act_as_shared_cache?
+      @act_as_shared_cache.nil? ? true : @act_as_shared_cache
     end
 
     private
@@ -159,6 +167,7 @@ module Faraday
         options[:serializer] = hash_params.delete(:serializer)
 
         @logger = hash_params[:logger]
+        @act_as_shared_cache = hash_params[:act_as_shared_cache]
       end
 
       options[:store_options] = args
@@ -245,7 +254,7 @@ module Faraday
     #
     # Returns nothing.
     def store(response)
-      if response.cacheable?
+      if act_as_shared_cache? ? response.cacheable_in_shared_cache? : response.cacheable_in_private_cache?
         trace :store
         @storage.write(@request, response)
       else

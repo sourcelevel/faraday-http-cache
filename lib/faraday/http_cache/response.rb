@@ -59,17 +59,29 @@ module Faraday
         @payload[:status] == 304
       end
 
-      # Internal: Checks if the response can be cached by the client.
-      # This is validated by the 'Cache-Control' directives, the response
-      # status code and it's freshness or validation status.
+      # Internal: Checks if the response can be cached by the client when the
+      # client is acting as a shared cache per RFC 2616. This is validated by
+      # the 'Cache-Control' directives, the response status code and it's
+      # freshness or validation status.
+      #
+      # Returns false if the 'Cache-Control' says that we can't store the
+      # response, or it can be stored in private caches only, or if isn't fresh
+      # or it can't be revalidated with the origin server. Otherwise, returns
+      # true.
+      def cacheable_in_shared_cache?
+        cacheable?(true)
+      end
+
+      # Internal: Checks if the response can be cached by the client when the
+      # client is acting as a private cache per RFC 2616. This is validated by
+      # the 'Cache-Control' directives, the response status code and it's
+      # freshness or validation status.
       #
       # Returns false if the 'Cache-Control' says that we can't store the
       # response, or if isn't fresh or it can't be revalidated with the origin
       # server. Otherwise, returns true.
-      def cacheable?
-        return false if cache_control.private? || cache_control.no_store?
-
-        cacheable_status_code? && (validateable? || fresh?)
+      def cacheable_in_private_cache?
+        cacheable?(false)
       end
 
       # Internal: Gets the response age in seconds.
@@ -136,6 +148,16 @@ module Faraday
       def validateable?
         headers.key?('Last-Modified') || headers.key?('ETag')
       end
+
+      # Internal: The logic behind cacheable_in_private_cache? and
+      # cacheable_in_shared_cache? The logic is the same except for the
+      # treatment of the private Cache-Control directive.
+      def cacheable?(shared_cache)
+        return false if (cache_control.private? && shared_cache) || cache_control.no_store?
+
+        cacheable_status_code? && (validateable? || fresh?)
+      end
+      private :cacheable?
 
       # Internal: Validates the response status against the
       # `CACHEABLE_STATUS_CODES' constant.

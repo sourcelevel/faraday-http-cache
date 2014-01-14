@@ -45,7 +45,7 @@ class TestApp < Sinatra::Base
   end
 
   get '/private' do
-    [200, { 'Cache-Control' => 'private' }, increment_counter]
+    [200, { 'Cache-Control' => 'private, max-age=100' }, increment_counter]
   end
 
   get '/dontstore' do
