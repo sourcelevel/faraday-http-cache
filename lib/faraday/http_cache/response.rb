@@ -157,7 +157,6 @@ module Faraday
 
         cacheable_status_code? && (validateable? || fresh?)
       end
-      private :cacheable?
 
       # Internal: Validates the response status against the
       # `CACHEABLE_STATUS_CODES' constant.
