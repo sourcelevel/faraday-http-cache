@@ -97,11 +97,11 @@ The `max-age`, `must-revalidate`, `proxy-revalidate` and `s-maxage` directives a
 
 By default, the middleware acts as a "shared cache" per RFC 2616. This means it does not cache
 responses with `Cache-Control: private`. This behavior can be changed by passing in the
-`:act_as_shared_cache` configuration option:
+`:shared_cache` configuration option:
 
 ```ruby
 client = Faraday.new do |builder|
-  builder.use :http_cache, act_as_shared_cache: false
+  builder.use :http_cache, shared_cache: false
   builder.adapter Faraday.default_adapter
 end
 

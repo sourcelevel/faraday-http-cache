@@ -41,7 +41,7 @@ module Faraday
   #   end
   class HttpCache < Faraday::Middleware
     # Internal: valid options for the 'initialize' configuration Hash.
-    VALID_OPTIONS = [:store, :serializer, :logger, :store_options, :act_as_shared_cache]
+    VALID_OPTIONS = [:store, :serializer, :logger, :store_options, :shared_cache]
 
     # Public: Initializes a new HttpCache middleware.
     #
@@ -68,7 +68,7 @@ module Faraday
       if args.first.is_a? Hash
         options = args.first
         @logger = options[:logger]
-        @act_as_shared_cache = options[:act_as_shared_cache]
+        @act_as_shared_cache = options[:shared_cache]
       else
         options = parse_deprecated_options(*args)
       end
@@ -167,7 +167,7 @@ module Faraday
         options[:serializer] = hash_params.delete(:serializer)
 
         @logger = hash_params[:logger]
-        @act_as_shared_cache = hash_params[:act_as_shared_cache]
+        @act_as_shared_cache = hash_params[:shared_cache]
       end
 
       options[:store_options] = args
