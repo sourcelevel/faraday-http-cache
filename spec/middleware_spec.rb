@@ -2,10 +2,11 @@ require 'spec_helper'
 
 describe Faraday::HttpCache do
   let(:logger) { double('a Logger object', debug: nil, warn: nil) }
+  let(:options) { { logger: logger } }
 
   let(:client) do
     Faraday.new(url: ENV['FARADAY_SERVER']) do |stack|
-      stack.use Faraday::HttpCache, logger: logger
+      stack.use Faraday::HttpCache, options
       adapter = ENV['FARADAY_ADAPTER']
       stack.headers['X-Faraday-Adapter'] = adapter
       stack.adapter adapter.to_sym
@@ -36,14 +37,32 @@ describe Faraday::HttpCache do
     client.get('broken')
   end
 
-  it 'does not cache requests with a private cache control' do
-    client.get('private')
-    expect(client.get('private').body).to eq('2')
+  describe 'when acting as a shared cache' do
+    let(:options) { { logger: logger, shared_cache: true } }
+
+    it 'does not cache requests with a private cache control' do
+      client.get('private')
+      expect(client.get('private').body).to eq('2')
+    end
+
+    it 'logs that a private response is invalid' do
+      expect(logger).to receive(:debug).with('HTTP Cache: [GET /private] miss, invalid')
+      client.get('private')
+    end
   end
 
-  it 'logs that a private response is invalid' do
-    expect(logger).to receive(:debug).with('HTTP Cache: [GET /private] miss, invalid')
-    client.get('private')
+  describe 'when acting as a private cache' do
+    let(:options) { { logger: logger, shared_cache: false } }
+
+    it 'does cache requests with a private cache control' do
+      client.get('private')
+      expect(client.get('private').body).to eq('1')
+    end
+
+    it 'logs that a private response is stored' do
+      expect(logger).to receive(:debug).with('HTTP Cache: [GET /private] miss, store')
+      client.get('private')
+    end
   end
 
   it 'does not cache requests with a explicit no-store directive' do
@@ -178,6 +197,20 @@ describe Faraday::HttpCache do
     it 'consumes the "logger" key' do
       expect(ActiveSupport::Cache).to receive(:lookup_store).with(:memory_store, nil)
       Faraday::HttpCache.new(app, store: :memory_store, logger: logger)
+    end
+
+    describe '#act_as_shared_cache?' do
+      it 'is true by default' do
+        expect(Faraday::HttpCache.new(app).act_as_shared_cache?).to eq(true)
+      end
+
+      it 'is true when configured to true' do
+        expect(Faraday::HttpCache.new(app, shared_cache: true).act_as_shared_cache?).to eq(true)
+      end
+
+      it 'is false when configured to be false' do
+        expect(Faraday::HttpCache.new(app, shared_cache: false).act_as_shared_cache?).to eq(false)
+      end
     end
 
     context 'with deprecated options format' do
