@@ -199,17 +199,17 @@ describe Faraday::HttpCache do
       Faraday::HttpCache.new(app, store: :memory_store, logger: logger)
     end
 
-    describe '#act_as_shared_cache?' do
+    describe '#shared_cache?' do
       it 'is true by default' do
-        expect(Faraday::HttpCache.new(app).act_as_shared_cache?).to eq(true)
+        expect(Faraday::HttpCache.new(app).shared_cache?).to eq(true)
       end
 
       it 'is true when configured to true' do
-        expect(Faraday::HttpCache.new(app, shared_cache: true).act_as_shared_cache?).to eq(true)
+        expect(Faraday::HttpCache.new(app, shared_cache: true).shared_cache?).to eq(true)
       end
 
       it 'is false when configured to be false' do
-        expect(Faraday::HttpCache.new(app, shared_cache: false).act_as_shared_cache?).to eq(false)
+        expect(Faraday::HttpCache.new(app, shared_cache: false).shared_cache?).to eq(false)
       end
     end
 
