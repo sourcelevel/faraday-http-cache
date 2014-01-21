@@ -1,3 +1,11 @@
+GIT
+  remote: git://github.com/lostisland/faraday_middleware.git
+  revision: b4b19115dd3e3ad0a4f66bdfcf97b61a85964b60
+  branch: faraday-0.9
+  specs:
+    faraday_middleware (0.9.0)
+      faraday (~> 0.9.0.rc5)
+
 PATH
   remote: .
   specs:
@@ -27,17 +35,15 @@ GEM
     em-socksify (0.3.0)
       eventmachine (>= 1.0.0.beta.4)
     eventmachine (1.0.3)
-    faraday (0.8.9)
-      multipart-post (~> 1.2.0)
-    faraday_middleware (0.9.0)
-      faraday (>= 0.7.4, < 0.9)
+    faraday (0.9.0)
+      multipart-post (>= 1.2, < 3)
     http_parser.rb (0.6.0)
     i18n (0.6.9)
     minitest (4.7.5)
     multi_json (1.8.4)
-    multipart-post (1.2.0)
+    multipart-post (2.0.0)
     rack (1.5.2)
-    rack-protection (1.5.1)
+    rack-protection (1.5.2)
       rack
     rake (10.1.1)
     rspec (3.0.0.beta1)
@@ -67,7 +73,7 @@ PLATFORMS
 DEPENDENCIES
   em-http-request (~> 1.1.0)
   faraday-http-cache!
-  faraday_middleware (~> 0.9.0)
+  faraday_middleware!
   rake (~> 10.1.0)
   rspec (= 3.0.0.beta1)
   sinatra (~> 1.4.3)
