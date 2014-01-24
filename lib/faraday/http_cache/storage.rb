@@ -1,7 +1,7 @@
 require 'json'
 require 'digest/sha1'
+
 require 'active_support/cache'
-require 'active_support/core_ext/hash/keys'
 
 module Faraday
   class HttpCache < Faraday::Middleware
@@ -57,11 +57,14 @@ module Faraday
       #           :request_headers - The custom headers for the request.
       # klass - The Class to be instantiated with the recovered informations.
       def read(request, klass = Faraday::HttpCache::Response)
-        key = cache_key_for(request)
-        value = cache.read(key)
+        cache_key = cache_key_for(request)
+        found = cache.read(cache_key)
 
-        if value
-          payload = @serializer.load(value).symbolize_keys
+        if found
+          payload = @serializer.load(found).inject({}) do |hash, (key,value)|
+            hash.update(key.to_sym => value)
+          end
+
           klass.new(payload)
         end
       end
@@ -75,8 +78,11 @@ module Faraday
       #
       # Returns the encoded String.
       def cache_key_for(request)
-        array = request.stringify_keys.to_a.sort
-        Digest::SHA1.hexdigest(@serializer.dump(array))
+        cache_keys = request.inject([]) do |parts, (key, value)|
+          parts << [key.to_s, value]
+        end
+
+        Digest::SHA1.hexdigest(@serializer.dump(cache_keys.sort))
       end
 
       # Internal: Logs a warning when the 'cache' implementation

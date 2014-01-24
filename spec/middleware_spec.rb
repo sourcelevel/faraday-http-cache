@@ -214,6 +214,10 @@ describe Faraday::HttpCache do
     end
 
     context 'with deprecated options format' do
+      before do
+        allow(Kernel).to receive(:warn)
+      end
+
       it 'uses the options to create a Cache Store' do
         expect(ActiveSupport::Cache).to receive(:lookup_store).with(:file_store, ['tmp'])
         Faraday::HttpCache.new(app, :file_store, 'tmp')
@@ -225,7 +229,7 @@ describe Faraday::HttpCache do
       end
 
       it 'warns the user about the deprecated options' do
-        expect(ActiveSupport::Deprecation).to receive(:warn)
+        expect(Kernel).to receive(:warn)
 
         Faraday::HttpCache.new(app, :memory_store, logger: logger)
       end

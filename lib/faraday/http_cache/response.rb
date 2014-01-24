@@ -136,7 +136,12 @@ module Faraday
       # Returns a 'Hash'.
       def serializable_hash
         prepare_to_cache
-        @payload.slice(:status, :body, :response_headers)
+
+        {
+          status: @payload[:status],
+          body: @payload[:body],
+          response_headers: @payload[:response_headers]
+        }
       end
 
       private
