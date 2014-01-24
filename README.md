@@ -21,21 +21,24 @@ shortcut using a symbol or passing the middleware class
 
 ```ruby
 client = Faraday.new do |builder|
-  builder.use :http_cache, store: :memory_store
+  builder.use :http_cache, store: Rails.cache
   # or
-  builder.use Faraday::HttpCache, store: :memory_store
+  builder.use Faraday::HttpCache, store: Rails.cache
 
   builder.adapter Faraday.default_adapter
 end
 ```
 
-The middleware uses the `ActiveSupport::Cache` API to record the responses from the targeted
-endpoints, and any extra configuration option will be used to setup the cache store.
+The middleware accepts a `store` option for the cache backend responsible for recording
+the API responses that should be stored. Stores should respond to `write` and `read`,
+just like an object from the `ActiveSupport::Cache` API.
 
 ```ruby
 # Connect the middleware to a Memcache instance.
+store = ActiveSupport::Cache.lookup_store(:mem_cache_store, ['localhost:11211'])
+
 client = Faraday.new do |builder|
-  builder.use :http_cache, store: :mem_cache_store, store_options: ['localhost:11211']
+  builder.use :http_cache, store: store
   builder.adapter Faraday.default_adapter
 end
 
@@ -45,9 +48,8 @@ client = Faraday.new do |builder|
   builder.adapter Faraday.default_adapter
 end
 ```
-
-The default store provided by ActiveSupport is the `MemoryStore` one, so it's important to
-configure a proper one for your production environment.
+The default store provided is a simple in memory cache that lives on the client
+instance, so it's important to configure a proper one for your production environment.
 
 the stdlib `JSON` module is used for serialization by default.
 If you expect to be dealing with images, you can use [Marshal][marshal] instead, or

@@ -17,13 +17,13 @@ module Faraday
   #
   #   # Using the middleware with a simple client:
   #   client = Faraday.new do |builder|
-  #     builder.user :http_cache, store: :memory_store
+  #     builder.user :http_cache, store: my_store_backend
   #     builder.adapter Faraday.default_adapter
   #   end
   #
   #   # Attach a Logger to the middleware.
   #   client = Faraday.new do |builder|
-  #     builder.use :http_cache, logger: my_logger_instance, store: :memory_store
+  #     builder.use :http_cache, logger: my_logger_instance, store: my_store_backend
   #     builder.adapter Faraday.default_adapter
   #   end
   #
@@ -42,8 +42,13 @@ module Faraday
 
     # Public: Initializes a new HttpCache middleware.
     #
-    # app - the next endpoint on the 'Faraday' stack.
-    # arguments - aditional options to setup the logger and the storage.
+    # app  - the next endpoint on the 'Faraday' stack.
+    # args - aditional options to setup the logger and the storage.
+    #             :logger        - A logger object.
+    #             :serializer    - A serializer that should respond to 'dump' and 'load'.
+    #             :shared_cache  - A flag to mark the middleware as a shared cache or not.
+    #             :store         - A cache store that should respond to 'read' and 'write'.
+    #             :store_options - Deprecated: additional options to setup the cache store.
     #
     # Examples:
     #
@@ -54,10 +59,12 @@ module Faraday
     #   Faraday:HttpCache.new(app, logger: my_logger, serializer: Marshal)
     #
     #   # Initialize the middleware with a FileStore at the 'tmp' dir.
-    #   Faraday::HttpCache.new(app, store: :file_store, store_options: ['tmp'])
+    #   store = ActiveSupport::Cache.lookup_store(:file_store, ['tmp'])
+    #   Faraday::HttpCache.new(app, store: store)
     #
     #   # Initialize the middleware with a MemoryStore and logger
-    #   Faraday::HttpCache.new(app, store: :memory_store, logger: my_logger, store_options: [size: 1024])
+    #   store = ActiveSupport::Cache.lookup_store
+    #   Faraday::HttpCache.new(app, store: store, logger: my_logger)
     def initialize(app, *args)
       super(app)
       @logger = nil

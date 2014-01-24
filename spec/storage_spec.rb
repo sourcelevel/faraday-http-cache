@@ -13,15 +13,34 @@ describe Faraday::HttpCache::Storage do
   subject { storage }
 
   describe 'Cache configuration' do
-    it 'lookups a ActiveSupport cache store' do
-      expect(ActiveSupport::Cache).to receive(:lookup_store).with(:file_store, ['/tmp'])
-      Faraday::HttpCache::Storage.new(store: :file_store, store_options: ['/tmp'])
+    it 'uses a MemoryStore by default' do
+      expect(Faraday::HttpCache::MemoryStore).to receive(:new).and_call_original
+      Faraday::HttpCache::Storage.new
     end
 
-    it 'emits a warning when using the "MemoryStore"' do
+    it 'emits a warning when using a MemoryStore' do
       logger = double
       expect(logger).to receive(:warn).with(/using a MemoryStore is not advised/)
       Faraday::HttpCache::Storage.new(logger: logger)
+    end
+
+    it 'lookups an ActiveSupport cache store if a Symbol is given' do
+      expect(ActiveSupport::Cache).to receive(:lookup_store).with(:file_store, ['/tmp']).and_call_original
+      Faraday::HttpCache::Storage.new(store: :file_store, store_options: ['/tmp'])
+    end
+
+    it 'emits a warning when doing the lookup of an ActiveSupport cache store' do
+      logger = double
+      expect(logger).to receive(:warn).with(/Passing a Symbol as the 'store' is deprecated/)
+      Faraday::HttpCache::Storage.new(store: :file_store, logger: logger)
+    end
+
+    it 'raises an error when the given store is not valid' do
+      wrong = double
+
+      expect {
+        Faraday::HttpCache::Storage.new(store: wrong)
+      }.to raise_error(ArgumentError)
     end
   end
 

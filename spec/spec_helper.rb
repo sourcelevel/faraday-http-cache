@@ -3,6 +3,7 @@ require 'socket'
 
 require 'faraday-http-cache'
 require 'faraday_middleware'
+require 'active_support/cache'
 
 require 'support/test_app'
 require 'support/test_server'

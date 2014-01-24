@@ -1,8 +1,6 @@
 require 'json'
 require 'digest/sha1'
 
-require 'active_support/cache'
-
 module Faraday
   class HttpCache < Faraday::Middleware
     # Internal: A Wrapper around a ActiveSupport::CacheStore to store responses.
@@ -17,23 +15,25 @@ module Faraday
     #   # Creates a new Storage using Marshal for serialization.
     #   Faraday::HttpCache::Storage.new(:memory_store, serializer: Marshal)
     class Storage
-      attr_reader :cache
-
       # Internal: Initialize a new Storage object with a cache backend.
       #
-      # options      - Storage options (default: {}).
-      #                :logger        - A Logger object to be used to emit warnings.
-      #                :store         - An ActiveSupport::CacheStore identifier.
-      #                :serializer    - A serializer object that should
-      #                                 respond to 'dump' and 'load'.
-      #                :store_options - An array containg the options for
-      #                                 the cache store.
+      # options - Storage options (default: {}).
+      #           :logger        - A Logger object to be used to emit warnings.
+      #           :store         - An cache store object that should
+      #                            respond to 'dump' and 'load'.
+      #           :serializer    - A serializer object that should
+      #                            respond to 'dump' and 'load'.
+      #           :store_options - An array containg the options for
+      #                            the cache store.
       def initialize(options = {})
-        store = options[:store]
+        @cache = options[:store] || MemoryStore.new
         @serializer = options[:serializer] || JSON
-
-        @cache = ActiveSupport::Cache.lookup_store(store, options[:store_options])
-        notify_memory_store_usage(options[:logger])
+        @logger = options[:logger]
+        if @cache.is_a? Symbol
+          @cache = lookup_store(@cache, options[:store_options])
+        end
+        assert_valid_store!
+        notify_memory_store_usage
       end
 
       # Internal: Writes a response with a key based on the given request.
@@ -46,7 +46,7 @@ module Faraday
       def write(request, response)
         key = cache_key_for(request)
         value = @serializer.dump(response.serializable_hash)
-        cache.write(key, value)
+        @cache.write(key, value)
       end
 
       # Internal: Reads a key based on the given request from the underlying cache.
@@ -58,7 +58,7 @@ module Faraday
       # klass - The Class to be instantiated with the recovered informations.
       def read(request, klass = Faraday::HttpCache::Response)
         cache_key = cache_key_for(request)
-        found = cache.read(cache_key)
+        found = @cache.read(cache_key)
 
         if found
           payload = @serializer.load(found).inject({}) do |hash, (key,value)|
@@ -89,13 +89,56 @@ module Faraday
       # isn't suitable for production use.
       #
       # Returns nothing.
-      def notify_memory_store_usage(logger)
-        return if logger.nil?
+      def notify_memory_store_usage
+        return if @logger.nil?
 
-        kind = cache.class.name.split('::').last.sub('Store', '').downcase
+        kind = @cache.class.name.split('::').last.sub('Store', '').downcase
         if kind == 'memory'
-          logger.warn 'HTTP Cache: using a MemoryStore is not advised as the cache might not be persisted across multiple processes or connection instances.'
+          @logger.warn 'HTTP Cache: using a MemoryStore is not advised as the cache might not be persisted across multiple processes or connection instances.'
         end
+      end
+
+      # Internal: Creates a cache store from 'ActiveSupport' a set of options.
+      #
+      # store   - A 'Symbol' with the store name.
+      # options - Additional options for the cache store.
+      #
+      # Returns a 'ActiveSupport::Cache' store.
+      def lookup_store(store, options)
+        if @logger
+          @logger.warn "Passing a Symbol as the 'store' is deprecated, please pass the cache store instead."
+        end
+
+        require 'active_support/cache'
+        ActiveSupport::Cache.lookup_store(store, options)
+      end
+
+      # Internal: Checks if the given cache object supports the
+      # expect API ('read' and 'write').
+      #
+      # Raises an 'ArgumentError'.
+      #
+      # Returns nothing.
+      def assert_valid_store!
+        unless @cache.respond_to?(:read) && @cache.respond_to?(:write)
+          raise ArgumentError.new("#{@cache.inspect} is not a valid cache store as it does not responds to 'read' and 'write'.")
+        end
+      end
+    end
+
+    # Internal: A Hash based store to be used by the 'Storage' class
+    # when a 'store' is not provided for the middleware setup.
+    class MemoryStore
+      def initialize
+        @cache = {}
+      end
+
+      def read(key)
+        @cache[key]
+      end
+
+      def write(key, value)
+        @cache[key] = value
       end
     end
   end
