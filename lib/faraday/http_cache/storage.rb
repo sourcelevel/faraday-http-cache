@@ -61,8 +61,8 @@ module Faraday
         found = @cache.read(cache_key)
 
         if found
-          payload = @serializer.load(found).inject({}) do |hash, (key,value)|
-            hash.update(key.to_sym => value)
+          payload = @serializer.load(found).each_with_object({}) do |(key,value), hash|
+            hash[key.to_sym] = value
           end
 
           klass.new(payload)
@@ -78,7 +78,7 @@ module Faraday
       #
       # Returns the encoded String.
       def cache_key_for(request)
-        cache_keys = request.inject([]) do |parts, (key, value)|
+        cache_keys = request.each_with_object([]) do |(key, value), parts|
           parts << [key.to_s, value]
         end
 
