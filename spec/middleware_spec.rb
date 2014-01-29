@@ -185,17 +185,19 @@ describe Faraday::HttpCache do
     let(:app) { double('it is an app!') }
 
     it 'uses the options to create a Cache Store' do
-      expect(ActiveSupport::Cache).to receive(:lookup_store).with(:file_store, ['tmp'])
-      Faraday::HttpCache.new(app, store: :file_store, store_options: ['tmp'])
+      store = double(read: nil, write: nil)
+
+      expect(Faraday::HttpCache::Storage).to receive(:new).with(store: store)
+      Faraday::HttpCache.new(app, store: store)
     end
 
     it 'accepts a Hash option' do
-      expect(ActiveSupport::Cache).to receive(:lookup_store).with(:memory_store, [{ size: 1024 }])
+      expect(ActiveSupport::Cache).to receive(:lookup_store).with(:memory_store, [{ size: 1024 }]).and_call_original
       Faraday::HttpCache.new(app, store: :memory_store, store_options: [size: 1024])
     end
 
     it 'consumes the "logger" key' do
-      expect(ActiveSupport::Cache).to receive(:lookup_store).with(:memory_store, nil)
+      expect(ActiveSupport::Cache).to receive(:lookup_store).with(:memory_store, nil).and_call_original
       Faraday::HttpCache.new(app, store: :memory_store, logger: logger)
     end
 
@@ -214,18 +216,22 @@ describe Faraday::HttpCache do
     end
 
     context 'with deprecated options format' do
+      before do
+        allow(Kernel).to receive(:warn)
+      end
+
       it 'uses the options to create a Cache Store' do
-        expect(ActiveSupport::Cache).to receive(:lookup_store).with(:file_store, ['tmp'])
+        expect(ActiveSupport::Cache).to receive(:lookup_store).with(:file_store, ['tmp']).and_call_original
         Faraday::HttpCache.new(app, :file_store, 'tmp')
       end
 
       it 'accepts a Hash option' do
-        expect(ActiveSupport::Cache).to receive(:lookup_store).with(:memory_store, [{ size: 1024 }])
+        expect(ActiveSupport::Cache).to receive(:lookup_store).with(:memory_store, [{ size: 1024 }]).and_call_original
         Faraday::HttpCache.new(app, :memory_store, size: 1024)
       end
 
       it 'warns the user about the deprecated options' do
-        expect(ActiveSupport::Deprecation).to receive(:warn)
+        expect(Kernel).to receive(:warn)
 
         Faraday::HttpCache.new(app, :memory_store, logger: logger)
       end

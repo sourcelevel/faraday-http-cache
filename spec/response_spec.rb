@@ -65,7 +65,7 @@ describe Faraday::HttpCache::Response do
 
   describe 'freshness' do
     it 'is fresh if the response still has some time to live' do
-      date = 200.seconds.ago.httpdate
+      date = (Time.now - 200).httpdate
       headers = { 'Cache-Control' => 'max-age=400', 'Date' => date }
       response = Faraday::HttpCache::Response.new(response_headers: headers)
 
@@ -73,7 +73,7 @@ describe Faraday::HttpCache::Response do
     end
 
     it 'is not fresh when the ttl has expired' do
-      date = 500.seconds.ago.httpdate
+      date = (Time.now - 500).httpdate
       headers = { 'Cache-Control' => 'max-age=400', 'Date' => date }
       response = Faraday::HttpCache::Response.new(response_headers: headers)
 
@@ -139,7 +139,7 @@ describe Faraday::HttpCache::Response do
     end
 
     it 'calculates the time from the "Date" header' do
-      date = 3.seconds.ago.httpdate
+      date = (Time.now - 3).httpdate
       response = Faraday::HttpCache::Response.new(response_headers: { 'Date' => date })
       expect(response.age).to eq(3)
     end
@@ -152,7 +152,7 @@ describe Faraday::HttpCache::Response do
 
   describe 'time to live calculation' do
     it 'returns the time to live based on the max age limit' do
-      date = 200.seconds.ago.httpdate
+      date = (Time.now - 200).httpdate
       headers = { 'Cache-Control' => 'max-age=400', 'Date' => date }
       response = Faraday::HttpCache::Response.new(response_headers: headers)
       expect(response.ttl).to eq(200)
@@ -191,9 +191,9 @@ describe Faraday::HttpCache::Response do
       headers = {
           'Age' => 6,
           'Cache-Control' => 'public, max-age=40',
-          'Date' => 38.seconds.ago.httpdate,
-          'Expires' => 37.seconds.from_now.httpdate,
-          'Last-Modified' => 300.seconds.ago.httpdate
+          'Date' => (Time.now - 38).httpdate,
+          'Expires' => (Time.now - 37).httpdate,
+          'Last-Modified' => (Time.now - 300).httpdate
       }
       response = Faraday::HttpCache::Response.new(response_headers: headers)
       expect(response).to be_fresh

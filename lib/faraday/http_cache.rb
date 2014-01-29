@@ -1,8 +1,5 @@
 require 'faraday'
 
-require 'active_support/core_ext/hash/slice'
-require 'active_support/deprecation'
-
 require 'faraday/http_cache/storage'
 require 'faraday/http_cache/response'
 
@@ -20,13 +17,13 @@ module Faraday
   #
   #   # Using the middleware with a simple client:
   #   client = Faraday.new do |builder|
-  #     builder.user :http_cache, store: :memory_store
+  #     builder.user :http_cache, store: my_store_backend
   #     builder.adapter Faraday.default_adapter
   #   end
   #
   #   # Attach a Logger to the middleware.
   #   client = Faraday.new do |builder|
-  #     builder.use :http_cache, logger: my_logger_instance, store: :memory_store
+  #     builder.use :http_cache, logger: my_logger_instance, store: my_store_backend
   #     builder.adapter Faraday.default_adapter
   #   end
   #
@@ -45,8 +42,13 @@ module Faraday
 
     # Public: Initializes a new HttpCache middleware.
     #
-    # app - the next endpoint on the 'Faraday' stack.
-    # arguments - aditional options to setup the logger and the storage.
+    # app  - the next endpoint on the 'Faraday' stack.
+    # args - aditional options to setup the logger and the storage.
+    #             :logger        - A logger object.
+    #             :serializer    - A serializer that should respond to 'dump' and 'load'.
+    #             :shared_cache  - A flag to mark the middleware as a shared cache or not.
+    #             :store         - A cache store that should respond to 'read' and 'write'.
+    #             :store_options - Deprecated: additional options to setup the cache store.
     #
     # Examples:
     #
@@ -57,10 +59,12 @@ module Faraday
     #   Faraday:HttpCache.new(app, logger: my_logger, serializer: Marshal)
     #
     #   # Initialize the middleware with a FileStore at the 'tmp' dir.
-    #   Faraday::HttpCache.new(app, store: :file_store, store_options: ['tmp'])
+    #   store = ActiveSupport::Cache.lookup_store(:file_store, ['tmp'])
+    #   Faraday::HttpCache.new(app, store: store)
     #
     #   # Initialize the middleware with a MemoryStore and logger
-    #   Faraday::HttpCache.new(app, store: :memory_store, logger: my_logger, store_options: [size: 1024])
+    #   store = ActiveSupport::Cache.lookup_store
+    #   Faraday::HttpCache.new(app, store: store, logger: my_logger)
     def initialize(app, *args)
       super(app)
       @logger = nil
@@ -157,7 +161,7 @@ module Faraday
     def parse_deprecated_options(*args)
       options = {}
       if args.length > 0
-        ActiveSupport::Deprecation.warn('This api is deprecated, refer to the documentation for the new one', caller)
+        Kernel.warn('DEPRECATION WARNING: This API is deprecated, refer to the documentation for the new one', caller)
       end
 
       options[:store] = args.shift
@@ -282,7 +286,13 @@ module Faraday
     # Returns a 'Hash' containing the ':status', ':body' and 'response_headers'
     # entries.
     def create_response(env)
-      env.to_hash.slice(:status, :body, :response_headers)
+      hash = env.to_hash
+
+      {
+        status: hash[:status],
+        body: hash[:body],
+        response_headers: hash[:response_headers]
+      }
     end
 
     # Internal: Creates a new 'Hash' containing the request information.
@@ -292,9 +302,13 @@ module Faraday
     # Returns a 'Hash' containing the ':method', ':url' and 'request_headers'
     # entries.
     def create_request(env)
-      request = env.to_hash.slice(:method, :url, :request_headers)
-      request[:request_headers] = request[:request_headers].dup
-      request
+      hash = env.to_hash
+
+      {
+        method: hash[:method],
+        url: hash[:url],
+        request_headers: hash[:request_headers].dup
+      }
     end
 
     # Internal: Logs the trace info about the incoming request

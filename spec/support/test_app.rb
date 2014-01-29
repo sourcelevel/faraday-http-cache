@@ -9,7 +9,7 @@ class TestApp < Sinatra::Base
 
   set :counter, 0
   set :requests, 0
-  set :yesterday, 1.day.ago.httpdate
+  set :yesterday, (Date.today - 1).httpdate
 
   get '/ping' do
     'PONG'

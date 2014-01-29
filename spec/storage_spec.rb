@@ -13,15 +13,34 @@ describe Faraday::HttpCache::Storage do
   subject { storage }
 
   describe 'Cache configuration' do
-    it 'lookups a ActiveSupport cache store' do
-      expect(ActiveSupport::Cache).to receive(:lookup_store).with(:file_store, ['/tmp'])
-      Faraday::HttpCache::Storage.new(store: :file_store, store_options: ['/tmp'])
+    it 'uses a MemoryStore by default' do
+      expect(Faraday::HttpCache::MemoryStore).to receive(:new).and_call_original
+      Faraday::HttpCache::Storage.new
     end
 
-    it 'emits a warning when using the "MemoryStore"' do
+    it 'emits a warning when using a MemoryStore' do
       logger = double
       expect(logger).to receive(:warn).with(/using a MemoryStore is not advised/)
       Faraday::HttpCache::Storage.new(logger: logger)
+    end
+
+    it 'lookups an ActiveSupport cache store if a Symbol is given' do
+      expect(ActiveSupport::Cache).to receive(:lookup_store).with(:file_store, ['/tmp']).and_call_original
+      Faraday::HttpCache::Storage.new(store: :file_store, store_options: ['/tmp'])
+    end
+
+    it 'emits a warning when doing the lookup of an ActiveSupport cache store' do
+      logger = double
+      expect(logger).to receive(:warn).with(/Passing a Symbol as the 'store' is deprecated/)
+      Faraday::HttpCache::Storage.new(store: :file_store, logger: logger)
+    end
+
+    it 'raises an error when the given store is not valid' do
+      wrong = double
+
+      expect {
+        Faraday::HttpCache::Storage.new(store: wrong)
+      }.to raise_error(ArgumentError)
     end
   end
 
@@ -69,9 +88,9 @@ describe Faraday::HttpCache::Storage do
       headers = {
           'Age' => 6,
           'Cache-Control' => 'public, max-age=40',
-          'Date' => 38.seconds.ago.httpdate,
-          'Expires' => 37.seconds.from_now.httpdate,
-          'Last-Modified' => 300.seconds.ago.httpdate
+          'Date' => (Time.now - 38).httpdate,
+          'Expires' => (Time.now - 37).httpdate,
+          'Last-Modified' => (Time.now - 300).httpdate
       }
       response = Faraday::HttpCache::Response.new(response_headers: headers)
       expect(response).to be_fresh
@@ -84,9 +103,10 @@ describe Faraday::HttpCache::Storage do
 
     it 'is fresh until cached and that 1 second elapses then the response is no longer fresh' do
       headers = {
-          'Date' => 39.seconds.ago.httpdate,
-          'Expires' => 40.seconds.from_now.httpdate,
+          'Date' => (Time.now - 39).httpdate,
+          'Expires' => (Time.now + 40).httpdate,
       }
+
       response = Faraday::HttpCache::Response.new(response_headers: headers)
       expect(response).to be_fresh
       subject.write(request, response)
