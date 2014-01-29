@@ -203,12 +203,14 @@ module Faraday
         @payload[:response_headers]
       end
 
-      # Internal: Prepares the response headers ready to be cached.
+      # Internal: Prepares the response headers to be cached.
       #
-      # It removes the age header if present to allow cached responses
+      # It removes the 'Age' header if present to allow cached responses
       # to continue aging while cached. It also normalizes the 'max-age'
       # related headers if the 'Age' header is provided to ensure accuracy
       # once the 'Age' header is removed.
+      #
+      # Returns nothing.
       def prepare_to_cache
         if headers.key? 'Age'
           cache_control.normalize_max_ages(headers['Age'].to_i)

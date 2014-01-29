@@ -3,10 +3,8 @@ require 'bundler/setup'
 
 require 'faraday/http_cache'
 require 'active_support/logger'
-require 'faraday_middleware'
 
 client = Faraday.new('https://api.github.com') do |stack|
-  stack.response :json, content_type: /\bjson$/
   stack.use :http_cache, logger: ActiveSupport::Logger.new(STDOUT)
   stack.adapter Faraday.default_adapter
 end
