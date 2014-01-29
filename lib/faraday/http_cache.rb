@@ -161,7 +161,7 @@ module Faraday
     def parse_deprecated_options(*args)
       options = {}
       if args.length > 0
-        Kernel.warn('This API is deprecated, refer to the documentation for the new one', caller)
+        Kernel.warn('DEPRECATION WARNING: This API is deprecated, refer to the documentation for the new one', caller)
       end
 
       options[:store] = args.shift
