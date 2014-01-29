@@ -3,7 +3,7 @@ require 'digest/sha1'
 
 module Faraday
   class HttpCache < Faraday::Middleware
-    # Internal: A Wrapper around a ActiveSupport::CacheStore to store responses.
+    # Internal: A Wrapper around an ActiveSupport::CacheStore to store responses.
     #
     # Examples
     #   # Creates a new Storage using a MemCached backend from ActiveSupport.
@@ -98,12 +98,12 @@ module Faraday
         end
       end
 
-      # Internal: Creates a cache store from 'ActiveSupport' a set of options.
+      # Internal: Creates a cache store from 'ActiveSupport' with a set of options.
       #
       # store   - A 'Symbol' with the store name.
       # options - Additional options for the cache store.
       #
-      # Returns a 'ActiveSupport::Cache' store.
+      # Returns an 'ActiveSupport::Cache' store.
       def lookup_store(store, options)
         if @logger
           @logger.warn "Passing a Symbol as the 'store' is deprecated, please pass the cache store instead."
