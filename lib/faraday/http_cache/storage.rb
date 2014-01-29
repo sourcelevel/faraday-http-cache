@@ -109,8 +109,13 @@ module Faraday
           @logger.warn "Passing a Symbol as the 'store' is deprecated, please pass the cache store instead."
         end
 
-        require 'active_support/cache'
-        ActiveSupport::Cache.lookup_store(store, options)
+        begin
+          require 'active_support/cache'
+          ActiveSupport::Cache.lookup_store(store, options)
+        rescue LoadError => e
+          puts "You're missing the 'activesupport' gem. Add it to your Gemfile, bundle it and try again"
+          raise e
+        end
       end
 
       # Internal: Checks if the given cache object supports the
