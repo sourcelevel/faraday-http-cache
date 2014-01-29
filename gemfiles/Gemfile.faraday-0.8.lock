@@ -2,7 +2,6 @@ PATH
   remote: ..
   specs:
     faraday-http-cache (0.4.0.dev)
-      activesupport (>= 3.0)
       faraday (~> 0.8)
 
 GEM
@@ -65,6 +64,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activesupport (>= 3.0)
   em-http-request (~> 1.1.0)
   faraday (= 0.8.9)
   faraday-http-cache!
