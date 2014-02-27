@@ -3,7 +3,7 @@ require 'digest/sha1'
 
 module Faraday
   class HttpCache < Faraday::Middleware
-    # Internal: A Wrapper around an ActiveSupport::CacheStore to store responses.
+    # Internal: A wrapper around an ActiveSupport::CacheStore to store responses.
     #
     # Examples
     #   # Creates a new Storage using a MemCached backend from ActiveSupport.

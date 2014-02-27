@@ -3,7 +3,7 @@ require 'faraday/http_cache/cache_control'
 
 module Faraday
   class HttpCache < Faraday::Middleware
-    # Internal: a class to represent a response from a Faraday request.
+    # Internal: A class to represent a response from a Faraday request.
     # It decorates the response hash into a smarter object that queries
     # the response headers and status informations about how the caching
     # middleware should handle this specific response.
