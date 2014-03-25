@@ -76,7 +76,21 @@ module Faraday
       # Returns the encoded String.
       def cache_key_for(request)
         array = request.stringify_keys.to_a.sort
-        Digest::SHA1.hexdigest(@serializer.dump(array))
+        Digest::SHA1.hexdigest(cache_key_prefix_for(request)) + Digest::SHA1.hexdigest(@serializer.dump(array))
+      end
+
+      def cache_key_prefix_for(request)
+        prefix = [path(request), authorization(request)].join("_") + "_"
+      end
+
+      def path(request)
+        request[:url].path
+      end
+
+      def authorization(request)
+        if request[:request_headers].key? "Authorization"
+          request[:request_headers]["Authorization"].gsub(/token /, '')
+        end
       end
 
       # Internal: Logs a warning when the 'cache' implementation
