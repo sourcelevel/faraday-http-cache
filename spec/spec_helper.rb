@@ -3,6 +3,9 @@ require 'socket'
 
 require 'faraday-http-cache'
 require 'faraday_middleware'
+
+# https://github.com/rails/rails/pull/14667
+require 'active_support/per_thread_registry'
 require 'active_support/cache'
 
 require 'support/test_app'
