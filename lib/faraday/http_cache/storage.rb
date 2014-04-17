@@ -28,7 +28,7 @@ module Faraday
       def initialize(options = {})
         @cache = options[:store] || MemoryStore.new
         @serializer = options[:serializer] || JSON
-        @logger = options[:logger]
+        @logger = options.fetch(:logger) { NullLogger.new }
         if @cache.is_a? Symbol
           @cache = lookup_store(@cache, options[:store_options])
         end
@@ -90,8 +90,6 @@ module Faraday
       #
       # Returns nothing.
       def notify_memory_store_usage
-        return if @logger.nil?
-
         kind = @cache.class.name.split('::').last.sub('Store', '').downcase
         if kind == 'memory'
           @logger.warn 'HTTP Cache: using a MemoryStore is not advised as the cache might not be persisted across multiple processes or connection instances.'
@@ -105,9 +103,7 @@ module Faraday
       #
       # Returns an 'ActiveSupport::Cache' store.
       def lookup_store(store, options)
-        if @logger
-          @logger.warn "Passing a Symbol as the 'store' is deprecated, please pass the cache store instead."
-        end
+        @logger.warn "Passing a Symbol as the 'store' is deprecated, please pass the cache store instead."
 
         begin
           require 'active_support/cache'
