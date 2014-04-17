@@ -47,6 +47,8 @@ module Faraday
         key = cache_key_for(request)
         value = @serializer.dump(response.serializable_hash)
         @cache.write(key, value)
+      rescue Encoding::UndefinedConversionError => e
+        puts "Response was not written to cache: #{e.message}"
       end
 
       # Internal: Reads a key based on the given request from the underlying cache.

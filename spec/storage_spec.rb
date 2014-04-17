@@ -69,6 +69,16 @@ describe Faraday::HttpCache::Storage do
       it_behaves_like 'serialization'
     end
 
+    context 'ASCII characters that cannot be converted to UTF-8' do
+      it 'does not write to the cache' do
+        body = "\u2665".force_encoding('ASCII-8BIT')
+        response = double(serializable_hash: { 'body' => body })
+
+        expect(cache).not_to receive(:write)
+
+        subject.write(request, response)
+      end
+    end
   end
 
   describe 'reading responses' do
