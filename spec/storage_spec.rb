@@ -57,6 +57,23 @@ describe Faraday::HttpCache::Storage do
       let(:serialized) { JSON.dump(response.serializable_hash) }
       let(:cache_key)  { '503ac9f7180ca1cdec49e8eb73a9cc0b47c27325' }
       it_behaves_like 'serialization'
+
+      context 'with ASCII character in response that cannot be converted to UTF-8' do
+        let(:response) do
+          body = "\u2665".force_encoding('ASCII-8BIT')
+          double(:response, serializable_hash: { 'body' => body })
+        end
+
+        it 'raises and logs a warning' do
+          logger = double(:logger, warn: nil)
+          storage = Faraday::HttpCache::Storage.new(logger: logger)
+
+          expect { storage.write(request, response) }.to raise_error
+          expect(logger).to have_received(:warn).with(
+            'Response could not be serialized: "\xE2" from ASCII-8BIT to UTF-8. Try using Marshal to serialize.'
+          )
+        end
+      end
     end
 
     context 'with Marshal serializer' do
@@ -67,17 +84,6 @@ describe Faraday::HttpCache::Storage do
         Digest::SHA1.hexdigest(Marshal.dump(array))
       end
       it_behaves_like 'serialization'
-    end
-
-    context 'ASCII characters that cannot be converted to UTF-8' do
-      it 'does not write to the cache' do
-        body = "\u2665".force_encoding('ASCII-8BIT')
-        response = double(serializable_hash: { 'body' => body })
-
-        expect(cache).not_to receive(:write)
-
-        subject.write(request, response)
-      end
     end
   end
 
