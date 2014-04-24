@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Faraday::HttpCache do
   let(:client) do
-    Faraday.new(url: ENV['FARADAY_SERVER']) do |stack|
+    Faraday.new(url: 'http://faraday-http-cache.local') do |stack|
       stack.use :http_cache, serializer: Marshal
       adapter = ENV['FARADAY_ADAPTER']
       stack.headers['X-Faraday-Adapter'] = adapter

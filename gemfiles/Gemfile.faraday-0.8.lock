@@ -50,6 +50,8 @@ GEM
     rspec-mocks (3.0.0.beta2)
       rspec-support (= 3.0.0.beta2)
     rspec-support (3.0.0.beta2)
+    sham_rack (1.3.6)
+      rack
     sinatra (1.4.5)
       rack (~> 1.4)
       rack-protection (~> 1.4)
@@ -70,4 +72,5 @@ DEPENDENCIES
   faraday_middleware (= 0.9.0)
   rake (~> 10.1.0)
   rspec (= 3.0.0.beta2)
+  sham_rack (~> 1.3.6)
   sinatra (~> 1.4.3)

@@ -41,7 +41,7 @@ class TestApp < Sinatra::Base
   end
 
   get '/get' do
-    [200, { 'Cache-Control' => 'max-age=200' }, increment_counter]
+    [200, { 'Cache-Control' => 'max-age=200', 'Date' => Time.now.httpdate }, increment_counter]
   end
 
   get '/private' do
