@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Faraday::HttpCache do
   let(:client) do
-    Faraday.new(url: ENV['FARADAY_SERVER']) do |stack|
+    Faraday.new(url: 'http://faraday-http-cache.local') do |stack|
       stack.response :json, content_type: /\bjson$/
       stack.use :http_cache
       adapter = ENV['FARADAY_ADAPTER']

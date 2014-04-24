@@ -5,7 +5,7 @@ describe Faraday::HttpCache do
   let(:options) { { logger: logger } }
 
   let(:client) do
-    Faraday.new(url: ENV['FARADAY_SERVER']) do |stack|
+    Faraday.new(url: 'http://faraday-http-cache.local') do |stack|
       stack.use Faraday::HttpCache, options
       adapter = ENV['FARADAY_ADAPTER']
       stack.headers['X-Faraday-Adapter'] = adapter
@@ -173,7 +173,7 @@ describe Faraday::HttpCache do
 
   it 'raises an error when misconfigured' do
     expect {
-      client = Faraday.new(url: ENV['FARADAY_SERVER']) do |stack|
+      client = Faraday.new(url: 'http://faraday-http-cache.local') do |stack|
         stack.use Faraday::HttpCache, i_have_no_idea: true
       end
 
