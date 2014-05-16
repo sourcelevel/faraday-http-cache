@@ -40,6 +40,12 @@ module Faraday
     # Internal: valid options for the 'initialize' configuration Hash.
     VALID_OPTIONS = [:store, :serializer, :logger, :store_options, :shared_cache]
 
+    class NullLogger
+      def method_missing(*args, &block)
+        nil
+      end
+    end
+
     # Public: Initializes a new HttpCache middleware.
     #
     # app  - the next endpoint on the 'Faraday' stack.
@@ -67,11 +73,11 @@ module Faraday
     #   Faraday::HttpCache.new(app, store: store, logger: my_logger)
     def initialize(app, *args)
       super(app)
-      @logger = nil
+      @logger = NullLogger.new
       @shared_cache = true
       if args.first.is_a? Hash
         options = args.first
-        @logger = options[:logger]
+        @logger = options.fetch(:logger) { @logger }
         @shared_cache = options.fetch(:shared_cache, true)
       else
         options = parse_deprecated_options(*args)
@@ -170,7 +176,7 @@ module Faraday
         hash_params = args.first
         options[:serializer] = hash_params.delete(:serializer)
 
-        @logger = hash_params[:logger]
+        @logger = hash_params.fetch(:logger) { @logger }
         @shared_cache = hash_params.fetch(:shared_cache, true)
       end
 
@@ -317,8 +323,6 @@ module Faraday
     #
     # Returns nothing.
     def log_request
-      return unless @logger
-
       method = @request[:method].to_s.upcase
       path = @request[:url].request_uri
       line = "HTTP Cache: [#{method} #{path}] #{@trace.join(', ')}"
