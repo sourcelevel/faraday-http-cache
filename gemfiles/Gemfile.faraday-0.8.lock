@@ -1,7 +1,7 @@
 PATH
   remote: ..
   specs:
-    faraday-http-cache (0.4.0)
+    faraday-http-cache (0.4.1)
       faraday (~> 0.8)
 
 GEM
