@@ -33,7 +33,6 @@ module Faraday
           @cache = lookup_store(@cache, options[:store_options])
         end
         assert_valid_store!
-        notify_memory_store_usage
       end
 
       # Internal: Writes a response with a key based on the given request.
@@ -88,19 +87,6 @@ module Faraday
         end
 
         Digest::SHA1.hexdigest(@serializer.dump(cache_keys.sort))
-      end
-
-      # Internal: Logs a warning when the 'cache' implementation
-      # isn't suitable for production use.
-      #
-      # Returns nothing.
-      def notify_memory_store_usage
-        return if @logger.nil?
-
-        kind = @cache.class.name.split('::').last.sub('Store', '').downcase
-        if kind == 'memory'
-          @logger.warn 'HTTP Cache: using a MemoryStore is not advised as the cache might not be persisted across multiple processes or connection instances.'
-        end
       end
 
       # Internal: Creates a cache store from 'ActiveSupport' with a set of options.
