@@ -12,6 +12,7 @@ Gem::Specification.new do |gem|
   gem.files         = Dir['LICENSE', 'README.md', 'lib/**/*']
   gem.test_files    = Dir['spec/**/*']
   gem.require_paths = ['lib']
+  gem.executables   = []
 
   gem.add_dependency 'faraday', '~> 0.8'
 end
