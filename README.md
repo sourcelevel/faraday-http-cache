@@ -48,8 +48,10 @@ client = Faraday.new do |builder|
   builder.adapter Faraday.default_adapter
 end
 ```
-The default store provided is a simple in memory cache that lives on the client
-instance, so it's important to configure a proper one for your production environment.
+The default store provided is a simple in memory cache that lives on the client instance.
+This type of store **might not be persisted across multiple processes or connection instances**
+so it is probably not suitable for most production environments.
+Make sure that you configure a store that is suitable for you.
 
 the stdlib `JSON` module is used for serialization by default.
 If you expect to be dealing with images, you can use [Marshal][marshal] instead, or
