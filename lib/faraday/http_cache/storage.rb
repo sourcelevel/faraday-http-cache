@@ -6,10 +6,11 @@ module Faraday
     # Internal: A wrapper around an ActiveSupport::CacheStore to store responses.
     #
     # Examples
+    #
     #   # Creates a new Storage using a MemCached backend from ActiveSupport.
     #   Faraday::HttpCache::Storage.new(:mem_cache_store)
     #
-    #   # Reuse some other instance of a ActiveSupport::CacheStore object.
+    #   # Reuse some other instance of an ActiveSupport::Cache::Store object.
     #   Faraday::HttpCache::Storage.new(Rails.cache)
     #
     #   # Creates a new Storage using Marshal for serialization.
