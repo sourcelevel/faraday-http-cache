@@ -77,7 +77,18 @@ describe Faraday::HttpCache::Storage do
         array = request.stringify_keys.to_a.sort
         Digest::SHA1.hexdigest(Marshal.dump(array))
       end
+
       it_behaves_like 'serialization'
+
+      it "should have a unique cache key" do
+        request = { method: :get, request_headers: {}, url: URI.parse('http://foo.bar/path/to/somewhere') }
+        duplicate_request = { method: :get, request_headers: {}, url: URI.parse('http://foo.bar/path/to/somewhere') }
+        storage = Faraday::HttpCache::Storage.new(serializer: Marshal)
+        response = Faraday::HttpCache::Response.new({ status: 200, body: "body" })
+        storage.write(request, response)
+        read_response  = storage.read(duplicate_request).serializable_hash
+        expect(read_response).to eq(response.serializable_hash)
+      end
     end
   end
 

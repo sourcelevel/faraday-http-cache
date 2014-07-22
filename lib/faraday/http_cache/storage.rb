@@ -84,7 +84,7 @@ module Faraday
       # Returns the encoded String.
       def cache_key_for(request)
         cache_keys = request.each_with_object([]) do |(key, value), parts|
-          parts << [key.to_s, value]
+          parts << [key.to_s, value.to_s]
         end
 
         Digest::SHA1.hexdigest(@serializer.dump(cache_keys.sort))
