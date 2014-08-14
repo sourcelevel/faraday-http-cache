@@ -1,5 +1,5 @@
 require 'json'
-require 'digest/sha1'
+require 'openssl'
 
 module Faraday
   class HttpCache < Faraday::Middleware
@@ -83,11 +83,17 @@ module Faraday
       #
       # Returns the encoded String.
       def cache_key_for(request)
-        cache_keys = request.each_with_object([]) do |(key, value), parts|
-          parts << [key.to_s, value.to_s]
+        digest = OpenSSL::Digest::SHA1.new
+        digest << "method"
+        digest << request[:method].to_s
+        digest << "request_headers"
+        request[:request_headers].keys.sort.each do |key|
+          digest << key.to_s
+          digest << request[:request_headers][key].to_s
         end
-
-        Digest::SHA1.hexdigest(@serializer.dump(cache_keys.sort))
+        digest << "url"
+        digest << request[:url].to_s
+        digest.to_s
       end
 
       # Internal: Creates a cache store from 'ActiveSupport' with a set of options.
