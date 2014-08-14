@@ -49,7 +49,7 @@ describe Faraday::HttpCache::Storage do
 
     context 'with default serializer' do
       let(:serialized) { JSON.dump(response.serializable_hash) }
-      let(:cache_key)  { '503ac9f7180ca1cdec49e8eb73a9cc0b47c27325' }
+      let(:cache_key)  { '084dd517af7651a9ca7823728544b9b55e0cc130' }
       it_behaves_like 'serialization'
 
       context 'with ASCII character in response that cannot be converted to UTF-8' do
@@ -73,10 +73,7 @@ describe Faraday::HttpCache::Storage do
     context 'with Marshal serializer' do
       let(:storage)    { Faraday::HttpCache::Storage.new store: cache, serializer: Marshal }
       let(:serialized) { Marshal.dump(response.serializable_hash) }
-      let(:cache_key) do
-        array = request.stringify_keys.to_a.sort
-        Digest::SHA1.hexdigest(Marshal.dump(array))
-      end
+      let(:cache_key) { '084dd517af7651a9ca7823728544b9b55e0cc130' }
 
       it_behaves_like 'serialization'
 
