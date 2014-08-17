@@ -49,7 +49,7 @@ describe Faraday::HttpCache::Storage do
 
     context 'with default serializer' do
       let(:serialized) { JSON.dump(response.serializable_hash) }
-      let(:cache_key)  { '503ac9f7180ca1cdec49e8eb73a9cc0b47c27325' }
+      let(:cache_key)  { '084dd517af7651a9ca7823728544b9b55e0cc130' }
       it_behaves_like 'serialization'
 
       context 'with ASCII character in response that cannot be converted to UTF-8' do
@@ -73,11 +73,19 @@ describe Faraday::HttpCache::Storage do
     context 'with Marshal serializer' do
       let(:storage)    { Faraday::HttpCache::Storage.new store: cache, serializer: Marshal }
       let(:serialized) { Marshal.dump(response.serializable_hash) }
-      let(:cache_key) do
-        array = request.stringify_keys.to_a.sort
-        Digest::SHA1.hexdigest(Marshal.dump(array))
-      end
+      let(:cache_key) { '084dd517af7651a9ca7823728544b9b55e0cc130' }
+
       it_behaves_like 'serialization'
+
+      it "should have a unique cache key" do
+        request = { method: :get, request_headers: {}, url: URI.parse('http://foo.bar/path/to/somewhere') }
+        duplicate_request = { method: :get, request_headers: {}, url: URI.parse('http://foo.bar/path/to/somewhere') }
+        storage = Faraday::HttpCache::Storage.new(serializer: Marshal)
+        response = Faraday::HttpCache::Response.new({ status: 200, body: "body" })
+        storage.write(request, response)
+        read_response  = storage.read(duplicate_request).serializable_hash
+        expect(read_response).to eq(response.serializable_hash)
+      end
     end
   end
 
