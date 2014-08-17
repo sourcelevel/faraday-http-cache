@@ -1,5 +1,5 @@
 require 'json'
-require 'openssl'
+require 'digest/sha1'
 
 module Faraday
   class HttpCache < Faraday::Middleware
@@ -77,22 +77,20 @@ module Faraday
       private
 
       # Internal: Generates a String key for a given request object.
-      # The request object is folded into a sorted Array (since we can't count
-      # on hashes order on Ruby 1.8), encoded as JSON and digested as a `SHA1`
-      # string.
       #
-      # Returns the encoded String.
+      # Returns the digested String.
       def cache_key_for(request)
-        digest = OpenSSL::Digest::SHA1.new
-        digest << "method"
-        digest << request[:method].to_s
-        digest << "request_headers"
+        digest = Digest::SHA1.new
+        digest.update 'method'
+        digest.update request[:method].to_s
+        digest.update 'request_headers'
         request[:request_headers].keys.sort.each do |key|
-          digest << key.to_s
-          digest << request[:request_headers][key].to_s
+          digest.update key.to_s
+          digest.update request[:request_headers][key].to_s
         end
-        digest << "url"
-        digest << request[:url].to_s
+        digest.update 'url'
+        digest.update request[:url].to_s
+
         digest.to_s
       end
 
