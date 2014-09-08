@@ -77,6 +77,15 @@ module Faraday
         end
       end
 
+      # Public: Deletes a response from the cache, when the cached response is
+      # outdated.
+      #
+      # Returns nothing.
+      def delete(request)
+        key = cache_key_for(request)
+        cache.delete(key)
+      end
+
       private
 
       # Internal: Generates a String key for a given request object.
@@ -143,6 +152,10 @@ module Faraday
 
       def write(key, value)
         @cache[key] = value
+      end
+
+      def delete(key)
+        @cache.delete(key)
       end
     end
   end

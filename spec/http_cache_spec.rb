@@ -23,13 +23,46 @@ describe Faraday::HttpCache do
   end
 
   it 'logs that a POST request is unacceptable' do
-    expect(logger).to receive(:debug).with('HTTP Cache: [POST /post] unacceptable')
+    expect(logger).to receive(:debug).with('HTTP Cache: [POST /post] unacceptable, delete')
     client.post('post').body
   end
 
   it 'does not cache responses with invalid status code' do
     client.get('broken')
     expect(client.get('broken').body).to eq('2')
+  end
+
+  it 'expires POST requests' do
+    client.get('counter')
+    client.post('counter')
+    expect(client.get('counter').body).to eq('2')
+  end
+
+  it 'logs that a POST request was deleted from the cache' do
+    expect(logger).to receive(:debug).with('HTTP Cache: [POST /counter] unacceptable, delete')
+    client.post('counter')
+  end
+
+  it 'expires PUT requests' do
+    client.get('counter')
+    client.put('counter')
+    expect(client.get('counter').body).to eq('2')
+  end
+
+  it 'logs that a PUT request was deleted from the cache' do
+    expect(logger).to receive(:debug).with('HTTP Cache: [PUT /counter] unacceptable, delete')
+    client.put('counter')
+  end
+
+  it 'expires DELETE requests' do
+    client.get('counter')
+    client.delete('counter')
+    expect(client.get('counter').body).to eq('2')
+  end
+
+  it 'logs that a DELETE request was deleted from the cache' do
+    expect(logger).to receive(:debug).with('HTTP Cache: [DELETE /counter] unacceptable, delete')
+    client.delete('counter')
   end
 
   it 'logs that a response with a bad status code is invalid' do

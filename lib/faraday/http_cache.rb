@@ -111,6 +111,7 @@ module Faraday
       end
 
       response.on_complete do
+        delete(@request) if should_delete?(@request[:method])
         log_request
       end
     end
@@ -203,6 +204,14 @@ module Faraday
       method == :get || method == :head
     end
 
+    # Internal: Checks if the current request method should remove any existing
+    # cache entries for the same resource.
+    #
+    # Returns true or false.
+    def should_delete?(method)
+      method == :put || method == :delete || method == :post
+    end
+
     # Internal: Tries to locate a valid response or forwards the call to the stack.
     # * If no entry is present on the storage, the 'fetch' method will forward
     # the call to the remaining stack and return the new response.
@@ -282,6 +291,12 @@ module Faraday
       else
         trace :invalid
       end
+    end
+
+    def delete(request)
+      @storage.delete(request.merge(method: :get))
+      @storage.delete(request.merge(method: :head))
+      trace :delete
     end
 
     # Internal: Fetches the response from the Faraday stack and stores it.

@@ -39,7 +39,6 @@ describe Faraday::HttpCache::Storage do
   end
 
   describe 'storing responses' do
-
     shared_examples 'serialization' do
       it 'writes the response json to the underlying cache using a digest as the key' do
         expect(cache).to receive(:write).with(cache_key, serialized)
@@ -101,6 +100,17 @@ describe Faraday::HttpCache::Storage do
     end
   end
 
+  describe 'deleting responses' do
+    it 'removes the response from the cache' do
+      request = { method: :get, request_headers: {}, url: URI.parse('http://foo.bar/path/to/somewhere') }
+      response = Faraday::HttpCache::Response.new(status: 200, body: 'body')
+
+      cache.write(request, response)
+      cache.delete(request)
+      expect(cache.read(request)).to be_nil
+    end
+  end
+
   describe 'remove age before caching and normalize max-age if non-zero age present' do
     it 'is fresh if the response still has some time to live' do
       headers = {
@@ -134,5 +144,4 @@ describe Faraday::HttpCache::Storage do
       expect(cached_response).not_to be_fresh
     end
   end
-
 end
