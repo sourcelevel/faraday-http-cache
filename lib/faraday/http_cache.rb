@@ -117,6 +117,12 @@ module Faraday
 
     protected
 
+    # Internal: Gets the request object created from the Faraday env Hash.
+    attr_reader :request
+
+    # Internal: Gets the storage instance associated with the middleware.
+    attr_reader :storage
+
     # Public: Creates the Storage instance for this middleware.
     #
     # options - A Hash of options.
