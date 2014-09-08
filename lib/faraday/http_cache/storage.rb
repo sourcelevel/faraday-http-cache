@@ -16,6 +16,9 @@ module Faraday
     #   # Creates a new Storage using Marshal for serialization.
     #   Faraday::HttpCache::Storage.new(:memory_store, serializer: Marshal)
     class Storage
+      # Public: Gets the underlying cache store object.
+      attr_reader :cache
+
       # Internal: Initialize a new Storage object with a cache backend.
       #
       # options - Storage options (default: {}).
@@ -46,7 +49,7 @@ module Faraday
       def write(request, response)
         key = cache_key_for(request)
         value = @serializer.dump(response.serializable_hash)
-        @cache.write(key, value)
+        cache.write(key, value)
       rescue Encoding::UndefinedConversionError => e
         if @logger
           @logger.warn("Response could not be serialized: #{e.message}. Try using Marshal to serialize.")
@@ -63,7 +66,7 @@ module Faraday
       # klass - The Class to be instantiated with the recovered informations.
       def read(request, klass = Faraday::HttpCache::Response)
         cache_key = cache_key_for(request)
-        found = @cache.read(cache_key)
+        found = cache.read(cache_key)
 
         if found
           payload = @serializer.load(found).each_with_object({}) do |(key,value), hash|
@@ -121,8 +124,8 @@ module Faraday
       #
       # Returns nothing.
       def assert_valid_store!
-        unless @cache.respond_to?(:read) && @cache.respond_to?(:write)
-          raise ArgumentError.new("#{@cache.inspect} is not a valid cache store as it does not responds to 'read' and 'write'.")
+        unless cache.respond_to?(:read) && cache.respond_to?(:write)
+          raise ArgumentError.new("#{cache.inspect} is not a valid cache store as it does not responds to 'read' and 'write'.")
         end
       end
     end
