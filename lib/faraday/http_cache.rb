@@ -78,7 +78,7 @@ module Faraday
       end
 
       assert_valid_options!(options)
-      @storage = Storage.new(options)
+      @storage = create_storage(options)
     end
 
     # Public: Process the request into a duplicate of this instance to
@@ -115,13 +115,25 @@ module Faraday
       end
     end
 
+    protected
+
+    # Public: Creates the Storage instance for this middleware.
+    #
+    # options - A Hash of options.
+    #
+    # Returns a Storage instance.
+    def create_storage(options)
+      Storage.new(options)
+    end
+
+    private
+
     # Internal: Should this cache instance act like a "shared cache" according
     # to the the definition in RFC 2616?
     def shared_cache?
       @shared_cache
     end
 
-    private
     # Internal: Receive the deprecated arguments to initialize the old API
     # and returns a Hash compatible with the new API
     #
