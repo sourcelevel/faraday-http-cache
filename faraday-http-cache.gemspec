@@ -14,5 +14,5 @@ Gem::Specification.new do |gem|
   gem.require_paths = ['lib']
   gem.executables   = []
 
-  gem.add_dependency 'faraday', '~> 0.8'
+  gem.add_dependency 'faraday', '>= 0.8'
 end
