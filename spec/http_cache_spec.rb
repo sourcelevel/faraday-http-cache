@@ -65,6 +65,17 @@ describe Faraday::HttpCache do
     client.delete('counter')
   end
 
+  it 'expires PATCH requests' do
+    client.get('counter')
+    client.patch('counter')
+    expect(client.get('counter').body).to eq('2')
+  end
+
+  it 'logs that a PATCH request was deleted from the cache' do
+    expect(logger).to receive(:debug).with('HTTP Cache: [PATCH /counter] unacceptable, delete')
+    client.patch('counter')
+  end
+
   it 'logs that a response with a bad status code is invalid' do
     expect(logger).to receive(:debug).with('HTTP Cache: [GET /broken] miss, invalid')
     client.get('broken')

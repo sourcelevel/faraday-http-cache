@@ -53,6 +53,9 @@ class TestApp < Sinatra::Base
   delete '/counter' do
   end
 
+  patch '/counter' do
+  end
+
   get '/get' do
     [200, { 'Cache-Control' => 'max-age=200' }, increment_counter]
   end

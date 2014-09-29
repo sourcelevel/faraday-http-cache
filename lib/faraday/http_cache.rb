@@ -40,6 +40,8 @@ module Faraday
     # Internal: valid options for the 'initialize' configuration Hash.
     VALID_OPTIONS = [:store, :serializer, :logger, :store_options, :shared_cache]
 
+    UNSAFE_METHODS = [:post, :put, :delete, :patch]
+
     # Public: Initializes a new HttpCache middleware.
     #
     # app  - the next endpoint on the 'Faraday' stack.
@@ -209,7 +211,7 @@ module Faraday
     #
     # Returns true or false.
     def should_delete?(method)
-      method == :put || method == :delete || method == :post
+      UNSAFE_METHODS.include?(method)
     end
 
     # Internal: Tries to locate a valid response or forwards the call to the stack.
