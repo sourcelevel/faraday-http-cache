@@ -60,6 +60,10 @@ class TestApp < Sinatra::Base
     [200, { 'Cache-Control' => 'max-age=200' }, increment_counter]
   end
 
+  post '/get' do
+    halt 405
+  end
+
   get '/private' do
     [200, { 'Cache-Control' => 'private, max-age=100' }, increment_counter]
   end

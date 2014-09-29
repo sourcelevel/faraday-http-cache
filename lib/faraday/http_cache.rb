@@ -42,6 +42,8 @@ module Faraday
 
     UNSAFE_METHODS = [:post, :put, :delete, :patch]
 
+    ERROR_STATUSES = 400..499
+
     # Public: Initializes a new HttpCache middleware.
     #
     # app  - the next endpoint on the 'Faraday' stack.
@@ -113,7 +115,7 @@ module Faraday
       end
 
       response.on_complete do
-        delete(@request) if should_delete?(@request[:method])
+        delete(@request) if should_delete?(response.status, @request[:method])
         log_request
       end
     end
@@ -210,8 +212,8 @@ module Faraday
     # cache entries for the same resource.
     #
     # Returns true or false.
-    def should_delete?(method)
-      UNSAFE_METHODS.include?(method)
+    def should_delete?(status, method)
+      UNSAFE_METHODS.include?(method) && !ERROR_STATUSES.cover?(status)
     end
 
     # Internal: Tries to locate a valid response or forwards the call to the stack.

@@ -43,6 +43,12 @@ describe Faraday::HttpCache do
     client.post('counter')
   end
 
+  it 'does not expires POST requests that failed' do
+    client.get('get')
+    client.post('get')
+    expect(client.get('get').body).to eq('1')
+  end
+
   it 'expires PUT requests' do
     client.get('counter')
     client.put('counter')
