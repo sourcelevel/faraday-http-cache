@@ -3,6 +3,7 @@
 .bundle
 .config
 .yardoc
+.ruby-version
 InstalledFiles
 _yardoc
 coverage

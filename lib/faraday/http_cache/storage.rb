@@ -47,7 +47,7 @@ module Faraday
       #           :request_headers - The custom headers for the request.
       # response - The Faraday::HttpCache::Response instance to be stored.
       def write(request, response)
-        key = cache_key_for(request)
+        key = request.cache_key
         value = @serializer.dump(response.serializable_hash)
         cache.write(key, value)
       rescue Encoding::UndefinedConversionError => e
@@ -65,7 +65,7 @@ module Faraday
       #           :request_headers - The custom headers for the request.
       # klass - The Class to be instantiated with the recovered informations.
       def read(request, klass = Faraday::HttpCache::Response)
-        cache_key = cache_key_for(request)
+        cache_key = request.cache_key
         found = cache.read(cache_key)
 
         if found
@@ -78,24 +78,6 @@ module Faraday
       end
 
       private
-
-      # Internal: Generates a String key for a given request object.
-      #
-      # Returns the digested String.
-      def cache_key_for(request)
-        digest = Digest::SHA1.new
-        digest.update 'method'
-        digest.update request[:method].to_s
-        digest.update 'request_headers'
-        request[:request_headers].keys.sort.each do |key|
-          digest.update key.to_s
-          digest.update request[:request_headers][key].to_s
-        end
-        digest.update 'url'
-        digest.update request[:url].to_s
-
-        digest.to_s
-      end
 
       # Internal: Creates a cache store from 'ActiveSupport' with a set of options.
       #
