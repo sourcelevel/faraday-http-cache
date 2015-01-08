@@ -40,6 +40,10 @@ module Faraday
     # Internal: valid options for the 'initialize' configuration Hash.
     VALID_OPTIONS = [:store, :serializer, :logger, :store_options, :shared_cache]
 
+    UNSAFE_METHODS = [:post, :put, :delete, :patch]
+
+    ERROR_STATUSES = 400..499
+
     # Public: Initializes a new HttpCache middleware.
     #
     # app  - the next endpoint on the 'Faraday' stack.
@@ -111,6 +115,7 @@ module Faraday
       end
 
       response.on_complete do
+        delete(@request) if should_delete?(response.status, @request[:method])
         log_request
       end
     end
@@ -203,6 +208,14 @@ module Faraday
       method == :get || method == :head
     end
 
+    # Internal: Checks if the current request method should remove any existing
+    # cache entries for the same resource.
+    #
+    # Returns true or false.
+    def should_delete?(status, method)
+      UNSAFE_METHODS.include?(method) && !ERROR_STATUSES.cover?(status)
+    end
+
     # Internal: Tries to locate a valid response or forwards the call to the stack.
     # * If no entry is present on the storage, the 'fetch' method will forward
     # the call to the remaining stack and return the new response.
@@ -282,6 +295,12 @@ module Faraday
       else
         trace :invalid
       end
+    end
+
+    def delete(request)
+      @storage.delete(request.merge(method: :get))
+      @storage.delete(request.merge(method: :head))
+      trace :delete
     end
 
     # Internal: Fetches the response from the Faraday stack and stores it.
