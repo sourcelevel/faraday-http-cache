@@ -39,17 +39,18 @@ module Faraday
   #   end
   class HttpCache < Faraday::Middleware
     # Internal: valid options for the 'initialize' configuration Hash.
-    VALID_OPTIONS = [:store, :serializer, :logger, :store_options, :shared_cache]
+    VALID_OPTIONS = [:store, :serializer, :logger, :store_options, :shared_cache, :ignore_headers]
 
     # Public: Initializes a new HttpCache middleware.
     #
     # app  - the next endpoint on the 'Faraday' stack.
     # args - aditional options to setup the logger and the storage.
-    #             :logger        - A logger object.
-    #             :serializer    - A serializer that should respond to 'dump' and 'load'.
-    #             :shared_cache  - A flag to mark the middleware as a shared cache or not.
-    #             :store         - A cache store that should respond to 'read' and 'write'.
-    #             :store_options - Deprecated: additional options to setup the cache store.
+    #             :logger         - A logger object.
+    #             :serializer     - A serializer that should respond to 'dump' and 'load'.
+    #             :shared_cache   - A flag to mark the middleware as a shared cache or not.
+    #             :store          - A cache store that should respond to 'read' and 'write'.
+    #             :store_options  - Deprecated: additional options to setup the cache store.
+    #             :ignore_headers - One or more headers to ignore when forming the cache key.
     #
     # Examples:
     #

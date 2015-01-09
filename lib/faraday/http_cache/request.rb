@@ -34,12 +34,16 @@ module Faraday
         @cache_control ||= CacheControl.new(headers['Cache-Control'])
       end
 
-      def cache_key
+      def cache_key(options = {})
+        ignore_headers = options.fetch(:ignore_headers, [])
+
         digest = Digest::SHA1.new
         digest.update 'method'
         digest.update method.to_s
         digest.update 'request_headers'
         headers.keys.sort.each do |key|
+          next if ignore_headers.include?(key)
+
           digest.update key.to_s
           digest.update headers[key].to_s
         end

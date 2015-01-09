@@ -17,18 +17,21 @@ module Faraday
     #   Faraday::HttpCache::Storage.new(:memory_store, serializer: Marshal)
     class Storage
       # Public: Gets the underlying cache store object.
-      attr_reader :cache
+      attr_reader :cache,
+                  :ignore_headers
 
       # Internal: Initialize a new Storage object with a cache backend.
       #
       # options - Storage options (default: {}).
-      #           :logger        - A Logger object to be used to emit warnings.
-      #           :store         - An cache store object that should
-      #                            respond to 'dump' and 'load'.
-      #           :serializer    - A serializer object that should
-      #                            respond to 'dump' and 'load'.
-      #           :store_options - An array containg the options for
-      #                            the cache store.
+      #           :logger         - A Logger object to be used to emit warnings.
+      #           :store          - An cache store object that should
+      #                             respond to 'dump' and 'load'.
+      #           :serializer     - A serializer object that should
+      #                             respond to 'dump' and 'load'.
+      #           :store_options  - An array containg the options for
+      #                             the cache store.
+      #           :ignore_headers - One or more headers to ignore when forming
+      #                             the cache key.
       def initialize(options = {})
         @cache = options[:store] || MemoryStore.new
         @serializer = options[:serializer] || JSON
@@ -37,6 +40,7 @@ module Faraday
           @cache = lookup_store(@cache, options[:store_options])
         end
         assert_valid_store!
+        @ignore_headers = Array(options[:ignore_headers])
       end
 
       # Internal: Writes a response with a key based on the given request.
@@ -47,7 +51,7 @@ module Faraday
       #           :request_headers - The custom headers for the request.
       # response - The Faraday::HttpCache::Response instance to be stored.
       def write(request, response)
-        key = request.cache_key
+        key = request.cache_key(ignore_headers: ignore_headers)
         value = @serializer.dump(response.serializable_hash)
         cache.write(key, value)
       rescue Encoding::UndefinedConversionError => e
@@ -63,7 +67,7 @@ module Faraday
       #           :request_headers - The custom headers for the request.
       # klass - The Class to be instantiated with the recovered informations.
       def read(request, klass = Faraday::HttpCache::Response)
-        cache_key = request.cache_key
+        cache_key = request.cache_key(ignore_headers: ignore_headers)
         found = cache.read(cache_key)
 
         if found
