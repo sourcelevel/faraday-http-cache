@@ -47,9 +47,18 @@ module Faraday
       #           :request_headers - The custom headers for the request.
       # response - The Faraday::HttpCache::Response instance to be stored.
       def write(request, response)
-        key = request.cache_key
-        value = @serializer.dump(response.serializable_hash)
-        cache.write(key, value)
+        key = cache_key_for(request)
+        entry = serialize_entry(request.serializable_hash, response.serializable_hash)
+
+        entries = cache.read(key) || []
+
+        entries.reject! do |(cached_request, cached_response)|
+          request_matches?(request, deserialize_object(cached_request), deserialize_object(cached_response))
+        end
+
+        entries << entry
+
+        cache.write(key, entries)
       rescue Encoding::UndefinedConversionError => e
         warn "Response could not be serialized: #{e.message}. Try using Marshal to serialize."
         raise e
@@ -63,19 +72,50 @@ module Faraday
       #           :request_headers - The custom headers for the request.
       # klass - The Class to be instantiated with the recovered informations.
       def read(request, klass = Faraday::HttpCache::Response)
-        cache_key = request.cache_key
-        found = cache.read(cache_key)
+        cache_key = cache_key_for(request)
+        entries = cache.read(cache_key)
+        response = find_response(entries, request)
 
-        if found
-          payload = @serializer.load(found).each_with_object({}) do |(key,value), hash|
-            hash[key.to_sym] = value
-          end
-
-          klass.new(payload)
+        if response
+          klass.new(response)
         end
       end
 
       private
+
+      def find_response(entries, request)
+        if entries
+          entries = entries.map { |entry| deserialize_entry(*entry) }
+          _, response = entries.find { |req, res| request_matches?(request, req, res) }
+          response
+        end
+      end
+
+      def request_matches?(request, cached_request, cached_response)
+        request.method.to_s == cached_request[:method]
+      end
+
+      def serialize_entry(*objects)
+        objects.map { |object| serialize_object(object) }
+      end
+
+      def serialize_object(object)
+        @serializer.dump(object)
+      end
+
+      def deserialize_entry(*objects)
+        objects.map { |object| deserialize_object(object) }
+      end
+
+      def deserialize_object(object)
+        @serializer.load(object).each_with_object({}) do |(key, value), hash|
+          hash[key.to_sym] = value
+        end
+      end
+
+      def cache_key_for(request)
+        Digest::SHA1.hexdigest(request.url.to_s)
+      end
 
       # Internal: Creates a cache store from 'ActiveSupport' with a set of options.
       #
