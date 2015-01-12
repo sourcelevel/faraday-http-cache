@@ -1,8 +1,12 @@
 require 'spec_helper'
 
 describe Faraday::HttpCache::Storage do
-  let(:cache_key) { '084dd517af7651a9ca7823728544b9b55e0cc130' }
-  let(:request) { double 'a Request', cache_key: cache_key }
+  let(:cache_key) { 'bdde120549a0e4eaa55741ffb6de17faea5f88e9' }
+  let(:request) do
+    env = { method: :get, url: 'http://test/index' }
+    double(env.merge(serializable_hash: env))
+  end
+
   let(:response) { double(serializable_hash: {}) }
 
   let(:cache) { ActiveSupport::Cache.lookup_store }
@@ -37,20 +41,19 @@ describe Faraday::HttpCache::Storage do
   end
 
   describe 'storing responses' do
-
-    shared_examples 'serialization' do
-      it 'writes the response json to the underlying cache using a digest as the key' do
-        expect(cache).to receive(:write).with(cache_key, serialized)
+    shared_examples 'A storage with serialization' do
+      it 'writes the response object to the underlying cache' do
+        entry = [serializer.dump(request.serializable_hash), serializer.dump(response.serializable_hash)]
+        expect(cache).to receive(:write).with(cache_key, [entry])
         subject.write(request, response)
       end
     end
 
-    context 'with default serializer' do
-      let(:serialized) { JSON.dump(response.serializable_hash) }
-      let(:cache_key)  { '084dd517af7651a9ca7823728544b9b55e0cc130' }
-      it_behaves_like 'serialization'
+    context 'with the JSON serializer' do
+      let(:serializer) { JSON }
+      it_behaves_like 'A storage with serialization'
 
-      context 'with ASCII character in response that cannot be converted to UTF-8' do
+      context 'when ASCII characters in response cannot be converted to UTF-8' do
         let(:response) do
           body = "\u2665".force_encoding('ASCII-8BIT')
           double(:response, serializable_hash: { 'body' => body })
@@ -68,20 +71,11 @@ describe Faraday::HttpCache::Storage do
       end
     end
 
-    context 'with Marshal serializer' do
-      let(:storage)    { Faraday::HttpCache::Storage.new store: cache, serializer: Marshal }
-      let(:serialized) { Marshal.dump(response.serializable_hash) }
-      let(:duplicate_request) { double 'another Request', cache_key: cache_key }
+    context 'with the Marshal serializer' do
+      let(:serializer) { Marshal }
+      let(:storage) { Faraday::HttpCache::Storage.new(store: cache, serializer: Marshal) }
 
-      it_behaves_like 'serialization'
-
-      it 'should have a unique cache key' do
-        storage = Faraday::HttpCache::Storage.new(serializer: Marshal)
-        response = Faraday::HttpCache::Response.new(status: 200, body: 'body')
-        storage.write(request, response)
-        read_response  = storage.read(duplicate_request).serializable_hash
-        expect(read_response).to eq(response.serializable_hash)
-      end
+      it_behaves_like 'A storage with serialization'
     end
   end
 

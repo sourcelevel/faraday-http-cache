@@ -75,11 +75,13 @@ describe Faraday::HttpCache do
     client.get('dontstore')
   end
 
-  it 'caches multiple responses when the headers differ' do
+  it 'does not caches multiple responses when the headers differ' do
     client.get('get', nil, 'HTTP_ACCEPT' => 'text/html')
     expect(client.get('get', nil, 'HTTP_ACCEPT' => 'text/html').body).to eq('1')
-    expect(client.get('get', nil, 'HTTP_ACCEPT' => 'application/json').body).to eq('2')
+    expect(client.get('get', nil, 'HTTP_ACCEPT' => 'application/json').body).to eq('1')
   end
+
+  it 'caches multiples responses based on the "Vary" header'
 
   it 'caches requests with the "Expires" header' do
     client.get('expires')
@@ -103,7 +105,6 @@ describe Faraday::HttpCache do
     end
 
     it 'caches the response' do
-      pending 'not possible as long as we use all the request headers for the cache key'
       client.get('get', nil, 'Cache-Control' => 'no-cache')
       expect(client.get('get', nil).body).to eq('1')
     end

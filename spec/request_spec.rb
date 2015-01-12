@@ -6,8 +6,6 @@ describe Faraday::HttpCache::Request do
   let(:url) { URI.parse('http://example.com/path/to/somewhere') }
   let(:headers) { {} }
 
-  it { should respond_to(:cache_key)}
-
   context 'a GET request' do
     it { should be_cacheable }
   end
