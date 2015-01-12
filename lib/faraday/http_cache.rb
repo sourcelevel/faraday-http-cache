@@ -39,7 +39,7 @@ module Faraday
   #   end
   class HttpCache < Faraday::Middleware
     # Internal: valid options for the 'initialize' configuration Hash.
-    VALID_OPTIONS = [:store, :serializer, :logger, :store_options, :shared_cache]
+    VALID_OPTIONS = [:store, :serializer, :logger, :shared_cache]
 
     # Public: Initializes a new HttpCache middleware.
     #
@@ -49,7 +49,6 @@ module Faraday
     #             :serializer    - A serializer that should respond to 'dump' and 'load'.
     #             :shared_cache  - A flag to mark the middleware as a shared cache or not.
     #             :store         - A cache store that should respond to 'read' and 'write'.
-    #             :store_options - Deprecated: additional options to setup the cache store.
     #
     # Examples:
     #
@@ -66,19 +65,12 @@ module Faraday
     #   # Initialize the middleware with a MemoryStore and logger
     #   store = ActiveSupport::Cache.lookup_store
     #   Faraday::HttpCache.new(app, store: store, logger: my_logger)
-    def initialize(app, *args)
+    def initialize(app, options = {})
       super(app)
-      @logger = nil
-      @shared_cache = true
-      if args.first.is_a? Hash
-        options = args.first
-        @logger = options[:logger]
-        @shared_cache = options.fetch(:shared_cache, true)
-      else
-        options = parse_deprecated_options(*args)
-      end
-
       assert_valid_options!(options)
+
+      @logger = options[:logger]
+      @shared_cache = options.fetch(:shared_cache, true)
       @storage = create_storage(options)
     end
 
@@ -147,62 +139,6 @@ module Faraday
     # to the the definition in RFC 2616?
     def shared_cache?
       @shared_cache
-    end
-
-    # Internal: Receive the deprecated arguments to initialize the old API
-    # and returns a Hash compatible with the new API
-    #
-    # Examples:
-    #
-    #   parse_deprecated_options(Rails.cache)
-    #   # => { store: Rails.cache }
-    #
-    #   parse_deprecated_options(:mem_cache_store)
-    #   # => { store: :mem_cache_store }
-    #
-    #   parse_deprecated_options(:mem_cache_store, logger: Rails.logger)
-    #   # => { store: :mem_cache_store, logger: Rails.logger }
-    #
-    #   parse_deprecated_options(:mem_cache_store, 'localhost:11211')
-    #   # => { store: :mem_cache_store, store_options: ['localhost:11211] }
-    #
-    #   parse_deprecated_options(:mem_cache_store, logger: Rails.logger, serializer: Marshal)
-    #   # => { store: :mem_cache_store, logger: Rails.logger, serializer: Marshal }
-    #
-    #   parse_deprecated_options(serializer: Marshal)
-    #   # => { serializer: Marshal }
-    #
-    #   parse_deprecated_options(:file_store, { serializer: Marshal }, 'tmp')
-    #   # => { store: :file_store, serializer: Marshal, store_options: ['tmp'] }
-    #
-    #   parse_deprecated_options(:memory_store, size: 1024)
-    #   # => { store: :memory_store, store_options: [size: 1024] }
-    #
-    # Returns a hash with the following keys:
-    #   - store
-    #   - serializer
-    #   - logger
-    #   - store_options
-    #
-    # In order to check what each key means, check `Storage#initialize` description.
-    def parse_deprecated_options(*args)
-      options = {}
-      if args.length > 0
-        Kernel.warn('DEPRECATION WARNING: This API is deprecated, refer to the documentation for the new one', caller)
-      end
-
-      options[:store] = args.shift
-
-      if args.first.is_a? Hash
-        hash_params = args.first
-        options[:serializer] = hash_params.delete(:serializer)
-
-        @logger = hash_params[:logger]
-        @shared_cache = hash_params.fetch(:shared_cache, true)
-      end
-
-      options[:store_options] = args
-      options
     end
 
     # Internal: Tries to locate a valid response or forwards the call to the stack.

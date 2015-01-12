@@ -9,7 +9,7 @@ describe Faraday::HttpCache::Storage do
 
   let(:response) { double(serializable_hash: {}) }
 
-  let(:cache) { ActiveSupport::Cache.lookup_store }
+  let(:cache) { Faraday::HttpCache::MemoryStore.new }
 
   let(:storage) { Faraday::HttpCache::Storage.new(store: cache) }
   subject { storage }
@@ -18,17 +18,6 @@ describe Faraday::HttpCache::Storage do
     it 'uses a MemoryStore by default' do
       expect(Faraday::HttpCache::MemoryStore).to receive(:new).and_call_original
       Faraday::HttpCache::Storage.new
-    end
-
-    it 'lookups an ActiveSupport cache store if a Symbol is given' do
-      expect(ActiveSupport::Cache).to receive(:lookup_store).with(:file_store, ['/tmp']).and_call_original
-      Faraday::HttpCache::Storage.new(store: :file_store, store_options: ['/tmp'])
-    end
-
-    it 'emits a warning when doing the lookup of an ActiveSupport cache store' do
-      logger = double
-      expect(logger).to receive(:warn).with(/Passing a Symbol as the 'store' is deprecated/)
-      Faraday::HttpCache::Storage.new(store: :file_store, logger: logger)
     end
 
     it 'raises an error when the given store is not valid' do

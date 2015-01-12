@@ -27,15 +27,10 @@ module Faraday
       #                            respond to 'dump' and 'load'.
       #           :serializer    - A serializer object that should
       #                            respond to 'dump' and 'load'.
-      #           :store_options - An array containg the options for
-      #                            the cache store.
       def initialize(options = {})
         @cache = options[:store] || MemoryStore.new
         @serializer = options[:serializer] || JSON
         @logger = options[:logger]
-        if @cache.is_a? Symbol
-          @cache = lookup_store(@cache, options[:store_options])
-        end
         assert_valid_store!
       end
 
@@ -140,24 +135,6 @@ module Faraday
       def cache_key_for(request)
         prefix = (@serializer.is_a?(Module) ? @serializer : @serializer.class).name
         Digest::SHA1.hexdigest("#{prefix}#{request.url}")
-      end
-
-      # Internal: Creates a cache store from 'ActiveSupport' with a set of options.
-      #
-      # store   - A 'Symbol' with the store name.
-      # options - Additional options for the cache store.
-      #
-      # Returns an 'ActiveSupport::Cache' store.
-      def lookup_store(store, options)
-        warn "Passing a Symbol as the 'store' is deprecated, please pass the cache store instead."
-
-        begin
-          require 'active_support/cache'
-          ActiveSupport::Cache.lookup_store(store, options)
-        rescue LoadError => e
-          puts "You're missing the 'activesupport' gem. Add it to your Gemfile, bundle it and try again"
-          raise e
-        end
       end
 
       # Internal: Checks if the given cache object supports the
