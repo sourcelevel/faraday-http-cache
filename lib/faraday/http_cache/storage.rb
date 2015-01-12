@@ -51,10 +51,8 @@ module Faraday
         value = @serializer.dump(response.serializable_hash)
         cache.write(key, value)
       rescue Encoding::UndefinedConversionError => e
-        if @logger
-          @logger.warn("Response could not be serialized: #{e.message}. Try using Marshal to serialize.")
-        end
-        raise
+        warn "Response could not be serialized: #{e.message}. Try using Marshal to serialize."
+        raise e
       end
 
       # Internal: Reads a key based on the given request from the underlying cache.
@@ -86,9 +84,7 @@ module Faraday
       #
       # Returns an 'ActiveSupport::Cache' store.
       def lookup_store(store, options)
-        if @logger
-          @logger.warn "Passing a Symbol as the 'store' is deprecated, please pass the cache store instead."
-        end
+        warn "Passing a Symbol as the 'store' is deprecated, please pass the cache store instead."
 
         begin
           require 'active_support/cache'
@@ -109,6 +105,10 @@ module Faraday
         unless cache.respond_to?(:read) && cache.respond_to?(:write)
           raise ArgumentError.new("#{cache.inspect} is not a valid cache store as it does not responds to 'read' and 'write'.")
         end
+      end
+
+      def warn(message)
+        @logger.warn(message) if @logger
       end
     end
 
