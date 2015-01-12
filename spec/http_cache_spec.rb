@@ -65,7 +65,7 @@ describe Faraday::HttpCache do
     end
   end
 
-  it 'does not cache requests with a explicit no-store directive' do
+  it 'does not cache responses with a explicit no-store directive' do
     client.get('dontstore')
     expect(client.get('dontstore').body).to eq('2')
   end
@@ -94,6 +94,19 @@ describe Faraday::HttpCache do
   it 'caches GET responses' do
     client.get('get')
     expect(client.get('get').body).to eq('1')
+  end
+
+  context 'when the request has a "no-cache" directive' do
+    it 'by-passes the cache' do
+      client.get('get', nil, 'Cache-Control' => 'no-cache')
+      expect(client.get('get', nil, 'Cache-Control' => 'no-cache').body).to eq('2')
+    end
+
+    it 'caches the response' do
+      pending 'not possible as long as we use all the request headers for the cache key'
+      client.get('get', nil, 'Cache-Control' => 'no-cache')
+      expect(client.get('get', nil).body).to eq('1')
+    end
   end
 
   it 'logs that a GET response is stored' do

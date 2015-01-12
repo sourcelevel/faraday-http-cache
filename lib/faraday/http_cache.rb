@@ -1,6 +1,7 @@
 require 'faraday'
 
 require 'faraday/http_cache/storage'
+require 'faraday/http_cache/request'
 require 'faraday/http_cache/response'
 
 module Faraday
@@ -103,8 +104,16 @@ module Faraday
 
       response = nil
 
-      if can_cache?(@request[:method])
-        response = process(env)
+      if @request.cacheable?
+        response = if @request.no_cache?
+          trace :bypass
+          @app.call(env).on_complete do |fresh_env|
+            response = Response.new(create_response(fresh_env))
+            store(response)
+          end
+        else
+          process(env)
+        end
       else
         trace :unacceptable
         response = @app.call(env)
@@ -194,13 +203,6 @@ module Faraday
 
       options[:store_options] = args
       options
-    end
-
-    # Internal: Validates if the current request method is valid for caching.
-    #
-    # Returns true if the method is ':get' or ':head'.
-    def can_cache?(method)
-      method == :get || method == :head
     end
 
     # Internal: Tries to locate a valid response or forwards the call to the stack.
@@ -313,20 +315,8 @@ module Faraday
       }
     end
 
-    # Internal: Creates a new 'Hash' containing the request information.
-    #
-    # env - the environment 'Hash' from the Faraday stack.
-    #
-    # Returns a 'Hash' containing the ':method', ':url' and 'request_headers'
-    # entries.
     def create_request(env)
-      hash = env.to_hash
-
-      {
-        method: hash[:method],
-        url: hash[:url],
-        request_headers: hash[:request_headers].dup
-      }
+      Request.from_env(env)
     end
 
     # Internal: Logs the trace info about the incoming request
@@ -337,8 +327,8 @@ module Faraday
     def log_request
       return unless @logger
 
-      method = @request[:method].to_s.upcase
-      path = @request[:url].request_uri
+      method = @request.method.to_s.upcase
+      path = @request.url.request_uri
       line = "HTTP Cache: [#{method} #{path}] #{@trace.join(', ')}"
       @logger.debug(line)
     end

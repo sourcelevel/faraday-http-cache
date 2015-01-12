@@ -1,10 +1,8 @@
 require 'spec_helper'
 
 describe Faraday::HttpCache::Storage do
-  let(:request) do
-    { method: :get, request_headers: {}, url: URI.parse('http://foo.bar/') }
-  end
-
+  let(:cache_key) { '084dd517af7651a9ca7823728544b9b55e0cc130' }
+  let(:request) { double 'a Request', cache_key: cache_key }
   let(:response) { double(serializable_hash: {}) }
 
   let(:cache) { ActiveSupport::Cache.lookup_store }
@@ -73,13 +71,11 @@ describe Faraday::HttpCache::Storage do
     context 'with Marshal serializer' do
       let(:storage)    { Faraday::HttpCache::Storage.new store: cache, serializer: Marshal }
       let(:serialized) { Marshal.dump(response.serializable_hash) }
-      let(:cache_key) { '084dd517af7651a9ca7823728544b9b55e0cc130' }
+      let(:duplicate_request) { double 'another Request', cache_key: cache_key }
 
       it_behaves_like 'serialization'
 
       it 'should have a unique cache key' do
-        request = { method: :get, request_headers: {}, url: URI.parse('http://foo.bar/path/to/somewhere') }
-        duplicate_request = { method: :get, request_headers: {}, url: URI.parse('http://foo.bar/path/to/somewhere') }
         storage = Faraday::HttpCache::Storage.new(serializer: Marshal)
         response = Faraday::HttpCache::Response.new(status: 200, body: 'body')
         storage.write(request, response)
