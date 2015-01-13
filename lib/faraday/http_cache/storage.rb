@@ -131,8 +131,15 @@ module Faraday
         end
       end
 
+      # Internal: Computes the cache key for a specific request, taking in
+      # account the current serializer to avoid cross serialization issues.
+      #
+      # request - The Faraday::HttpCache::Request instance.
+      #
+      # Returns a String.
       def cache_key_for(request)
-        Digest::SHA1.hexdigest(request.url.to_s)
+        prefix = (@serializer.is_a?(Module) ? @serializer : @serializer.class).name
+        Digest::SHA1.hexdigest("#{prefix}#{request.url}")
       end
 
       # Internal: Creates a cache store from 'ActiveSupport' with a set of options.

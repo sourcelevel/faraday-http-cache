@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Faraday::HttpCache::Storage do
-  let(:cache_key) { 'bdde120549a0e4eaa55741ffb6de17faea5f88e9' }
+  let(:cache_key) { '6e3b941d0f7572291c777b3e48c04b74124a55d0' }
   let(:request) do
     env = { method: :get, url: 'http://test/index' }
     double(env.merge(serializable_hash: env))
@@ -72,6 +72,7 @@ describe Faraday::HttpCache::Storage do
     end
 
     context 'with the Marshal serializer' do
+      let(:cache_key) { '337d1e9c6c92423dd1c48a23054139058f97be40' }
       let(:serializer) { Marshal }
       let(:storage) { Faraday::HttpCache::Storage.new(store: cache, serializer: Marshal) }
 
