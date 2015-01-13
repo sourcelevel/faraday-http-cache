@@ -75,10 +75,31 @@ describe Faraday::HttpCache do
     client.get('dontstore')
   end
 
-  it 'caches multiple responses when the headers differ' do
-    client.get('get', nil, 'HTTP_ACCEPT' => 'text/html')
-    expect(client.get('get', nil, 'HTTP_ACCEPT' => 'text/html').body).to eq('1')
-    expect(client.get('get', nil, 'HTTP_ACCEPT' => 'application/json').body).to eq('2')
+  describe 'headers' do
+    let(:headers_1) { {'HTTP_ACCEPT' => 'text/html'} }
+    let(:headers_2) { {'HTTP_ACCEPT' => 'application/json'} }
+
+    def get(headers)
+      client.get('get', nil, headers)
+    end
+
+    context 'not ignored' do
+      it 'caches multiple responses when the headers differ' do
+        get(headers_1)
+        expect(get(headers_1).body).to eq('1')
+        expect(get(headers_2).body).to eq('2')
+      end
+    end
+
+    context 'ignored' do
+      let(:options) { {ignore_headers: 'HTTP_ACCEPT'} }
+
+      it 'caches one response when the headers differ' do
+        get(headers_1)
+        expect(get(headers_1).body).to eq('1')
+        expect(get(headers_2).body).to eq('1')
+      end
+    end
   end
 
   it 'caches requests with the "Expires" header' do
