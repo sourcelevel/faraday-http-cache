@@ -42,7 +42,7 @@ module Faraday
       #
       # Returns nothing.
       def write(request, response)
-        key = cache_key_for(request)
+        key = cache_key_for(request.url)
         entry = serialize_entry(request.serializable_hash, response.serializable_hash)
 
         entries = cache.read(key) || []
@@ -68,13 +68,18 @@ module Faraday
       #
       # Returns an instance of 'klass'.
       def read(request, klass = Faraday::HttpCache::Response)
-        cache_key = cache_key_for(request)
+        cache_key = cache_key_for(request.url)
         entries = cache.read(cache_key)
         response = lookup_response(request, entries)
 
         if response
           klass.new(response)
         end
+      end
+
+      def delete(url)
+        cache_key = cache_key_for(url)
+        cache.delete(cache_key)
       end
 
       private
@@ -129,12 +134,12 @@ module Faraday
       # Internal: Computes the cache key for a specific request, taking in
       # account the current serializer to avoid cross serialization issues.
       #
-      # request - The Faraday::HttpCache::Request instance.
+      # url - The request URL.
       #
       # Returns a String.
-      def cache_key_for(request)
+      def cache_key_for(url)
         prefix = (@serializer.is_a?(Module) ? @serializer : @serializer.class).name
-        Digest::SHA1.hexdigest("#{prefix}#{request.url}")
+        Digest::SHA1.hexdigest("#{prefix}#{url}")
       end
 
       # Internal: Checks if the given cache object supports the
@@ -144,8 +149,8 @@ module Faraday
       #
       # Returns nothing.
       def assert_valid_store!
-        unless cache.respond_to?(:read) && cache.respond_to?(:write)
-          raise ArgumentError.new("#{cache.inspect} is not a valid cache store as it does not responds to 'read' and 'write'.")
+        unless cache.respond_to?(:read) && cache.respond_to?(:write) && cache.respond_to?(:delete)
+          raise ArgumentError.new("#{cache.inspect} is not a valid cache store as it does not responds to 'read', 'write' or 'delete'.")
         end
       end
 
@@ -163,6 +168,10 @@ module Faraday
 
       def read(key)
         @cache[key]
+      end
+
+      def delete(key)
+        @cache.delete(key)
       end
 
       def write(key, value)

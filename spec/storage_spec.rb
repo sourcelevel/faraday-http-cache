@@ -81,6 +81,14 @@ describe Faraday::HttpCache::Storage do
     end
   end
 
+  describe 'deleting responses' do
+    it 'removes the entries from the cache of the given URL' do
+      subject.write(request, response)
+      subject.delete(request.url)
+      expect(subject.read(request)).to be_nil
+    end
+  end
+
   describe 'remove age before caching and normalize max-age if non-zero age present' do
     it 'is fresh if the response still has some time to live' do
       headers = {

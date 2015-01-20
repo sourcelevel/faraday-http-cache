@@ -23,7 +23,7 @@ describe Faraday::HttpCache do
   end
 
   it 'logs that a POST request is unacceptable' do
-    expect(logger).to receive(:debug).with('HTTP Cache: [POST /post] unacceptable')
+    expect(logger).to receive(:debug).with('HTTP Cache: [POST /post] unacceptable, delete')
     client.post('post').body
   end
 
@@ -32,9 +32,73 @@ describe Faraday::HttpCache do
     expect(client.get('broken').body).to eq('2')
   end
 
-  it 'logs that a response with a bad status code is invalid' do
-    expect(logger).to receive(:debug).with('HTTP Cache: [GET /broken] miss, invalid')
-    client.get('broken')
+  describe 'cache invalidation' do
+    it 'expires POST requests' do
+      client.get('counter')
+      client.post('counter')
+      expect(client.get('counter').body).to eq('2')
+    end
+
+    it 'logs that a POST request was deleted from the cache' do
+      expect(logger).to receive(:debug).with('HTTP Cache: [POST /counter] unacceptable, delete')
+      client.post('counter')
+    end
+
+    it 'does not expires POST requests that failed' do
+      client.get('get')
+      client.post('get')
+      expect(client.get('get').body).to eq('1')
+    end
+
+    it 'expires PUT requests' do
+      client.get('counter')
+      client.put('counter')
+      expect(client.get('counter').body).to eq('2')
+    end
+
+    it 'logs that a PUT request was deleted from the cache' do
+      expect(logger).to receive(:debug).with('HTTP Cache: [PUT /counter] unacceptable, delete')
+      client.put('counter')
+    end
+
+    it 'expires DELETE requests' do
+      client.get('counter')
+      client.delete('counter')
+      expect(client.get('counter').body).to eq('2')
+    end
+
+    it 'logs that a DELETE request was deleted from the cache' do
+      expect(logger).to receive(:debug).with('HTTP Cache: [DELETE /counter] unacceptable, delete')
+      client.delete('counter')
+    end
+
+    it 'expires PATCH requests' do
+      client.get('counter')
+      client.patch('counter')
+      expect(client.get('counter').body).to eq('2')
+    end
+
+    it 'logs that a PATCH request was deleted from the cache' do
+      expect(logger).to receive(:debug).with('HTTP Cache: [PATCH /counter] unacceptable, delete')
+      client.patch('counter')
+    end
+
+    it 'logs that a response with a bad status code is invalid' do
+      expect(logger).to receive(:debug).with('HTTP Cache: [GET /broken] miss, invalid')
+      client.get('broken')
+    end
+
+    it 'expires entries for the "Location" header' do
+      client.get('get')
+      client.post('delete-with-location')
+      expect(client.get('get').body).to eq('2')
+    end
+
+    it 'expires entries for the "Content-Location" header' do
+      client.get('get')
+      client.post('delete-with-content-location')
+      expect(client.get('get').body).to eq('2')
+    end
   end
 
   describe 'when acting as a shared cache' do

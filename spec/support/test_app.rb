@@ -40,8 +40,36 @@ class TestApp < Sinatra::Base
     [500, { 'Cache-Control' => 'max-age=400' }, increment_counter]
   end
 
+  get '/counter' do
+    [200, { 'Cache-Control' => 'max-age=200' }, increment_counter]
+  end
+
+  post '/counter' do
+  end
+
+  put '/counter' do
+  end
+
+  delete '/counter' do
+  end
+
+  patch '/counter' do
+  end
+
   get '/get' do
     [200, { 'Cache-Control' => 'max-age=200' }, increment_counter]
+  end
+
+  post '/delete-with-location' do
+    [200, { 'Location' => "#{request.base_url}/get" }, '']
+  end
+
+  post '/delete-with-content-location' do
+    [200, { 'Content-Location' => "#{request.base_url}/get" }, '']
+  end
+
+  post '/get' do
+    halt 405
   end
 
   get '/private' do
