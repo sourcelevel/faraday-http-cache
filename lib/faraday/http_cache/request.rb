@@ -34,21 +34,13 @@ module Faraday
         @cache_control ||= CacheControl.new(headers['Cache-Control'])
       end
 
-      def cache_key
-        digest = Digest::SHA1.new
-        digest.update 'method'
-        digest.update method.to_s
-        digest.update 'request_headers'
-        headers.keys.sort.each do |key|
-          digest.update key.to_s
-          digest.update headers[key].to_s
-        end
-        digest.update 'url'
-        digest.update url.to_s
-
-        digest.to_s
+      def serializable_hash
+        {
+          method: @method,
+          url: @url,
+          headers: @headers
+        }
       end
-
     end
   end
 end
