@@ -7,7 +7,7 @@ describe Faraday::HttpCache::Storage do
     double(env.merge(serializable_hash: env))
   end
 
-  let(:response) { double(serializable_hash: {}) }
+  let(:response) { double(serializable_hash: { response_headers: {} }) }
 
   let(:cache) { Faraday::HttpCache::MemoryStore.new }
 

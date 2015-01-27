@@ -145,7 +145,17 @@ describe Faraday::HttpCache do
     expect(client.get('get', nil, 'HTTP_ACCEPT' => 'application/json').body).to eq('1')
   end
 
-  it 'caches multiples responses based on the "Vary" header'
+  it 'caches multiples responses based on the "Vary" header' do
+    client.get('vary', nil, 'User-Agent' => 'Agent/1.0')
+    expect(client.get('vary', nil, 'User-Agent' => 'Agent/1.0').body).to eq('1')
+    expect(client.get('vary', nil, 'User-Agent' => 'Agent/2.0').body).to eq('2')
+    expect(client.get('vary', nil, 'User-Agent' => 'Agent/3.0').body).to eq('3')
+  end
+
+  it 'never caches responses with the wildcard "Vary" header' do
+    client.get('vary-wildcard')
+    expect(client.get('vary-wildcard').body).to eq('2')
+  end
 
   it 'caches requests with the "Expires" header' do
     client.get('expires')

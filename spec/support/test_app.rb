@@ -110,6 +110,14 @@ class TestApp < Sinatra::Base
     end
   end
 
+  get '/vary' do
+    [200, { 'Cache-Control' => 'max-age=50', 'Vary' => 'User-Agent' }, increment_counter]
+  end
+
+  get '/vary-wildcard' do
+    [200, { 'Cache-Control' => 'max-age=50', 'Vary' => '*' }, increment_counter]
+  end
+
   # Increments the 'requests' counter to act as a newly processed response.
   def increment_counter
     (settings.requests += 1).to_s

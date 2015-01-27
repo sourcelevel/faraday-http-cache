@@ -110,7 +110,17 @@ module Faraday
       #
       # Returns true or false.
       def response_matches?(request, cached_request, cached_response)
-        request.method.to_s == cached_request[:method]
+        request.method.to_s == cached_request[:method] &&
+          vary_matches?(cached_response, request, cached_request)
+      end
+
+      def vary_matches?(cached_response, request, cached_request)
+        headers = Faraday::Utils::Headers.new(cached_response[:response_headers])
+        vary = headers['Vary'].to_s
+
+        vary.empty? || (vary != '*' && vary.split(/[\s,]+/).all? do |header|
+          request.headers[header] == cached_request[:headers][header]
+        end)
       end
 
       def serialize_entry(*objects)
