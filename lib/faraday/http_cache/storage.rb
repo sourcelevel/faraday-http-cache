@@ -110,7 +110,7 @@ module Faraday
       #
       # Returns true or false.
       def response_matches?(request, cached_request, cached_response)
-        request.method.to_s == cached_request[:method] &&
+        request.method.to_s == cached_request[:method].to_s &&
           vary_matches?(cached_response, request, cached_request)
       end
 
