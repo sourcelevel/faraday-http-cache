@@ -70,14 +70,30 @@ describe Faraday::HttpCache::Storage do
   end
 
   describe 'reading responses' do
-    it 'returns nil if the response is not cached' do
-      expect(subject.read(request)).to be_nil
+    let(:storage) { Faraday::HttpCache::Storage.new(store: cache, serializer: serializer) }
+
+    shared_examples 'A storage with serialization' do
+      it 'returns nil if the response is not cached' do
+        expect(subject.read(request)).to be_nil
+      end
+
+      it 'decodes a stored response' do
+        subject.write(request, response)
+
+        expect(subject.read(request)).to be_a(Faraday::HttpCache::Response)
+      end
     end
 
-    it 'decodes a stored response' do
-      subject.write(request, response)
+    context 'with the JSON serializer' do
+      let(:serializer) { JSON }
 
-      expect(subject.read(request)).to be_a(Faraday::HttpCache::Response)
+      it_behaves_like 'A storage with serialization'
+    end
+
+    context 'with the Marshal serializer' do
+      let(:serializer) { Marshal }
+
+      it_behaves_like 'A storage with serialization'
     end
   end
 
