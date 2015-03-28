@@ -200,8 +200,16 @@ module Faraday
         response = Response.new(requested_env)
         if response.not_modified?
           trace :valid
+          updated_response_headers = response.payload[:response_headers]
+
+          # These headers are not allowed in 304 responses, yet some proxy
+          # servers add them in. Don't override the values from the original
+          # response.
+          updated_response_headers.delete('Content-Type')
+          updated_response_headers.delete('Content-Length')
+
           updated_payload = entry.payload
-          updated_payload[:response_headers].update(response.payload[:response_headers])
+          updated_payload[:response_headers].update(updated_response_headers)
           requested_env.update(updated_payload)
           response = Response.new(updated_payload)
         end
