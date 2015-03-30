@@ -118,6 +118,7 @@ module Faraday
       response.on_complete do
         delete(@request, response) if should_delete?(response.status, @request.method)
         log_request
+        response.env[:http_cache_trace] = @trace
       end
     end
 

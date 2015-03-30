@@ -32,6 +32,11 @@ describe Faraday::HttpCache do
     expect(client.get('broken').body).to eq('2')
   end
 
+  it 'adds a trace of the actions performed to the env' do
+    response = client.post('post')
+    expect(response.env[:http_cache_trace]).to eq([:unacceptable, :delete])
+  end
+
   describe 'cache invalidation' do
     it 'expires POST requests' do
       client.get('counter')
