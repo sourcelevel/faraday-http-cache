@@ -79,6 +79,45 @@ client.get('http://site/api/users')
 # logs "HTTP Cache: [GET users] miss, store"
 ```
 
+### Instrumentation
+
+In addition to logging you can instrument the middleware by passing in an `:instrumenter` option
+such as ActiveSupport::Notifications (compatible objects are also allowed).
+
+The event `process_request.http_cache.faraday` will be published every time the middleware
+processes a request. In the event payload, `:env` contains the response Faraday env and
+`:cache_status` contains a Symbol indicating the status of the cache processing for that request:
+
+- `:unacceptable` means that the request did not go through the cache at all.
+- `:miss` means that no cached response could be found.
+- `:invalid` means that the cached response could not be validated against the server.
+- `:valid` means that the cached response *could* be validated against the server.
+- `:fresh` means that the cached response was still fresh and could be returned without even
+  calling the server.
+
+```ruby
+client = Faraday.new do |builder|
+  builder.use :http_cache, store: Rails.cache, instrumenter: ActiveSupport::Notifications
+  builder.adapter Faraday.default_adapter
+end
+
+# Subscribes to all events from Faraday::HttpCache.
+ActiveSupport::Notifications.subscribe "process_request.http_cache.faraday" do |*args|
+  event = ActiveSupport::Notifications::Event.new(*args)
+  cache_status = event.payload.fetch(:cache_status)
+  statsd = Statsd.new
+
+  case cache_status
+  when :fresh, :valid
+    statsd.increment("api-calls.cache_hits")
+  when :invalid, :miss
+    statsd.increment("api-calls.cache_misses")
+  when :unacceptable
+    statsd.increment("api-calls.cache_bypass")
+  end
+end
+```
+
 ## See it live
 
 You can clone this repository, install it's dependencies with Bundler (run `bundle install`) and

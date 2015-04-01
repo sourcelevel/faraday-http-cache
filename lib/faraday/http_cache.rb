@@ -37,13 +37,38 @@ module Faraday
   #   client = Faraday.new do |builder|
   #     builder.use :http_cache, store: Rails.cache, serializer: Marshal
   #   end
+  #
+  #   # Instrument events using ActiveSupport::Notifications
+  #   client = Faraday.new do |builder|
+  #     builder.use :http_cache, store: Rails.cache, instrumenter: ActiveSupport::Notifications
+  #   end
   class HttpCache < Faraday::Middleware
     # Internal: valid options for the 'initialize' configuration Hash.
-    VALID_OPTIONS = [:store, :serializer, :logger, :shared_cache]
+    VALID_OPTIONS = [:store, :serializer, :logger, :shared_cache, :instrumenter]
 
     UNSAFE_METHODS = [:post, :put, :delete, :patch]
 
     ERROR_STATUSES = 400..499
+
+    # The name of the instrumentation event.
+    EVENT_NAME = "process_request.http_cache.faraday"
+
+    CACHE_STATUSES = [
+      # The request was not cacheable:
+      :unacceptable,
+
+      # The response was cached and can still be used:
+      :fresh,
+
+      # The response was cached and the server has validated it with a 304 response:
+      :valid,
+
+      # The response was cached but the server could not validate it.
+      :invalid,
+
+      # No response was found in the cache:
+      :miss
+    ]
 
     # Public: Initializes a new HttpCache middleware.
     #
@@ -53,6 +78,7 @@ module Faraday
     #             :serializer    - A serializer that should respond to 'dump' and 'load'.
     #             :shared_cache  - A flag to mark the middleware as a shared cache or not.
     #             :store         - A cache store that should respond to 'read' and 'write'.
+    #             :instrumenter  - An instrumentation object that should respond to 'instrument'.
     #
     # Examples:
     #
@@ -75,6 +101,7 @@ module Faraday
 
       @logger = options[:logger]
       @shared_cache = options.fetch(:shared_cache, true)
+      @instrumenter = options[:instrumenter]
       @storage = create_storage(options)
     end
 
@@ -119,6 +146,7 @@ module Faraday
         delete(@request, response) if should_delete?(response.status, @request.method)
         log_request
         response.env[:http_cache_trace] = @trace
+        instrument(response.env)
       end
     end
 
@@ -300,6 +328,27 @@ module Faraday
       path = @request.url.request_uri
       line = "HTTP Cache: [#{method} #{path}] #{@trace.join(', ')}"
       @logger.debug(line)
+    end
+
+    # Internal: instruments the request processing.
+    #
+    # Returns nothing.
+    def instrument(env)
+      return unless @instrumenter
+
+      payload = {
+        env: env,
+        cache_status: extract_status(env[:http_cache_trace])
+      }
+
+      @instrumenter.instrument(EVENT_NAME, payload)
+    end
+
+    # Internal: Extracts the cache status from a trace.
+    #
+    # Returns the Symbol status or nil if none was available.
+    def extract_status(trace)
+      CACHE_STATUSES.detect {|status| trace.include?(status) }
     end
 
     # Internal: Checks if the given 'options' Hash contains only
