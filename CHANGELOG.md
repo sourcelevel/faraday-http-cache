@@ -1,3 +1,9 @@
+## 1.1.0 (2015-04-02)
+
+* Instrumentation supported. (by @dasch)
+* Illegal headers from `304` responses will be removed before updating the
+cached responses. (by @dasch)
+
 ## 1.0.1 (2015-01-30)
 
 * Fixed HTTP method matching that failed when using the `Marshal` serializer.
