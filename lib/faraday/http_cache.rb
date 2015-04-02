@@ -51,7 +51,7 @@ module Faraday
     ERROR_STATUSES = 400..499
 
     # The name of the instrumentation event.
-    EVENT_NAME = "process_request.http_cache.faraday"
+    EVENT_NAME = 'process_request.http_cache.faraday'
 
     CACHE_STATUSES = [
       # The request was not cacheable:
