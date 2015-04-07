@@ -22,7 +22,7 @@ describe Faraday::HttpCache::Response do
       expect(response).not_to be_cacheable_in_shared_cache
     end
 
-    [200, 203, 300, 301, 302, 404, 410].each do |status|
+    [200, 203, 300, 301, 302, 307, 404, 410].each do |status|
       it "the response is cacheable if the status code is #{status} and the response is fresh" do
         headers  = { 'Cache-Control' => 'max-age=400' }
         response = Faraday::HttpCache::Response.new(status: status, response_headers: headers)
@@ -53,7 +53,7 @@ describe Faraday::HttpCache::Response do
       expect(response).not_to be_cacheable_in_private_cache
     end
 
-    [200, 203, 300, 301, 302, 404, 410].each do |status|
+    [200, 203, 300, 301, 302, 307, 404, 410].each do |status|
       it "the response is cacheable if the status code is #{status} and the response is fresh" do
         headers  = { 'Cache-Control' => 'max-age=400' }
         response = Faraday::HttpCache::Response.new(status: status, response_headers: headers)
