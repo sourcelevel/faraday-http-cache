@@ -74,11 +74,12 @@ module Faraday
     #
     # app  - the next endpoint on the 'Faraday' stack.
     # args - aditional options to setup the logger and the storage.
-    #             :logger        - A logger object.
-    #             :serializer    - A serializer that should respond to 'dump' and 'load'.
-    #             :shared_cache  - A flag to mark the middleware as a shared cache or not.
-    #             :store         - A cache store that should respond to 'read' and 'write'.
-    #             :instrumenter  - An instrumentation object that should respond to 'instrument'.
+    #             :logger          - A logger object.
+    #             :serializer      - A serializer that should respond to 'dump' and 'load'.
+    #             :shared_cache    - A flag to mark the middleware as a shared cache or not.
+    #             :store           - A cache store that should respond to 'read' and 'write'.
+    #             :instrumenter    - An instrumentation object that should respond to 'instrument'.
+    #             :instrument_name - The String name of the instrument being reported on (optional).
     #
     # Examples:
     #
@@ -102,6 +103,7 @@ module Faraday
       @logger = options[:logger]
       @shared_cache = options.fetch(:shared_cache, true)
       @instrumenter = options[:instrumenter]
+      @instrument_name = options.fetch(:instrument_name, EVENT_NAME)
       @storage = create_storage(options)
     end
 
@@ -341,7 +343,7 @@ module Faraday
         cache_status: extract_status(env[:http_cache_trace])
       }
 
-      @instrumenter.instrument(EVENT_NAME, payload)
+      @instrumenter.instrument(@instrument_name, payload)
     end
 
     # Internal: Extracts the cache status from a trace.
