@@ -77,7 +77,7 @@ module Faraday
     #             :logger          - A logger object.
     #             :serializer      - A serializer that should respond to 'dump' and 'load'.
     #             :shared_cache    - A flag to mark the middleware as a shared cache or not.
-    #             :store           - A cache store that should respond to 'read' and 'write'.
+    #             :store           - A cache store that should respond to 'read', 'write', and 'delete'.
     #             :instrumenter    - An instrumentation object that should respond to 'instrument'.
     #             :instrument_name - The String name of the instrument being reported on (optional).
     #

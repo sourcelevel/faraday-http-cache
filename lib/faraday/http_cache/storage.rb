@@ -24,7 +24,7 @@ module Faraday
       # options - Storage options (default: {}).
       #           :logger        - A Logger object to be used to emit warnings.
       #           :store         - An cache store object that should
-      #                            respond to 'dump' and 'load'.
+      #                            respond to 'read', 'write', and 'delete'.
       #           :serializer    - A serializer object that should
       #                            respond to 'dump' and 'load'.
       def initialize(options = {})
