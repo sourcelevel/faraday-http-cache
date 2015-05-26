@@ -46,6 +46,7 @@ module Faraday
         entry = serialize_entry(request.serializable_hash, response.serializable_hash)
 
         entries = cache.read(key) || []
+        entries = entries.dup if entries.frozen?
 
         entries.reject! do |(cached_request, cached_response)|
           response_matches?(request, deserialize_object(cached_request), deserialize_object(cached_response))
