@@ -173,9 +173,9 @@ module Faraday
 
       # Internal: Gets the 'Expires' in a Time object.
       #
-      # Returns the Time object, or nil if the header isn't present.
+      # Returns the Time object, or nil if the header isn't present or isn't RFC 2616 compliant.
       def expires
-        headers['Expires'] && Time.httpdate(headers['Expires'])
+        @expires ||= headers['Expires'] && Time.httpdate(headers['Expires']) rescue nil
       end
 
       # Internal: Gets the 'CacheControl' object.

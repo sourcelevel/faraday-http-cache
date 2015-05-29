@@ -130,6 +130,12 @@ describe Faraday::HttpCache::Response do
       response = Faraday::HttpCache::Response.new
       expect(response.max_age).to be_nil
     end
+
+    it 'returns nil when falling back to expiration date but it is not RFC 2616 compliant' do
+      headers = { 'Expires' => 'Mon, 1 Jan 2001 00:00:00 GMT' }
+      response = Faraday::HttpCache::Response.new(response_headers: headers)
+      expect(response.max_age).to be_nil
+    end
   end
 
   describe 'age calculation' do
