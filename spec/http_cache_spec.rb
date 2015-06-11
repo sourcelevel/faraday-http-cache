@@ -23,7 +23,7 @@ describe Faraday::HttpCache do
   end
 
   it 'logs that a POST request is unacceptable' do
-    expect(logger).to receive(:debug).with('HTTP Cache: [POST /post] unacceptable, delete')
+    expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [POST /post] unacceptable, delete') }
     client.post('post').body
   end
 
@@ -45,7 +45,7 @@ describe Faraday::HttpCache do
     end
 
     it 'logs that a POST request was deleted from the cache' do
-      expect(logger).to receive(:debug).with('HTTP Cache: [POST /counter] unacceptable, delete')
+      expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [POST /counter] unacceptable, delete') }
       client.post('counter')
     end
 
@@ -62,7 +62,7 @@ describe Faraday::HttpCache do
     end
 
     it 'logs that a PUT request was deleted from the cache' do
-      expect(logger).to receive(:debug).with('HTTP Cache: [PUT /counter] unacceptable, delete')
+      expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [PUT /counter] unacceptable, delete') }
       client.put('counter')
     end
 
@@ -73,7 +73,7 @@ describe Faraday::HttpCache do
     end
 
     it 'logs that a DELETE request was deleted from the cache' do
-      expect(logger).to receive(:debug).with('HTTP Cache: [DELETE /counter] unacceptable, delete')
+      expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [DELETE /counter] unacceptable, delete') }
       client.delete('counter')
     end
 
@@ -84,12 +84,12 @@ describe Faraday::HttpCache do
     end
 
     it 'logs that a PATCH request was deleted from the cache' do
-      expect(logger).to receive(:debug).with('HTTP Cache: [PATCH /counter] unacceptable, delete')
+      expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [PATCH /counter] unacceptable, delete') }
       client.patch('counter')
     end
 
     it 'logs that a response with a bad status code is invalid' do
-      expect(logger).to receive(:debug).with('HTTP Cache: [GET /broken] miss, invalid')
+      expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /broken] miss, invalid') }
       client.get('broken')
     end
 
@@ -115,7 +115,7 @@ describe Faraday::HttpCache do
     end
 
     it 'logs that a private response is invalid' do
-      expect(logger).to receive(:debug).with('HTTP Cache: [GET /private] miss, invalid')
+      expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /private] miss, invalid') }
       client.get('private')
     end
   end
@@ -129,7 +129,7 @@ describe Faraday::HttpCache do
     end
 
     it 'logs that a private response is stored' do
-      expect(logger).to receive(:debug).with('HTTP Cache: [GET /private] miss, store')
+      expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /private] miss, store') }
       client.get('private')
     end
   end
@@ -140,7 +140,7 @@ describe Faraday::HttpCache do
   end
 
   it 'logs that a response with a no-store directive is invalid' do
-    expect(logger).to receive(:debug).with('HTTP Cache: [GET /dontstore] miss, invalid')
+    expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /dontstore] miss, invalid') }
     client.get('dontstore')
   end
 
@@ -168,7 +168,7 @@ describe Faraday::HttpCache do
   end
 
   it 'logs that a request with the "Expires" is fresh and stored' do
-    expect(logger).to receive(:debug).with('HTTP Cache: [GET /expires] miss, store')
+    expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /expires] miss, store') }
     client.get('expires')
   end
 
@@ -190,20 +190,20 @@ describe Faraday::HttpCache do
   end
 
   it 'logs that a GET response is stored' do
-    expect(logger).to receive(:debug).with('HTTP Cache: [GET /get] miss, store')
+    expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /get] miss, store') }
     client.get('get')
   end
 
   it 'differs requests with different query strings in the log' do
-    expect(logger).to receive(:debug).with('HTTP Cache: [GET /get] miss, store')
-    expect(logger).to receive(:debug).with('HTTP Cache: [GET /get?q=what] miss, store')
+    expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /get] miss, store') }
+    expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /get?q=what] miss, store') }
     client.get('get')
     client.get('get', q: 'what')
   end
 
   it 'logs that a stored GET response is fresh' do
     client.get('get')
-    expect(logger).to receive(:debug).with('HTTP Cache: [GET /get] fresh')
+    expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /get] fresh') }
     client.get('get')
   end
 
@@ -214,7 +214,7 @@ describe Faraday::HttpCache do
 
   it 'logs that the request with "Last-Modified" was revalidated' do
     client.get('timestamped')
-    expect(logger).to receive(:debug).with('HTTP Cache: [GET /timestamped] valid, store')
+    expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /timestamped] valid, store') }
     expect(client.get('timestamped').body).to eq('1')
   end
 
@@ -225,7 +225,7 @@ describe Faraday::HttpCache do
 
   it 'logs that the request with "ETag" was revalidated' do
     client.get('etag')
-    expect(logger).to receive(:debug).with('HTTP Cache: [GET /etag] valid, store')
+    expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /etag] valid, store') }
     expect(client.get('etag').body).to eq('1')
   end
 

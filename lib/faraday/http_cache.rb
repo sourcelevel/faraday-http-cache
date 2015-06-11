@@ -328,8 +328,7 @@ module Faraday
 
       method = @request.method.to_s.upcase
       path = @request.url.request_uri
-      line = "HTTP Cache: [#{method} #{path}] #{@trace.join(', ')}"
-      @logger.debug(line)
+      @logger.debug { "HTTP Cache: [#{method} #{path}] #{@trace.join(', ')}" }
     end
 
     # Internal: instruments the request processing.
