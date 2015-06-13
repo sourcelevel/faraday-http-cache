@@ -9,6 +9,7 @@ describe Faraday::HttpCache do
       stack.use Faraday::HttpCache, options
       adapter = ENV['FARADAY_ADAPTER']
       stack.headers['X-Faraday-Adapter'] = adapter
+      stack.headers['Content-Type'] = 'application/x-www-form-urlencoded'
       stack.adapter adapter.to_sym
     end
   end
