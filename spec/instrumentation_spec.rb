@@ -14,7 +14,7 @@ describe 'Instrumentation' do
   let(:subscriber) { lambda {|*args| events << ActiveSupport::Notifications::Event.new(*args) } }
 
   around do |example|
-    ActiveSupport::Notifications.subscribed(subscriber, 'process_request.http_cache.faraday') do
+    ActiveSupport::Notifications.subscribed(subscriber, 'http_cache.faraday') do
       example.run
     end
   end

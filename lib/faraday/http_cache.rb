@@ -51,7 +51,7 @@ module Faraday
     ERROR_STATUSES = 400..499
 
     # The name of the instrumentation event.
-    EVENT_NAME = 'process_request.http_cache.faraday'
+    EVENT_NAME = 'http_cache.faraday'
 
     CACHE_STATUSES = [
       # The request was not cacheable:
@@ -343,13 +343,16 @@ module Faraday
       }
 
       @instrumenter.instrument(@instrument_name, payload)
+      # DEPRECATED: Event name from the 1.1.1 release that isn't compatible
+      # with the `ActiveSupport::LogSubscriber` API.
+      @instrumenter.instrument('process_request.http_cache.faraday', payload)
     end
 
     # Internal: Extracts the cache status from a trace.
     #
     # Returns the Symbol status or nil if none was available.
     def extract_status(trace)
-      CACHE_STATUSES.detect {|status| trace.include?(status) }
+      CACHE_STATUSES.find { |status| trace.include?(status) }
     end
 
     # Internal: Checks if the given 'options' Hash contains only

@@ -84,7 +84,7 @@ client.get('http://site/api/users')
 In addition to logging you can instrument the middleware by passing in an `:instrumenter` option
 such as ActiveSupport::Notifications (compatible objects are also allowed).
 
-The event `process_request.http_cache.faraday` will be published every time the middleware
+The event `http_cache.faraday` will be published every time the middleware
 processes a request. In the event payload, `:env` contains the response Faraday env and
 `:cache_status` contains a Symbol indicating the status of the cache processing for that request:
 
@@ -102,18 +102,18 @@ client = Faraday.new do |builder|
 end
 
 # Subscribes to all events from Faraday::HttpCache.
-ActiveSupport::Notifications.subscribe "process_request.http_cache.faraday" do |*args|
+ActiveSupport::Notifications.subscribe "http_cache.faraday" do |*args|
   event = ActiveSupport::Notifications::Event.new(*args)
-  cache_status = event.payload.fetch(:cache_status)
+  cache_status = event.payload[:cache_status]
   statsd = Statsd.new
 
   case cache_status
   when :fresh, :valid
-    statsd.increment("api-calls.cache_hits")
+    statsd.increment('api-calls.cache_hits')
   when :invalid, :miss
-    statsd.increment("api-calls.cache_misses")
+    statsd.increment('api-calls.cache_misses')
   when :unacceptable
-    statsd.increment("api-calls.cache_bypass")
+    statsd.increment('api-calls.cache_bypass')
   end
 end
 ```
