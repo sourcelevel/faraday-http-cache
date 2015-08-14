@@ -44,7 +44,7 @@ module Faraday
   #   end
   class HttpCache < Faraday::Middleware
     # Internal: valid options for the 'initialize' configuration Hash.
-    VALID_OPTIONS = [:store, :serializer, :logger, :shared_cache, :instrumenter]
+    VALID_OPTIONS = [:store, :serializer, :logger, :shared_cache, :instrumenter, :instrument_name]
 
     UNSAFE_METHODS = [:post, :put, :delete, :patch]
 
