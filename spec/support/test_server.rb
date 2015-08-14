@@ -27,7 +27,7 @@ class TestServer
       log.sync = true
       webrick_opts = {
        Port: @port,
-       Logger:  WEBrick::Log::new(log),
+       Logger:  WEBrick::Log.new(log),
        AccessLog: [[log, '[%{X-Faraday-Adapter}i] %m  %U  ->  %s %b']]
       }
       Rack::Handler::WEBrick.run(TestApp, webrick_opts)
@@ -38,7 +38,7 @@ class TestServer
     conn = Net::HTTP.new @host, @port
     conn.open_timeout = conn.read_timeout = 0.1
 
-    responsive = lambda { |path|
+    responsive = ->(path) { # rubocop:disable Style/BlockDelimiters
       begin
         res = conn.start { conn.get(path) }
         res.is_a?(Net::HTTPSuccess)
@@ -48,11 +48,12 @@ class TestServer
     }
 
     server_pings = 0
-    begin
+    loop do
+      break if responsive.call('/ping')
       server_pings += 1
       sleep 0.05
       abort 'test server did not managed to start' if server_pings >= 50
-    end until responsive.call('/ping')
+    end
   end
 
   def find_port

@@ -11,7 +11,7 @@ end
 
 5.times do |index|
   started = Time.now
-  puts "Request ##{index+1}"
+  puts "Request ##{index + 1}"
   response = client.get('repos/plataformatec/faraday-http-cache')
   finished = Time.now
   remaining = response.headers['X-RateLimit-Remaining']

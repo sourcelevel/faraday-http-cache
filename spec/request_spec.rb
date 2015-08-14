@@ -44,5 +44,4 @@ describe Faraday::HttpCache::Request do
     let(:headers) { { 'Cache-Control' => 'no-store' } }
     it { should_not be_cacheable }
   end
-
 end

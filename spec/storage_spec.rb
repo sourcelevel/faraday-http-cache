@@ -127,8 +127,8 @@ describe Faraday::HttpCache::Storage do
 
     it 'is fresh until cached and that 1 second elapses then the response is no longer fresh' do
       headers = {
-          'Date' => (Time.now - 39).httpdate,
-          'Expires' => (Time.now + 40).httpdate,
+        'Date' => (Time.now - 39).httpdate,
+        'Expires' => (Time.now + 40).httpdate
       }
 
       response = Faraday::HttpCache::Response.new(response_headers: headers)
@@ -140,5 +140,4 @@ describe Faraday::HttpCache::Storage do
       expect(cached_response).not_to be_fresh
     end
   end
-
 end

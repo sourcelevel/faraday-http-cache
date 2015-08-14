@@ -1,1 +1,1 @@
-require 'faraday/http_cache'
+require 'faraday/http_cache' # rubocop:disable Style/FileName

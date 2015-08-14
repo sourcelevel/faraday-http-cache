@@ -5,7 +5,6 @@ module Faraday
     # It breaks the several directives into keys/values and stores them into
     # a Hash.
     class CacheControl
-
       # Internal: Initialize a new CacheControl.
       def initialize(header)
         @directives = parse(header.to_s)
@@ -74,7 +73,8 @@ module Faraday
       #
       # Returns the Cache Control string.
       def to_s
-        booleans, values = [], []
+        booleans = []
+        values = []
 
         @directives.each do |key, value|
           if value == true

@@ -175,7 +175,7 @@ module Faraday
       #
       # Returns the Time object, or nil if the header isn't present or isn't RFC 2616 compliant.
       def expires
-        @expires ||= headers['Expires'] && Time.httpdate(headers['Expires']) rescue nil
+        @expires ||= headers['Expires'] && Time.httpdate(headers['Expires']) rescue nil # rubocop:disable Style/RescueModifier
       end
 
       # Internal: Gets the 'CacheControl' object.

@@ -11,11 +11,11 @@ describe Faraday::HttpCache do
   end
 
   it 'maintains the "Content-Type" header for cached responses' do
-    backend.get('/test') { [200, { 'ETag' => '123ABC', 'Content-Type' => 'x' }, ""] }
+    backend.get('/test') { [200, { 'ETag' => '123ABC', 'Content-Type' => 'x' }, ''] }
     first_content_type = client.get('/test').headers['Content-Type']
 
     # The Content-Type header of the validation response should be ignored.
-    backend.get('/test') { [304, { 'Content-Type' => 'y' }, ""] }
+    backend.get('/test') { [304, { 'Content-Type' => 'y' }, ''] }
     second_content_type = client.get('/test').headers['Content-Type']
 
     expect(first_content_type).to eq('x')
@@ -23,11 +23,11 @@ describe Faraday::HttpCache do
   end
 
   it 'maintains the "Content-Length" header for cached responses' do
-    backend.get('/test') { [200, { 'ETag' => '123ABC', 'Content-Length' => 1 }, ""] }
+    backend.get('/test') { [200, { 'ETag' => '123ABC', 'Content-Length' => 1 }, ''] }
     first_content_length = client.get('/test').headers['Content-Length']
 
     # The Content-Length header of the validation response should be ignored.
-    backend.get('/test') { [304, { 'Content-Length' => 2 }, ""] }
+    backend.get('/test') { [304, { 'Content-Length' => 2 }, ''] }
     second_content_length = client.get('/test').headers['Content-Length']
 
     expect(first_content_length).to eq(1)

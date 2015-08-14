@@ -2,7 +2,6 @@ require 'sinatra/base'
 require 'json'
 
 class TestApp < Sinatra::Base
-
   set :environment, :test
   set :server, 'webrick'
   disable :protection
@@ -104,7 +103,7 @@ class TestApp < Sinatra::Base
     tag = settings.counter > 2 ? '1' : '2'
 
     if env['HTTP_IF_NONE_MATCH'] == tag
-      [304, { 'ETag' => tag, 'Cache-Control' => 'max-age=200', 'Date' => Time.now.httpdate, 'Expires' => (Time.now + 200).httpdate, 'Vary' => '*' }, ""]
+      [304, { 'ETag' => tag, 'Cache-Control' => 'max-age=200', 'Date' => Time.now.httpdate, 'Expires' => (Time.now + 200).httpdate, 'Vary' => '*' }, '']
     else
       [200, { 'ETag' => tag, 'Cache-Control' => 'max-age=0', 'Date' => settings.yesterday, 'Expires' => Time.now.httpdate, 'Vary' => 'Accept' }, increment_counter]
     end
