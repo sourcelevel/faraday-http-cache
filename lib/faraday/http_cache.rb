@@ -54,20 +54,23 @@ module Faraday
     EVENT_NAME = 'http_cache.faraday'
 
     CACHE_STATUSES = [
-      # The request was not cacheable:
+      # The request was not cacheable.
       :unacceptable,
 
-      # The response was cached and can still be used:
+      # The response was cached and can still be used.
       :fresh,
 
-      # The response was cached and the server has validated it with a 304 response:
+      # The response was cached and the server has validated it with a 304 response.
       :valid,
 
-      # The response was cached but the server could not validate it.
+      # The response was cache but was revalidated by the sserver.
       :invalid,
 
-      # No response was found in the cache:
-      :miss
+      # No response was found in the cache.
+      :miss,
+
+      # The response can't be cached.
+      :uncacheable
     ]
 
     # Public: Initializes a new HttpCache middleware.
@@ -243,6 +246,8 @@ module Faraday
           updated_payload[:response_headers].update(updated_response_headers)
           requested_env.update(updated_payload)
           response = Response.new(updated_payload)
+        else
+          trace :invalid
         end
         store(response)
       end
@@ -259,7 +264,7 @@ module Faraday
     end
 
     # Internal: Stores the response into the storage.
-    # If the response isn't cacheable, a trace action 'invalid' will be
+    # If the response isn't cacheable, a trace action 'uncacheable' will be
     # recorded for logging purposes.
     #
     # response - a 'Faraday::HttpCache::Response' instance to be stored.
@@ -270,7 +275,7 @@ module Faraday
         trace :store
         @storage.write(@request, response)
       else
-        trace :invalid
+        trace :uncacheable
       end
     end
 
