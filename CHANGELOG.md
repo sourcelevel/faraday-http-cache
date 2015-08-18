@@ -1,3 +1,18 @@
+## 1.2.1
+
+* Update the `CACHE_STATUSES` to better instrument `invalid` and `uncacheable` responses.
+
+## 1.2.0 (2015-08-14)
+
+* Deprecate the default instrumenter name `process_request.http_cache.faraday`
+in favor of `http_cache.faraday`.
+
+## 1.1.1 (2015-06-04)
+
+* Added support for `:instrumenter_name` option.
+* 307 responses (`Temporary Redirects`) are now cached.
+* Do not crash on non RFC 2616 compliant `Expires` headers.
+
 ## 1.1.0 (2015-04-02)
 
 * Instrumentation supported. (by @dasch)
