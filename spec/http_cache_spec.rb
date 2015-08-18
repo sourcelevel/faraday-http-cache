@@ -28,7 +28,7 @@ describe Faraday::HttpCache do
     client.post('post').body
   end
 
-  it 'does not cache responses with invalid status code' do
+  it 'does not cache responses with , status code' do
     client.get('broken')
     expect(client.get('broken').body).to eq('2')
   end
@@ -89,8 +89,8 @@ describe Faraday::HttpCache do
       client.patch('counter')
     end
 
-    it 'logs that a response with a bad status code is invalid' do
-      expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /broken] miss, invalid') }
+    it 'logs that a response with a bad status code is uncacheable' do
+      expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /broken] miss, uncacheable') }
       client.get('broken')
     end
 
@@ -115,8 +115,8 @@ describe Faraday::HttpCache do
       expect(client.get('private').body).to eq('2')
     end
 
-    it 'logs that a private response is invalid' do
-      expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /private] miss, invalid') }
+    it 'logs that a private response is uncacheable' do
+      expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /private] miss, uncacheable') }
       client.get('private')
     end
   end
@@ -140,8 +140,8 @@ describe Faraday::HttpCache do
     expect(client.get('dontstore').body).to eq('2')
   end
 
-  it 'logs that a response with a no-store directive is invalid' do
-    expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /dontstore] miss, invalid') }
+  it 'logs that a response with a no-store directive is uncacheable' do
+    expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /dontstore] miss, uncacheable') }
     client.get('dontstore')
   end
 
