@@ -70,7 +70,10 @@ module Faraday
       :miss,
 
       # The response can't be cached.
-      :uncacheable
+      :uncacheable,
+
+      # The request decided to ignore the cache.
+      :bypass
     ]
 
     # Public: Initializes a new HttpCache middleware.
