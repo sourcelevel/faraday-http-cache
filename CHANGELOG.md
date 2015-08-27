@@ -1,3 +1,7 @@
+## 1.2.2 (2015-08-27)
+
+* Update the `CACHE_STATUSES` to properly instrument requests with the `Cache-Control: no-store` header.
+
 ## 1.2.1
 
 * Update the `CACHE_STATUSES` to better instrument `invalid` and `uncacheable` responses.
