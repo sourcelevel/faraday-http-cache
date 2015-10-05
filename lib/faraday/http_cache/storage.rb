@@ -42,7 +42,7 @@ module Faraday
       #
       # Returns nothing.
       def write(request, response)
-        key = cache_key_for(request.url)
+        key = cache_key_for(request.url, request.body)
         entry = serialize_entry(request.serializable_hash, response.serializable_hash)
 
         entries = cache.read(key) || []
@@ -69,7 +69,7 @@ module Faraday
       #
       # Returns an instance of 'klass'.
       def read(request, klass = Faraday::HttpCache::Response)
-        cache_key = cache_key_for(request.url)
+        cache_key = cache_key_for(request.url, request.body)
         entries = cache.read(cache_key)
         response = lookup_response(request, entries)
 
@@ -78,8 +78,8 @@ module Faraday
         end
       end
 
-      def delete(url)
-        cache_key = cache_key_for(url)
+      def delete(url, body = nil)
+        cache_key = cache_key_for(url, body)
         cache.delete(cache_key)
       end
 
@@ -148,9 +148,9 @@ module Faraday
       # url - The request URL.
       #
       # Returns a String.
-      def cache_key_for(url)
+      def cache_key_for(url, body = nil)
         prefix = (@serializer.is_a?(Module) ? @serializer : @serializer.class).name
-        Digest::SHA1.hexdigest("#{prefix}#{url}")
+        Digest::SHA1.hexdigest("#{prefix}#{url}#{body}")
       end
 
       # Internal: Checks if the given cache object supports the
