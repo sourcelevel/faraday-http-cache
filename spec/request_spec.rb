@@ -1,10 +1,11 @@
 require 'spec_helper'
 
 describe Faraday::HttpCache::Request do
-  subject { Faraday::HttpCache::Request.new method: method, url: url, headers: headers }
+  subject { Faraday::HttpCache::Request.new method: method, url: url, headers: headers, body: body }
   let(:method) { :get }
   let(:url) { URI.parse('http://example.com/path/to/somewhere') }
   let(:headers) { {} }
+  let(:body) { JSON.dump({}) }
 
   context 'a GET request' do
     it { should be_cacheable }
