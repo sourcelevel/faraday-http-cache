@@ -13,6 +13,8 @@ env:
 notifications:
   email: false
   slack:
+    on_success: change
+    on_failure: always
     secure: Ri3bGJvNKfZ6ynbHcbICknWaAJFbQPlGQE9YSY9xMB7rGomsofY4yS8yf17WlSTd2MqxhzMXgbqXfkQW759Opknw75URo8tLTnSlpJsVSqV7T4dUsfNZguyQElVZMxYacFbBZEJGBdz2Ra6xbMBdg8NqVACb65I2xeK2fsvm77k=
 gemfile:
   - gemfiles/Gemfile.faraday-0.8
