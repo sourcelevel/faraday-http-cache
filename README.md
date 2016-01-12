@@ -30,7 +30,7 @@ end
 ```
 
 The middleware accepts a `store` option for the cache backend responsible for recording
-the API responses that should be stored. Stores should respond to `write` and `read`,
+the API responses that should be stored. Stores should respond to `write`, `read` and `delete`,
 just like an object from the `ActiveSupport::Cache` API.
 
 ```ruby
