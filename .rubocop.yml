@@ -87,9 +87,10 @@ Style/RedundantSelf:
 
 Style/FrozenStringLiteralComment:
   Exclude:
-    - Gemfile
-    - Rakefile
     - examples/*.rb
+    - Gemfile
+    - lib/faraday-http-cache.rb
+    - Rakefile
 
 Style/TrivialAccessors:
   AllowPredicates: true
