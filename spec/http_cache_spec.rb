@@ -289,7 +289,7 @@ describe Faraday::HttpCache do
     it 'uses the options to create a Cache Store' do
       store = double(read: nil, write: nil)
 
-      expect(Faraday::HttpCache::Storage).to receive(:new).with(store: store)
+      expect(Faraday::HttpCache::Storage).to receive(:new).with(hash_including(store: store))
       Faraday::HttpCache.new(app, store: store)
     end
   end

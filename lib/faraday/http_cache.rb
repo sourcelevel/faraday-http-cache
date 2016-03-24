@@ -43,9 +43,6 @@ module Faraday
   #     builder.use :http_cache, store: Rails.cache, instrumenter: ActiveSupport::Notifications
   #   end
   class HttpCache < Faraday::Middleware
-    # Internal: valid options for the 'initialize' configuration Hash.
-    VALID_OPTIONS = [:store, :serializer, :logger, :shared_cache, :instrumenter, :instrument_name].freeze
-
     UNSAFE_METHODS = [:post, :put, :delete, :patch].freeze
 
     ERROR_STATUSES = (400..499).freeze
@@ -79,13 +76,12 @@ module Faraday
     # Public: Initializes a new HttpCache middleware.
     #
     # app  - the next endpoint on the 'Faraday' stack.
-    # args - aditional options to setup the logger and the storage.
-    #             :logger          - A logger object.
-    #             :serializer      - A serializer that should respond to 'dump' and 'load'.
-    #             :shared_cache    - A flag to mark the middleware as a shared cache or not.
-    #             :store           - A cache store that should respond to 'read', 'write', and 'delete'.
-    #             :instrumenter    - An instrumentation object that should respond to 'instrument'.
-    #             :instrument_name - The String name of the instrument being reported on (optional).
+    # :store           - A cache store that should respond to 'read', 'write', and 'delete'.
+    # :serializer      - A serializer that should respond to 'dump' and 'load'.
+    # :shared_cache    - A flag to mark the middleware as a shared cache or not.
+    # :instrumenter    - An instrumentation object that should respond to 'instrument'.
+    # :instrument_name - The String name of the instrument being reported on (optional).
+    # :logger          - A logger object.
     #
     # Examples:
     #
@@ -102,15 +98,14 @@ module Faraday
     #   # Initialize the middleware with a MemoryStore and logger
     #   store = ActiveSupport::Cache.lookup_store
     #   Faraday::HttpCache.new(app, store: store, logger: my_logger)
-    def initialize(app, options = {})
+    def initialize(app, store: nil, serializer: nil, shared_cache: true, instrumenter: nil, instrument_name: EVENT_NAME, logger: nil) # rubocop:disable Metrics/ParameterLists
       super(app)
-      assert_valid_options!(options)
 
-      @logger = options[:logger]
-      @shared_cache = options.fetch(:shared_cache, true)
-      @instrumenter = options[:instrumenter]
-      @instrument_name = options.fetch(:instrument_name, EVENT_NAME)
-      @storage = create_storage(options)
+      @logger = logger
+      @shared_cache = shared_cache
+      @instrumenter = instrumenter
+      @instrument_name = instrument_name
+      @storage = Storage.new(store: store, serializer: serializer, logger: logger)
     end
 
     # Public: Process the request into a duplicate of this instance to
@@ -165,15 +160,6 @@ module Faraday
 
     # Internal: Gets the storage instance associated with the middleware.
     attr_reader :storage
-
-    # Public: Creates the Storage instance for this middleware.
-    #
-    # options - A Hash of options.
-    #
-    # Returns a Storage instance.
-    def create_storage(options)
-      Storage.new(options)
-    end
 
     private
 
@@ -361,21 +347,6 @@ module Faraday
     # Returns the Symbol status or nil if none was available.
     def extract_status(trace)
       CACHE_STATUSES.find { |status| trace.include?(status) }
-    end
-
-    # Internal: Checks if the given 'options' Hash contains only
-    # valid keys. Please see the 'VALID_OPTIONS' constant for the
-    # acceptable keys.
-    #
-    # Raises an 'ArgumentError'.
-    #
-    # Returns nothing.
-    def assert_valid_options!(options)
-      options.each_key do |key|
-        unless VALID_OPTIONS.include?(key)
-          raise ArgumentError.new("Unknown option: #{key}. Valid options are :#{VALID_OPTIONS.join(', ')}")
-        end
-      end
     end
   end
 end

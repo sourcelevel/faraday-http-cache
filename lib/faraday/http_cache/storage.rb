@@ -22,16 +22,15 @@ module Faraday
 
       # Internal: Initialize a new Storage object with a cache backend.
       #
-      # options - Storage options (default: {}).
-      #           :logger        - A Logger object to be used to emit warnings.
-      #           :store         - An cache store object that should
-      #                            respond to 'read', 'write', and 'delete'.
-      #           :serializer    - A serializer object that should
-      #                            respond to 'dump' and 'load'.
-      def initialize(options = {})
-        @cache = options[:store] || MemoryStore.new
-        @serializer = options[:serializer] || JSON
-        @logger = options[:logger]
+      # :logger     - A Logger object to be used to emit warnings.
+      # :store      - An cache store object that should respond to 'read',
+      #              'write', and 'delete'.
+      # :serializer - A serializer object that should respond to 'dump'
+      #               and 'load'.
+      def initialize(store: nil, serializer: nil, logger: nil)
+        @cache = store || MemoryStore.new
+        @serializer = serializer || JSON
+        @logger = logger
         assert_valid_store!
       end
 
@@ -69,7 +68,7 @@ module Faraday
       # klass    - The Class to be instantiated with the stored response.
       #
       # Returns an instance of 'klass'.
-      def read(request, klass = Faraday::HttpCache::Response)
+      def read(request, klass: Faraday::HttpCache::Response)
         cache_key = cache_key_for(request.url)
         entries = cache.read(cache_key)
         response = lookup_response(request, entries)
