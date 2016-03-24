@@ -1,6 +1,10 @@
+## Unreleased
+
+* Support only Ruby 2.1+.
+
 ## 1.3.1 (2016-08-12)
 
-* Reject invalid `Date` response headers instead of letting the exception bubble. 
+* Reject invalid `Date` response headers instead of letting the exception bubble.
 
 ## 1.3.0 (2016-03-24)
 
