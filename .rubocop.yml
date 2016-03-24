@@ -93,3 +93,7 @@ Style/FrozenStringLiteralComment:
 
 Style/TrivialAccessors:
   AllowPredicates: true
+
+Style/FileName:
+  Exclude:
+    - lib/faraday-http-cache.rb
