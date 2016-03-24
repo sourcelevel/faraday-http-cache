@@ -44,14 +44,14 @@ module Faraday
   #   end
   class HttpCache < Faraday::Middleware
     # Internal: valid options for the 'initialize' configuration Hash.
-    VALID_OPTIONS = [:store, :serializer, :logger, :shared_cache, :instrumenter, :instrument_name]
+    VALID_OPTIONS = [:store, :serializer, :logger, :shared_cache, :instrumenter, :instrument_name].freeze
 
-    UNSAFE_METHODS = [:post, :put, :delete, :patch]
+    UNSAFE_METHODS = [:post, :put, :delete, :patch].freeze
 
-    ERROR_STATUSES = 400..499
+    ERROR_STATUSES = (400..499).freeze
 
     # The name of the instrumentation event.
-    EVENT_NAME = 'http_cache.faraday'
+    EVENT_NAME = 'http_cache.faraday'.freeze
 
     CACHE_STATUSES = [
       # The request was not cacheable.
@@ -74,7 +74,7 @@ module Faraday
 
       # The request decided to ignore the cache.
       :bypass
-    ]
+    ].freeze
 
     # Public: Initializes a new HttpCache middleware.
     #

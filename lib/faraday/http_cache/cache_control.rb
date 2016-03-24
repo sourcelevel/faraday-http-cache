@@ -54,7 +54,7 @@ module Faraday
       def shared_max_age
         @directives['s-maxage'].to_i if @directives.key?('s-maxage')
       end
-      alias_method :s_maxage, :shared_max_age
+      alias s_maxage shared_max_age
 
       # Internal: Checks if the 'must-revalidate' directive is present.
       def must_revalidate?
