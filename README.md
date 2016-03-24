@@ -1,6 +1,6 @@
 # Faraday Http Cache
 
-[![Build Status](https://secure.travis-ci.org/plataformatec/faraday-http-cache.png?branch=master)](https://travis-ci.org/plataformatec/faraday-http-cache)
+[![Build Status](https://secure.travis-ci.org/plataformatec/faraday-http-cache.svg?branch=master)](https://travis-ci.org/plataformatec/faraday-http-cache)
 
 a [Faraday](https://github.com/lostisland/faraday) middleware that respects HTTP cache,
 by checking expiration and validation of the stored responses.
