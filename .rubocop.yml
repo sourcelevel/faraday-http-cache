@@ -90,3 +90,6 @@ Style/FrozenStringLiteralComment:
     - Gemfile
     - Rakefile
     - examples/*.rb
+
+Style/TrivialAccessors:
+  AllowPredicates: true
