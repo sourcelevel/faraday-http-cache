@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
 describe Faraday::HttpCache::Storage do
@@ -44,7 +45,7 @@ describe Faraday::HttpCache::Storage do
 
       context 'when ASCII characters in response cannot be converted to UTF-8' do
         let(:response) do
-          body = "\u2665".force_encoding('ASCII-8BIT')
+          body = String.new("\u2665").force_encoding('ASCII-8BIT')
           double(:response, serializable_hash: { 'body' => body })
         end
 

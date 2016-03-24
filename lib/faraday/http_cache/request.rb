@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Faraday
   class HttpCache < Faraday::Middleware
     # Internal: A class to represent a request

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'faraday'
 
 require 'faraday/http_cache/storage'
@@ -48,7 +49,7 @@ module Faraday
     ERROR_STATUSES = (400..499).freeze
 
     # The name of the instrumentation event.
-    EVENT_NAME = 'http_cache.faraday'.freeze
+    EVENT_NAME = 'http_cache.faraday'
 
     CACHE_STATUSES = [
       # The request was not cacheable.
