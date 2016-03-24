@@ -1,3 +1,7 @@
+## Unreleased
+
+* `no-cache` responses won't be treated as fresh and will always be revalidated.
+
 ## 1.2.2 (2015-08-27)
 
 * Update the `CACHE_STATUSES` to properly instrument requests with the `Cache-Control: no-store` header.

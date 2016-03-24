@@ -190,6 +190,14 @@ describe Faraday::HttpCache do
     end
   end
 
+  context 'when the response has a "no-cache" directive' do
+    it 'always revalidate the cached response' do
+      client.get('no_cache')
+      expect(client.get('no_cache').body).to eq('2')
+      expect(client.get('no_cache').body).to eq('3')
+    end
+  end
+
   it 'logs that a GET response is stored' do
     expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /get] miss, store') }
     client.get('get')

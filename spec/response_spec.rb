@@ -72,9 +72,17 @@ describe Faraday::HttpCache::Response do
       expect(response).to be_fresh
     end
 
-    it 'is not fresh when the ttl has expired' do
+    it 'is not fresh if the ttl has expired' do
       date = (Time.now - 500).httpdate
       headers = { 'Cache-Control' => 'max-age=400', 'Date' => date }
+      response = Faraday::HttpCache::Response.new(response_headers: headers)
+
+      expect(response).not_to be_fresh
+    end
+
+    it 'is not fresh if Cache Control has "no-cache"' do
+      date = (Time.now - 200).httpdate
+      headers = { 'Cache-Control' => 'max-age=400, no-cache', 'Date' => date }
       response = Faraday::HttpCache::Response.new(response_headers: headers)
 
       expect(response).not_to be_fresh

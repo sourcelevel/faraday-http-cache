@@ -49,7 +49,7 @@ module Faraday
       #
       # Returns true if the response is fresh, otherwise false.
       def fresh?
-        ttl && ttl > 0
+        !cache_control.no_cache? && ttl && ttl > 0
       end
 
       # Internal: Checks if the Response returned a 'Not Modified' status.

@@ -109,6 +109,10 @@ class TestApp < Sinatra::Base
     end
   end
 
+  get '/no_cache' do
+    [200, { 'Cache-Control' => 'max-age=200, no-cache', 'ETag' => settings.counter.to_s }, increment_counter]
+  end
+
   get '/vary' do
     [200, { 'Cache-Control' => 'max-age=50', 'Vary' => 'User-Agent' }, increment_counter]
   end
