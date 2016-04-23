@@ -172,7 +172,7 @@ module Faraday
     #
     # Returns a Storage instance.
     def create_storage(options)
-      Storage.new(options)
+      options[:store].is_a?(Storage) ? options[:store] : Storage.new(options)
     end
 
     private

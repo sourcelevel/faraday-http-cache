@@ -8,13 +8,14 @@ module Faraday
     # Examples
     #
     #   # Creates a new Storage using a MemCached backend from ActiveSupport.
-    #   Faraday::HttpCache::Storage.new(:mem_cache_store)
+    #   mem_cache_store = ActiveSupport::Cache.lookup_store(:mem_cache_store, ['localhost:11211'])
+    #   Faraday::HttpCache::Storage.new(store: mem_cache_store)
     #
     #   # Reuse some other instance of an ActiveSupport::Cache::Store object.
-    #   Faraday::HttpCache::Storage.new(Rails.cache)
+    #   Faraday::HttpCache::Storage.new(store: Rails.cache)
     #
     #   # Creates a new Storage using Marshal for serialization.
-    #   Faraday::HttpCache::Storage.new(:memory_store, serializer: Marshal)
+    #   Faraday::HttpCache::Storage.new(store: Rails.cache, serializer: Marshal)
     class Storage
       # Public: Gets the underlying cache store object.
       attr_reader :cache
