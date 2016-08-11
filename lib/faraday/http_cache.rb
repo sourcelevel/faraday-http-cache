@@ -207,6 +207,8 @@ module Faraday
 
       return fetch(env) if entry.nil?
 
+      @logger.debug("cached response_headers = #{entry.payload[:response_headers]}") if @logger
+
       if entry.fresh?
         response = entry.to_response(env)
         trace :fresh
@@ -302,6 +304,7 @@ module Faraday
       trace :miss
       @app.call(env).on_complete do |fresh_env|
         response = Response.new(create_response(fresh_env))
+        @logger.debug("fetched response_headers = #{response.payload[:response_headers]}") if @logger
         store(response)
       end
     end
