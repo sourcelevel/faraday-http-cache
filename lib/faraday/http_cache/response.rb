@@ -38,7 +38,7 @@ module Faraday
         @now = Time.now
         @payload = payload
         wrap_headers!
-        headers['Date'] ||= @now.httpdate
+        ensure_date_header!
 
         @last_modified = headers['Last-Modified']
         @etag = headers['ETag']
@@ -196,6 +196,17 @@ module Faraday
 
         @payload[:response_headers] = Faraday::Utils::Headers.new
         @payload[:response_headers].update(headers) if headers
+      end
+
+      # Internal: Try to parse the Date header, if it fails set it to @now.
+      #
+      # Returns nothing.
+      def ensure_date_header!
+        begin
+          date
+        rescue
+          headers['Date'] = @now.httpdate
+        end
       end
 
       # Internal: Gets the headers 'Hash' from the payload.

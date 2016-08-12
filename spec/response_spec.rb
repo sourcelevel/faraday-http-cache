@@ -96,6 +96,14 @@ describe Faraday::HttpCache::Response do
     expect(response.date).to be
   end
 
+  it 'sets the "Date" header if is not a valid RFC 2616 compliant string' do
+    date = Time.now.httpdate
+    headers = { 'Date' => "#{date}, #{date}" }
+    response = Faraday::HttpCache::Response.new(response_headers: headers)
+
+    expect(response.date).to be
+  end
+
   it 'the response is not modified if the status code is 304' do
     response = Faraday::HttpCache::Response.new(status: 304)
     expect(response).to be_not_modified
