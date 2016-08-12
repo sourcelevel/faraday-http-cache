@@ -202,11 +202,9 @@ module Faraday
       #
       # Returns nothing.
       def ensure_date_header!
-        begin
-          date
-        rescue
-          headers['Date'] = @now.httpdate
-        end
+        date
+      rescue
+        headers['Date'] = @now.httpdate
       end
 
       # Internal: Gets the headers 'Hash' from the payload.
