@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
 describe Faraday::HttpCache::Response do
@@ -83,6 +84,14 @@ describe Faraday::HttpCache::Response do
     it 'is not fresh if Cache Control has "no-cache"' do
       date = (Time.now - 200).httpdate
       headers = { 'Cache-Control' => 'max-age=400, no-cache', 'Date' => date }
+      response = Faraday::HttpCache::Response.new(response_headers: headers)
+
+      expect(response).not_to be_fresh
+    end
+
+    it 'is not fresh if Cache Control has "must-revalidate"' do
+      date = (Time.now - 200).httpdate
+      headers = { 'Cache-Control' => 'max-age=400, must-revalidate', 'Date' => date }
       response = Faraday::HttpCache::Response.new(response_headers: headers)
 
       expect(response).not_to be_fresh
