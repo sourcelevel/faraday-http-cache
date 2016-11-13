@@ -13,6 +13,11 @@ describe 'Instrumentation' do
   let(:events) { [] }
   let(:subscriber) { lambda { |*args| events << ActiveSupport::Notifications::Event.new(*args) } }
 
+  before :all do
+    require 'active_support'
+    require 'active_support/notifications'
+  end
+    
   around do |example|
     ActiveSupport::Notifications.subscribed(subscriber, 'http_cache.faraday') do
       example.run
