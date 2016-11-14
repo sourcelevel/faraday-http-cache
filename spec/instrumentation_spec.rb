@@ -13,7 +13,7 @@ describe 'Instrumentation' do
   end
 
   let(:events) { [] }
-  let(:subscriber) { lambda { |*args| events << ActiveSupport::Notifications::Event.new(*
+  let(:subscriber) { lambda { |*args| events << ActiveSupport::Notifications::Event.new(*args) } }
     
   around do |example|
     ActiveSupport::Notifications.subscribed(subscriber, 'http_cache.faraday') do
