@@ -5,9 +5,9 @@ cache: bundler
 rvm:
   - 1.9.3
   - 2.0.0
-  - 2.1.5
-  - 2.2.4
-  - 2.3.0
+  - 2.1.10
+  - 2.2.5
+  - 2.3.1
 env:
   - FARADAY_ADAPTER=net_http
   - FARADAY_ADAPTER=em_http
