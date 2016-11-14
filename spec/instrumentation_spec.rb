@@ -1,4 +1,6 @@
 require 'spec_helper'
+require 'active_support'
+require 'active_support/notifications'
 
 describe 'Instrumentation' do
   let(:backend) { Faraday::Adapter::Test::Stubs.new }
@@ -11,12 +13,7 @@ describe 'Instrumentation' do
   end
 
   let(:events) { [] }
-  let(:subscriber) { lambda { |*args| events << ActiveSupport::Notifications::Event.new(*args) } }
-
-  before :all do
-    require 'active_support'
-    require 'active_support/notifications'
-  end
+  let(:subscriber) { lambda { |*args| events << ActiveSupport::Notifications::Event.new(*
     
   around do |example|
     ActiveSupport::Notifications.subscribed(subscriber, 'http_cache.faraday') do
