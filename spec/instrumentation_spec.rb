@@ -1,4 +1,6 @@
 require 'spec_helper'
+require 'active_support'
+require 'active_support/notifications'
 
 describe 'Instrumentation' do
   let(:backend) { Faraday::Adapter::Test::Stubs.new }
