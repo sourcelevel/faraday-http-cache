@@ -1,6 +1,10 @@
 ## Unreleased
 
-* Support only Ruby 2.1+.
+## 2.0.0 (2016-11-16)
+
+* Ruby version constraint changed to 2.1.0.
+* Changed `Faraday::HttpCache#initialize` to use keyword arguments instead of
+a `Hash`.
 
 ## 1.3.1 (2016-08-12)
 

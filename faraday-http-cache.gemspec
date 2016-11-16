@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 Gem::Specification.new do |gem|
   gem.name          = 'faraday-http-cache'
-  gem.version       = '1.3.1'
+  gem.version       = '2.0.0'
   gem.licenses      = ['Apache 2.0']
   gem.description   = 'Middleware to handle HTTP caching'
   gem.summary       = 'A Faraday middleware that stores and validates cache expiration.'
