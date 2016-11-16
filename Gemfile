@@ -1,6 +1,5 @@
 source 'http://rubygems.org'
 
-# Specify your gem's dependencies in faraday-cache_store.gemspec
 gemspec
 
 gem 'faraday_middleware', '>= 0.9.1'
