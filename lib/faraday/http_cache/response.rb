@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'time'
 require 'faraday/http_cache/cache_control'
 

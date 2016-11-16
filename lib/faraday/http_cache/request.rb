@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Faraday
   class HttpCache < Faraday::Middleware
     # Internal: A class to represent a request
@@ -11,8 +12,10 @@ module Faraday
 
       attr_reader :method, :url, :headers
 
-      def initialize(options)
-        @method, @url, @headers = options.values_at(:method, :url, :headers)
+      def initialize(method:, url:, headers:)
+        @method = method
+        @url = url
+        @headers = headers
       end
 
       # Internal: Validates if the current request method is valid for caching.
