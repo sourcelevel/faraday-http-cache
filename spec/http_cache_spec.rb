@@ -224,7 +224,7 @@ describe Faraday::HttpCache do
 
   it 'logs that the request with "Last-Modified" was revalidated' do
     client.get('timestamped')
-    expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /timestamped] valid, store') }
+    expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /timestamped] valid') }
     expect(client.get('timestamped').body).to eq('1')
   end
 
@@ -233,10 +233,21 @@ describe Faraday::HttpCache do
     expect(client.get('etag').body).to eq('1')
   end
 
-  it 'logs that the request with "ETag" was revalidated' do
-    client.get('etag')
-    expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /etag] valid, store') }
-    expect(client.get('etag').body).to eq('1')
+  context "when a request is revalidated" do
+    it 'logs that the request with "ETag" was revalidated and stored' do
+      client.get('etag')
+      expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /etag] valid, store') }
+      expect(client.get('etag').body).to eq('1')
+    end
+
+    context "when headers that change are ignored" do
+      let(:options) { { validate_ignored_headers: ["Date", "max-age", "Expires", "Cache-Control"], logger: logger } }
+      it 'logs that the request with "ETag" was revalidated' do
+        client.get('etag')
+        expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /etag] valid') }
+        expect(client.get('etag').body).to eq('1')
+      end
+    end
   end
 
   it 'maintains the "Date" header for cached responses' do
@@ -266,12 +277,6 @@ describe Faraday::HttpCache do
     first_expires  = client.get('etag').headers['Expires']
     second_expires = client.get('etag').headers['Expires']
     expect(first_expires).not_to eql(second_expires)
-  end
-
-  it 'updates the "Vary" header when a response is validated' do
-    first_vary  = client.get('etag').headers['Vary']
-    second_vary = client.get('etag').headers['Vary']
-    expect(first_vary).not_to eql(second_vary)
   end
 
   it 'raises an error when misconfigured' do

@@ -77,12 +77,13 @@ module Faraday
     # Public: Initializes a new HttpCache middleware.
     #
     # app  - the next endpoint on the 'Faraday' stack.
-    # :store           - A cache store that should respond to 'read', 'write', and 'delete'.
-    # :serializer      - A serializer that should respond to 'dump' and 'load'.
-    # :shared_cache    - A flag to mark the middleware as a shared cache or not.
-    # :instrumenter    - An instrumentation object that should respond to 'instrument'.
-    # :instrument_name - The String name of the instrument being reported on (optional).
-    # :logger          - A logger object.
+    # :store                    - A cache store that should respond to 'read', 'write', and 'delete'.
+    # :serializer               - A serializer that should respond to 'dump' and 'load'.
+    # :shared_cache             - A flag to mark the middleware as a shared cache or not.
+    # :instrumenter             - An instrumentation object that should respond to 'instrument'.
+    # :instrument_name          - The String name of the instrument being reported on (optional).
+    # :logger                   - A logger object.
+    # :validate_ignored_headers - An Array of headers to ignore during comparisons of requests when writing to the cache
     #
     # Examples:
     #
@@ -99,7 +100,7 @@ module Faraday
     #   # Initialize the middleware with a MemoryStore and logger
     #   store = ActiveSupport::Cache.lookup_store
     #   Faraday::HttpCache.new(app, store: store, logger: my_logger)
-    def initialize(app, store: nil, serializer: nil, shared_cache: true, instrumenter: nil, instrument_name: EVENT_NAME, logger: nil) # rubocop:disable Metrics/ParameterLists
+    def initialize(app, store: nil, serializer: nil, shared_cache: true, instrumenter: nil, instrument_name: EVENT_NAME, logger: nil, validate_ignored_headers: []) # rubocop:disable Metrics/ParameterLists
       super(app)
 
       @logger = logger
@@ -107,6 +108,7 @@ module Faraday
       @instrumenter = instrumenter
       @instrument_name = instrument_name
       @storage = Storage.new(store: store, serializer: serializer, logger: logger)
+      @validate_ignored_headers = validate_ignored_headers.map(&:downcase)
     end
 
     # Public: Process the request into a duplicate of this instance to
@@ -224,6 +226,7 @@ module Faraday
         response = Response.new(requested_env)
         if response.not_modified?
           trace :valid
+          entry_headers = entry.payload[:response_headers].clone
           updated_response_headers = response.payload[:response_headers]
 
           # These headers are not allowed in 304 responses, yet some proxy
@@ -236,11 +239,24 @@ module Faraday
           updated_payload[:response_headers].update(updated_response_headers)
           requested_env.update(updated_payload)
           response = Response.new(updated_payload)
+          store(response) if updated_headers_in_cache?(entry_headers, updated_response_headers)
         else
           trace :invalid
+          store(response)
         end
-        store(response)
       end
+    end
+
+    def updated_headers_in_cache?(cached_response_headers, response_headers)
+      cached_response_headers_to_check = filter_validate_ignored_headers(cached_response_headers)
+      response_headers_to_check = filter_validate_ignored_headers(response_headers)
+
+      cached_response_headers_to_check.merge(response_headers_to_check) != cached_response_headers_to_check
+    end
+
+    def filter_validate_ignored_headers(headers)
+      ignored_headers = @validate_ignored_headers
+      headers.reject { |header, _| ignored_headers.include?(header.downcase) }
     end
 
     # Internal: Records a traced action to be used by the logger once the
