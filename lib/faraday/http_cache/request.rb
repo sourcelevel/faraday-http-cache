@@ -39,7 +39,7 @@ module Faraday
       def serializable_hash
         {
           method: @method,
-          url: @url,
+          url: @url.to_s,
           headers: @headers
         }
       end
