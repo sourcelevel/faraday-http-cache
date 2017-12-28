@@ -120,7 +120,7 @@ end
 
 ## See it live
 
-You can clone this repository, install it's dependencies with Bundler (run `bundle install`) and
+You can clone this repository, install its dependencies with Bundler (run `bundle install`) and
 execute the files under the `examples` directory to see a sample of the middleware usage.
 
 ## What gets cached?
