@@ -28,10 +28,11 @@ module Faraday
       #              'write', and 'delete'.
       # :serializer - A serializer object that should respond to 'dump'
       #               and 'load'.
-      def initialize(store: nil, serializer: nil, logger: nil)
+      def initialize(store: nil, serializer: nil, logger: nil, cache_key_callback: nil)
         @cache = store || MemoryStore.new
         @serializer = serializer || JSON
         @logger = logger
+        @cache_key_callback = cache_key_callback
         assert_valid_store!
       end
 
@@ -43,7 +44,7 @@ module Faraday
       #
       # Returns nothing.
       def write(request, response)
-        key = cache_key_for(request.url)
+        key = cache_key_for(request)
         entry = serialize_entry(request.serializable_hash, response.serializable_hash)
 
         entries = cache.read(key) || []
@@ -70,7 +71,7 @@ module Faraday
       #
       # Returns an instance of 'klass'.
       def read(request, klass: Faraday::HttpCache::Response)
-        cache_key = cache_key_for(request.url)
+        cache_key = cache_key_for(request)
         entries = cache.read(cache_key)
         response = lookup_response(request, entries)
 
@@ -143,15 +144,30 @@ module Faraday
         end
       end
 
-      # Internal: Computes the cache key for a specific request, taking in
+      # Internal: Computes the cache key for a specific request, taking into
       # account the current serializer to avoid cross serialization issues.
       #
-      # url - The request URL.
+      # If @cache_key_callback is present, the Proc is used to generate a custom key based off
+      # of the request parameter.
+      #
+      # request - a Faraday::HttpCache::Request instance.
       #
       # Returns a String.
-      def cache_key_for(url)
+      def cache_key_for(request)
         prefix = (@serializer.is_a?(Module) ? @serializer : @serializer.class).name
-        Digest::SHA1.hexdigest("#{prefix}#{url}")
+        Digest::SHA1.hexdigest("#{prefix}#{build_cache_key(request)}")
+      end
+
+      def build_cache_key(request)
+        if @cache_key_callback
+          unless @cache_key_callback.is_a?(Proc)
+            raise TypeError.new('cache_key_callback must be of type Proc')
+          end
+
+          @cache_key_callback.call(request)
+        else
+          request.url
+        end
       end
 
       # Internal: Checks if the given cache object supports the

@@ -99,14 +99,14 @@ module Faraday
     #   # Initialize the middleware with a MemoryStore and logger
     #   store = ActiveSupport::Cache.lookup_store
     #   Faraday::HttpCache.new(app, store: store, logger: my_logger)
-    def initialize(app, store: nil, serializer: nil, shared_cache: true, instrumenter: nil, instrument_name: EVENT_NAME, logger: nil) # rubocop:disable Metrics/ParameterLists
+    def initialize(app, store: nil, serializer: nil, shared_cache: true, instrumenter: nil, instrument_name: EVENT_NAME, logger: nil, cache_key_callback: nil) # rubocop:disable Metrics/ParameterLists
       super(app)
 
       @logger = logger
       @shared_cache = shared_cache
       @instrumenter = instrumenter
       @instrument_name = instrument_name
-      @storage = Storage.new(store: store, serializer: serializer, logger: logger)
+      @storage = Storage.new(store: store, serializer: serializer, logger: logger, cache_key_callback: cache_key_callback)
     end
 
     # Public: Process the request into a duplicate of this instance to
