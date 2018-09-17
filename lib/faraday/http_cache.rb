@@ -147,7 +147,7 @@ module Faraday
       end
 
       response.on_complete do
-        delete(@request, response) if should_delete?(response.status, @request.method)
+        delete(@request) if should_delete?(response.status, @request.method)
         log_request
         response.env[:http_cache_trace] = @trace
         instrument(response.env)
@@ -269,14 +269,13 @@ module Faraday
       end
     end
 
-    def delete(request, response)
-      headers = %w(Location Content-Location)
-      headers.each do |header|
-        url = response.headers[header]
-        @storage.delete(url) if url
-      end
-
-      @storage.delete(request.url)
+    # Internal: Deletes the cache entry in the store.
+    #
+    # request - a 'Faraday::HttpCache::Request' instance.
+    #
+    # Returns nothing.
+    def delete(request)
+      @storage.delete(request)
       trace :delete
     end
 
