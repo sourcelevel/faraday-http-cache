@@ -151,6 +151,29 @@ end
 client.get('http://site/api/some-private-resource') # => will be cached
 ```
 
+### Custom cache key
+
+By default, the middleware uses the url from the `request` object as a cache key. In the event that
+you might want to pass a key that uses different values from the `request`, you can use the
+`:cache_key_callback` configuration option. This option takes a `Proc` that receives the `request`
+object as an argument:
+
+```ruby
+client = Faraday.new do |builder|
+  builder.use :http_cache,
+              cache_key_callback: -> (request) do
+                "#{request.headers['Authorization'].match(/\Atoken\s(.*)\z/)[1]}/#{request.url}"
+              end
+  builder.adapter Faraday.default_adapter
+end
+
+client.get do |req|
+  req.url 'http://site/api/some-resource'
+  req.headers['Authorization'] = 'token 1234'
+end
+# => cache_key will be a Digest::SHA1.hexdigest value of '1234/http://site/api/some-resource'
+```
+
 ## License
 
 Copyright (c) 2012-2014 Plataformatec. See LICENSE file.
