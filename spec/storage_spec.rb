@@ -30,6 +30,38 @@ describe Faraday::HttpCache::Storage do
     end
   end
 
+  describe 'with cache_key_callback provided' do
+    let(:serializer) { JSON }
+
+    let(:storage) do
+      Faraday::HttpCache::Storage.new(
+        cache_key_callback: cache_key_callback,
+        serializer: serializer,
+        store: cache
+      )
+    end
+
+    let(:expected_cache_key) { Digest::SHA1.hexdigest("#{JSON.name}my_custom_key/#{request.url}") }
+
+    context 'when provided callback is a proc' do
+      let(:cache_key_callback) { -> (request_obj) { "my_custom_key/#{request_obj.url}" } }
+
+      it 'uses callback to generate cache key' do
+        expect(cache).to receive(:read).with(expected_cache_key)
+        subject.write(request, response)
+      end
+    end
+
+    context 'when provided callback is NOT a proc' do
+      let(:cache_key_callback) { 'foo' }
+
+      it 'raises TypeError' do
+        expect { subject.write(request, response) }.to raise_error(TypeError)
+      end
+    end
+
+  end
+
   describe 'storing responses' do
     shared_examples 'A storage with serialization' do
       it 'writes the response object to the underlying cache' do
@@ -103,7 +135,7 @@ describe Faraday::HttpCache::Storage do
   describe 'deleting responses' do
     it 'removes the entries from the cache of the given URL' do
       subject.write(request, response)
-      subject.delete(request.url)
+      subject.delete(request)
       expect(subject.read(request)).to be_nil
     end
   end

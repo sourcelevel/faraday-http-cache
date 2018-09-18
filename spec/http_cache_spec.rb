@@ -94,18 +94,6 @@ describe Faraday::HttpCache do
       expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /broken] miss, uncacheable') }
       client.get('broken')
     end
-
-    it 'expires entries for the "Location" header' do
-      client.get('get')
-      client.post('delete-with-location')
-      expect(client.get('get').body).to eq('2')
-    end
-
-    it 'expires entries for the "Content-Location" header' do
-      client.get('get')
-      client.post('delete-with-content-location')
-      expect(client.get('get').body).to eq('2')
-    end
   end
 
   describe 'when acting as a shared cache' do
@@ -292,6 +280,15 @@ describe Faraday::HttpCache do
 
       expect(Faraday::HttpCache::Storage).to receive(:new).with(hash_including(store: store))
       Faraday::HttpCache.new(app, store: store)
+    end
+
+    describe 'when cache_key_callback option is provided' do
+      cache_key_callback = -> { 'my custom cache key callback' }
+
+      it 'uses the cache_key_callback option' do
+        expect(Faraday::HttpCache::Storage).to receive(:new).with(hash_including(cache_key_callback: cache_key_callback))
+        Faraday::HttpCache.new(app, cache_key_callback: cache_key_callback)
+      end
     end
   end
 end
