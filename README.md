@@ -53,9 +53,16 @@ This type of store **might not be persisted across multiple processes or connect
 so it is probably not suitable for most production environments.
 Make sure that you configure a store that is suitable for you.
 
-the stdlib `JSON` module is used for serialization by default.
-If you expect to be dealing with images, you can use [Marshal][marshal] instead, or
-if you want to use another json library like `oj` or `yajl-ruby`.
+The stdlib `JSON` module is used for serialization by default, which can struggle with unicode 
+characters in responses. For example, if your JSON returns `"name": "Raül"` then you might see 
+errors like:
+
+```
+Response could not be serialized: "\xC3" from ASCII-8BIT to UTF-8. Try using Marshal to serialize.
+```
+
+For full unicode support, or if you expect to be dealing with images, you can use 
+[Marshal][marshal] instead. Alternatively you could use another json library like `oj` or `yajl-ruby`.
 
 ```ruby
 client = Faraday.new do |builder|
