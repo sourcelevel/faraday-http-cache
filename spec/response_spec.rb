@@ -89,8 +89,16 @@ describe Faraday::HttpCache::Response do
       expect(response).not_to be_fresh
     end
 
-    it 'is not fresh if Cache Control has "must-revalidate"' do
+    it 'is fresh if the response contains "must-revalidate" and is not stale' do
       date = (Time.now - 200).httpdate
+      headers = { 'Cache-Control' => 'public, max-age=23880, must-revalidate, no-transform', 'Date' => date }
+      response = Faraday::HttpCache::Response.new(response_headers: headers)
+
+      expect(response).to be_fresh
+    end
+
+    it 'is not fresh if Cache Control has "must-revalidate" and is stale' do
+      date = (Time.now - 500).httpdate
       headers = { 'Cache-Control' => 'max-age=400, must-revalidate', 'Date' => date }
       response = Faraday::HttpCache::Response.new(response_headers: headers)
 
