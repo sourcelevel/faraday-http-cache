@@ -1,6 +1,5 @@
 language: ruby
 script: bin/rspec
-sudo: false
 cache: bundler
 rvm:
   - 2.4
