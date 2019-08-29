@@ -61,7 +61,7 @@ module Faraday
       # The response was cached and the server has validated it with a 304 response.
       :valid,
 
-      # The response was cache but was revalidated by the sserver.
+      # The response was cached but was not revalidated by the server.
       :invalid,
 
       # No response was found in the cache.
@@ -70,8 +70,8 @@ module Faraday
       # The response can't be cached.
       :uncacheable,
 
-      # The request decided to ignore the cache.
-      :bypass
+      # The request was cached but need to be revalidated by the server.
+      :must_revalidate,
     ].freeze
 
     # Public: Initializes a new HttpCache middleware.
@@ -132,15 +132,7 @@ module Faraday
       response = nil
 
       if @request.cacheable?
-        response = if @request.no_cache?
-          trace :bypass
-          @app.call(env).on_complete do |fresh_env|
-            response = Response.new(create_response(fresh_env))
-            store(response)
-          end
-        else
-          process(env)
-        end
+        response = process(env)
       else
         trace :unacceptable
         response = @app.call(env)
@@ -194,10 +186,11 @@ module Faraday
 
       return fetch(env) if entry.nil?
 
-      if entry.fresh?
+      if entry.fresh? && !@request.no_cache?
         response = entry.to_response(env)
         trace :fresh
       else
+        trace :must_revalidate
         response = validate(entry, env)
       end
 

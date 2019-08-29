@@ -180,9 +180,12 @@ describe Faraday::HttpCache do
   end
 
   context 'when the request has a "no-cache" directive' do
-    it 'by-passes the cache' do
-      client.get('get', nil, 'Cache-Control' => 'no-cache')
-      expect(client.get('get', nil, 'Cache-Control' => 'no-cache').body).to eq('2')
+    it 'revalidates the cache' do
+      expect(client.get('etag').body).to eq('1')
+      expect(client.get('etag', nil, 'Cache-Control' => 'no-cache').body).to eq('1')
+
+      expect(client.get('get', nil).body).to eq('2')
+      expect(client.get('etag', nil, 'Cache-Control' => 'no-cache').body).to eq('3')
     end
 
     it 'caches the response' do
@@ -224,7 +227,7 @@ describe Faraday::HttpCache do
 
   it 'logs that the request with "Last-Modified" was revalidated' do
     client.get('timestamped')
-    expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /timestamped] valid, store') }
+    expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /timestamped] must_revalidate, valid, store') }
     expect(client.get('timestamped').body).to eq('1')
   end
 
@@ -235,7 +238,7 @@ describe Faraday::HttpCache do
 
   it 'logs that the request with "ETag" was revalidated' do
     client.get('etag')
-    expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /etag] valid, store') }
+    expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /etag] must_revalidate, valid, store') }
     expect(client.get('etag').body).to eq('1')
   end
 
