@@ -19,7 +19,7 @@ module Faraday
   #
   #   # Using the middleware with a simple client:
   #   client = Faraday.new do |builder|
-  #     builder.user :http_cache, store: my_store_backend
+  #     builder.use :http_cache, store: my_store_backend
   #     builder.adapter Faraday.default_adapter
   #   end
   #
