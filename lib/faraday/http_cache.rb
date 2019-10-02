@@ -297,7 +297,7 @@ module Faraday
 
       {
         status: hash[:status],
-        body: hash[:body],
+        body: hash[:body] || hash[:response_body],
         response_headers: hash[:response_headers]
       }
     end
