@@ -277,6 +277,11 @@ describe Faraday::HttpCache do
     expect(first_vary).not_to eql(second_vary)
   end
 
+  it 'caches non-stale response with "must-revalidate" directive' do
+    client.get('must-revalidate')
+    expect(client.get('must-revalidate').body).to eq('1')
+  end
+
   it 'raises an error when misconfigured' do
     expect {
       client = Faraday.new(url: ENV['FARADAY_SERVER']) do |stack|

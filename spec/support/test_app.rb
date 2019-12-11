@@ -88,6 +88,10 @@ class TestApp < Sinatra::Base
     [200, { 'Date' => settings.yesterday, 'Expires' => settings.yesterday }, increment_counter]
   end
 
+  get '/must-revalidate' do
+    [200, { 'Date' => Time.now.httpdate, 'Cache-Control' => 'public, max-age=23880, must-revalidate, no-transform' }, increment_counter]
+  end
+
   get '/timestamped' do
     settings.counter += 1
     header = settings.counter > 2 ? '1' : '2'
