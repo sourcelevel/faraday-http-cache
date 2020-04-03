@@ -7,7 +7,7 @@ Gem::Specification.new do |gem|
   gem.summary       = 'A Faraday middleware that stores and validates cache expiration.'
   gem.authors       = ['Lucas Mazza']
   gem.email         = ['opensource@plataformatec.com.br']
-  gem.homepage      = 'https://github.com/plataformatec/faraday-http-cache'
+  gem.homepage      = 'https://github.com/sourcelevel/faraday-http-cache'
 
   gem.files         = Dir['LICENSE', 'README.md', 'lib/**/*']
   gem.test_files    = Dir['spec/**/*']
