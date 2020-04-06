@@ -160,6 +160,7 @@ client.get('http://site/api/some-private-resource') # => will be cached
 
 ## License
 
-Copyright (c) 2012-2014 Plataformatec. See LICENSE file.
+Copyright (c) 2012-2018 Plataformatec.
+Copyright (c) 2019 SourceLevel and contributors.
 
   [marshal]: http://www.ruby-doc.org/core-2.0/Marshal.html

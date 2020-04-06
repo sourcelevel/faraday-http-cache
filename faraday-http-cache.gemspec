@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 Gem::Specification.new do |gem|
   gem.name          = 'faraday-http-cache'
-  gem.version       = '2.0.0'
+  gem.version       = '2.1.0'
   gem.licenses      = ['Apache 2.0']
   gem.description   = 'Middleware to handle HTTP caching'
   gem.summary       = 'A Faraday middleware that stores and validates cache expiration.'
-  gem.authors       = ['Lucas Mazza']
-  gem.email         = ['opensource@plataformatec.com.br']
+  gem.authors       = ['Lucas Mazza', 'George Guimarães']
+  gem.email         = ['opensource@sourcelevel.io']
   gem.homepage      = 'https://github.com/sourcelevel/faraday-http-cache'
 
   gem.files         = Dir['LICENSE', 'README.md', 'lib/**/*']
