@@ -15,5 +15,5 @@ Gem::Specification.new do |gem|
   gem.executables   = []
 
   gem.required_ruby_version = '>= 2.1.0'
-  gem.add_dependency 'faraday', '~> 0.8'
+  gem.add_dependency 'faraday', '>= 0.8'
 end

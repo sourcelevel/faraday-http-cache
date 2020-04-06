@@ -12,4 +12,5 @@ notifications:
   email: false
 gemfile:
   - gemfiles/Gemfile.faraday-0.8
+  - gemfiles/Gemfile.faraday-1.0
   - Gemfile
