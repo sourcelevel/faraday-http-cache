@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 2.2.0 (2019-04-13)
+
+* Support for faraday 1.x
+
 ## 2.0.0 (2016-11-16)
 
 * Ruby version constraint changed to 2.1.0.
