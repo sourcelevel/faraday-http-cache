@@ -83,6 +83,7 @@ module Faraday
     # :instrumenter    - An instrumentation object that should respond to 'instrument'.
     # :instrument_name - The String name of the instrument being reported on (optional).
     # :logger          - A logger object.
+    # :max_entries     - The maximum number of entries to store per cache key.
     #
     # Examples:
     #
@@ -99,14 +100,14 @@ module Faraday
     #   # Initialize the middleware with a MemoryStore and logger
     #   store = ActiveSupport::Cache.lookup_store
     #   Faraday::HttpCache.new(app, store: store, logger: my_logger)
-    def initialize(app, store: nil, serializer: nil, shared_cache: true, instrumenter: nil, instrument_name: EVENT_NAME, logger: nil) # rubocop:disable Metrics/ParameterLists
+    def initialize(app, store: nil, serializer: nil, shared_cache: true, instrumenter: nil, instrument_name: EVENT_NAME, logger: nil, max_entries: nil) # rubocop:disable Metrics/ParameterLists
       super(app)
 
       @logger = logger
       @shared_cache = shared_cache
       @instrumenter = instrumenter
       @instrument_name = instrument_name
-      @storage = Storage.new(store: store, serializer: serializer, logger: logger)
+      @storage = Storage.new(store: store, serializer: serializer, logger: logger, max_entries: max_entries)
     end
 
     # Public: Process the request into a duplicate of this instance to

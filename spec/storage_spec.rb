@@ -11,8 +11,10 @@ describe Faraday::HttpCache::Storage do
   let(:response) { double(serializable_hash: { response_headers: {} }) }
 
   let(:cache) { Faraday::HttpCache::MemoryStore.new }
+  let(:serializer) { nil }
+  let(:max_entries) { nil }
+  let(:storage) { Faraday::HttpCache::Storage.new(store: cache, serializer: serializer, max_entries: max_entries) }
 
-  let(:storage) { Faraday::HttpCache::Storage.new(store: cache) }
   subject { storage }
 
   describe 'Cache configuration' do
@@ -37,10 +39,33 @@ describe Faraday::HttpCache::Storage do
         expect(cache).to receive(:write).with(cache_key, [entry])
         subject.write(request, response)
       end
+
+      context 'with max_entries set' do
+        let(:max_entries) { 2 }
+        let(:response) { double(serializable_hash: { response_headers: { 'Vary' => 'X-Foo' } }) }
+
+        it 'limits the number of cached entries' do
+          requests = Array.new(max_entries + 1) do |i|
+            env = { method: :get, url: 'http://test/index', headers: { 'X-Foo' => i } }
+            double(env.merge(serializable_hash: env))
+          end
+
+          requests.each { |request| subject.write(request, response) }
+
+          expect(subject.cache.read(cache_key).count).to eq(max_entries)
+
+          expect(subject.read(requests.first)).to eq(nil)
+
+          requests.last(max_entries).each do |request|
+            expect(subject.read(request)).not_to be_nil
+          end
+        end
+      end
     end
 
     context 'with the JSON serializer' do
       let(:serializer) { JSON }
+
       it_behaves_like 'A storage with serialization'
 
       context 'when ASCII characters in response cannot be converted to UTF-8' do
@@ -66,7 +91,6 @@ describe Faraday::HttpCache::Storage do
     context 'with the Marshal serializer' do
       let(:cache_key) { '337d1e9c6c92423dd1c48a23054139058f97be40' }
       let(:serializer) { Marshal }
-      let(:storage) { Faraday::HttpCache::Storage.new(store: cache, serializer: Marshal) }
 
       it_behaves_like 'A storage with serialization'
     end
