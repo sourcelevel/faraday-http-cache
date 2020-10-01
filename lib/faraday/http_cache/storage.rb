@@ -23,15 +23,17 @@ module Faraday
 
       # Internal: Initialize a new Storage object with a cache backend.
       #
-      # :logger     - A Logger object to be used to emit warnings.
-      # :store      - An cache store object that should respond to 'read',
-      #              'write', and 'delete'.
-      # :serializer - A serializer object that should respond to 'dump'
-      #               and 'load'.
-      def initialize(store: nil, serializer: nil, logger: nil)
+      # :logger      - A Logger object to be used to emit warnings.
+      # :store       - An cache store object that should respond to 'read',
+      #               'write', and 'delete'.
+      # :serializer  - A serializer object that should respond to 'dump'
+      #                and 'load'.
+      # :max_entries - The maximum number of entries per cache key.
+      def initialize(store: nil, serializer: nil, logger: nil, max_entries: nil)
         @cache = store || MemoryStore.new
         @serializer = serializer || JSON
         @logger = logger
+        @max_entries = max_entries
         assert_valid_store!
       end
 
@@ -54,6 +56,8 @@ module Faraday
         end
 
         entries << entry
+
+        entries = entries.last(@max_entries) unless @max_entries.nil?
 
         cache.write(key, entries)
       rescue ::Encoding::UndefinedConversionError => e
