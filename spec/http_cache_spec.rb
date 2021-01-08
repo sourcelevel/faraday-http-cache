@@ -7,7 +7,7 @@ describe Faraday::HttpCache do
 
   let(:client) do
     Faraday.new(url: ENV['FARADAY_SERVER']) do |stack|
-      stack.use Faraday::HttpCache, options
+      stack.use Faraday::HttpCache, **options
       adapter = ENV['FARADAY_ADAPTER']
       stack.headers['X-Faraday-Adapter'] = adapter
       stack.headers['Content-Type'] = 'application/x-www-form-urlencoded'
