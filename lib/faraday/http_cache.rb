@@ -99,8 +99,18 @@ module Faraday
     #   # Initialize the middleware with a MemoryStore and logger
     #   store = ActiveSupport::Cache.lookup_store
     #   Faraday::HttpCache.new(app, store: store, logger: my_logger)
-    def initialize(app, store: nil, serializer: nil, shared_cache: true, instrumenter: nil, instrument_name: EVENT_NAME, logger: nil) # rubocop:disable Metrics/ParameterLists
+    def initialize(app, options = {})
       super(app)
+
+      options = options.dup
+      store = options.delete(:store)
+      serializer = options.delete(:serializer)
+      shared_cache = options.delete(:shared_cache) { true }
+      instrumenter = options.delete(:instrumenter)
+      instrument_name = options.delete(:instrument_name) { EVENT_NAME }
+      logger = options.delete(:logger)
+
+      raise ArgumentError, "Unknown options: #{options.inspect}" unless options.empty?
 
       @logger = logger
       @shared_cache = shared_cache
