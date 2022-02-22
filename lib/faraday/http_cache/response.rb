@@ -17,7 +17,7 @@ module Faraday
       # * 302 - 'Found'
       # * 404 - 'Not Found'
       # * 410 - 'Gone'
-      CACHEABLE_STATUS_CODES = [200, 203, 300, 301, 302, 307, 404, 410].freeze
+      CACHEABLE_STATUS_CODES = [200, 203, 204, 300, 301, 302, 307, 404, 410].freeze
 
       # Internal: Gets the actual response Hash (status, headers and body).
       attr_reader :payload
