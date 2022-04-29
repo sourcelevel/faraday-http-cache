@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Faraday::HttpCache::Storage do
@@ -111,11 +112,11 @@ describe Faraday::HttpCache::Storage do
   describe 'remove age before caching and normalize max-age if non-zero age present' do
     it 'is fresh if the response still has some time to live' do
       headers = {
-          'Age' => 6,
-          'Cache-Control' => 'public, max-age=40',
-          'Date' => (Time.now - 38).httpdate,
-          'Expires' => (Time.now - 37).httpdate,
-          'Last-Modified' => (Time.now - 300).httpdate
+        'Age' => 6,
+        'Cache-Control' => 'public, max-age=40',
+        'Date' => (Time.now - 38).httpdate,
+        'Expires' => (Time.now - 37).httpdate,
+        'Last-Modified' => (Time.now - 300).httpdate
       }
       response = Faraday::HttpCache::Response.new(response_headers: headers)
       expect(response).to be_fresh

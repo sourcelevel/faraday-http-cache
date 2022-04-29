@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 Gem::Specification.new do |gem|
   gem.name          = 'faraday-http-cache'
   gem.version       = '2.2.0'

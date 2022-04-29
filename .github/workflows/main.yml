@@ -1,4 +1,4 @@
-name: Build
+name: Test Ruby
 
 on:
   push:
@@ -8,9 +8,11 @@ on:
   pull_request:
 
 jobs:
-  build:
+  rspec:
     runs-on: ubuntu-latest
     env:
+      BUNDLE_JOBS: 4
+      BUNDLE_RETRY: 3
       FARADAY_VERSION: ${{ matrix.faraday }}
       FARADAY_ADAPTER: ${{ matrix.faraday_adapter }}
       ACTIVESUPPORT_VERSION: ${{ matrix.activesupport }}

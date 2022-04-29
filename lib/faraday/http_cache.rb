@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'faraday'
 
 require 'faraday/http_cache/storage'
@@ -44,7 +45,7 @@ module Faraday
   #     builder.use :http_cache, store: Rails.cache, instrumenter: ActiveSupport::Notifications
   #   end
   class HttpCache < Faraday::Middleware
-    UNSAFE_METHODS = [:post, :put, :delete, :patch].freeze
+    UNSAFE_METHODS = %i[post put delete patch].freeze
 
     ERROR_STATUSES = (400..499).freeze
 
@@ -71,7 +72,7 @@ module Faraday
       :uncacheable,
 
       # The request was cached but need to be revalidated by the server.
-      :must_revalidate,
+      :must_revalidate
     ].freeze
 
     # Public: Initializes a new HttpCache middleware.
@@ -270,7 +271,7 @@ module Faraday
     end
 
     def delete(request, response)
-      headers = %w(Location Content-Location)
+      headers = %w[Location Content-Location]
       headers.each do |header|
         url = response.headers[header]
         @storage.delete(url) if url

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Faraday::HttpCache do
@@ -10,7 +11,7 @@ describe Faraday::HttpCache do
       stack.adapter adapter.to_sym
     end
   end
-  let(:data) { IO.binread File.expand_path('../support/empty.png', __FILE__) }
+  let(:data) { IO.binread File.expand_path('support/empty.png', __dir__) }
 
   it 'works fine with binary data' do
     expect(client.get('image').body).to eq data

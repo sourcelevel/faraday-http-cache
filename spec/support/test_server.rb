@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'net/http'
 
 class TestServer
@@ -27,9 +28,9 @@ class TestServer
       log = File.open('log/test.log', 'w+')
       log.sync = true
       webrick_opts = {
-       Port: @port,
-       Logger:  WEBrick::Log.new(log),
-       AccessLog: [[log, '[%{X-Faraday-Adapter}i] %m  %U  ->  %s %b']]
+        Port: @port,
+        Logger: WEBrick::Log.new(log),
+        AccessLog: [[log, '[%{X-Faraday-Adapter}i] %m  %U  ->  %s %b']]
       }
       Rack::Handler::WEBrick.run(TestApp, **webrick_opts)
     end
@@ -39,7 +40,7 @@ class TestServer
     conn = Net::HTTP.new @host, @port
     conn.open_timeout = conn.read_timeout = 0.1
 
-    responsive = ->(path) { # rubocop:disable Style/BlockDelimiters
+    responsive = ->(path) {
       begin
         res = conn.start { conn.get(path) }
         res.is_a?(Net::HTTPSuccess)
@@ -51,6 +52,7 @@ class TestServer
     server_pings = 0
     loop do
       break if responsive.call('/ping')
+
       server_pings += 1
       sleep 0.05
       abort 'test server did not managed to start' if server_pings >= 50
@@ -61,6 +63,6 @@ class TestServer
     server = TCPServer.new(@host, 0)
     server.addr[1]
   ensure
-    server.close if server
+    server&.close
   end
 end

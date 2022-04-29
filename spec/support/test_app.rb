@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'sinatra/base'
 require 'json'
 
@@ -27,7 +28,7 @@ class TestApp < Sinatra::Base
   end
 
   get '/image' do
-    image = File.expand_path('../empty.png', __FILE__)
+    image = File.expand_path('empty.png', __dir__)
     data  = IO.binread(image)
     [200, { 'Cache-Control' => 'max-age=400', 'Content-Type' => 'image/png' }, data]
   end
