@@ -3,10 +3,14 @@ require 'uri'
 require 'socket'
 
 require 'faraday-http-cache'
-require 'faraday_middleware'
 
-# https://github.com/rails/rails/pull/14667
-require 'active_support/per_thread_registry'
+if Gem::Version.new(Faraday::VERSION) < Gem::Version.new('1.0')
+  require 'faraday_middleware'
+elsif ENV['FARADAY_ADAPTER'] == 'em_http'
+  require 'faraday/em_http'
+end
+
+require 'active_support'
 require 'active_support/cache'
 
 require 'support/test_app'

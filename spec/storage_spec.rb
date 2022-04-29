@@ -43,7 +43,7 @@ describe Faraday::HttpCache::Storage do
       let(:serializer) { JSON }
       it_behaves_like 'A storage with serialization'
 
-      context 'when ASCII characters in response cannot be converted to UTF-8' do
+      context 'when ASCII characters in response cannot be converted to UTF-8', if: Gem::Version.new(RUBY_VERSION) < Gem::Version.new('3.1') do
         let(:response) do
           body = String.new("\u2665").force_encoding('ASCII-8BIT')
           double(:response, serializable_hash: { 'body' => body })
