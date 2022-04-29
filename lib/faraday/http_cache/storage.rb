@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'json'
 require 'digest/sha1'
 
@@ -167,7 +168,7 @@ module Faraday
       end
 
       def warn(message)
-        @logger.warn(message) if @logger
+        @logger.warn(message) if @logger # rubocop:disable Style/SafeNavigation
       end
     end
 

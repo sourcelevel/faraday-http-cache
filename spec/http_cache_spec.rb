@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Faraday::HttpCache do
@@ -36,7 +37,7 @@ describe Faraday::HttpCache do
 
   it 'adds a trace of the actions performed to the env' do
     response = client.post('post')
-    expect(response.env[:http_cache_trace]).to eq([:unacceptable, :delete])
+    expect(response.env[:http_cache_trace]).to eq(%i[unacceptable delete])
   end
 
   describe 'cache invalidation' do

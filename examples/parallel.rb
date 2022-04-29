@@ -6,7 +6,7 @@ require 'active_support/logger'
 require 'em-http-request'
 
 client = Faraday.new('https://api.github.com') do |stack|
-  stack.use :http_cache, logger: ActiveSupport::Logger.new(STDOUT)
+  stack.use :http_cache, logger: ActiveSupport::Logger.new($stdout)
   stack.adapter :em_http
 end
 

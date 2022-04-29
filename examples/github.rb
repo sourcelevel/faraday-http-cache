@@ -5,7 +5,7 @@ require 'faraday/http_cache'
 require 'active_support/logger'
 
 client = Faraday.new('https://api.github.com') do |stack|
-  stack.use :http_cache, logger: ActiveSupport::Logger.new(STDOUT)
+  stack.use :http_cache, logger: ActiveSupport::Logger.new($stdout)
   stack.adapter Faraday.default_adapter
 end
 
