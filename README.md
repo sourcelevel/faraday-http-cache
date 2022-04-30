@@ -1,8 +1,9 @@
 # Faraday Http Cache
 
-[![Build Status](https://secure.travis-ci.org/sourcelevel/faraday-http-cache.svg?branch=master)](https://travis-ci.org/sourcelevel/faraday-http-cache)
+[![Gem Version](https://badge.fury.io/rb/faraday-http-cache.svg)](https://rubygems.org/gems/faraday-http-cache)
+[![Build](https://github.com/sourcelevel/faraday-http-cache/workflows/Build/badge.svg)](https://github.com/sourcelevel/faraday-http-cache/actions)
 
-a [Faraday](https://github.com/lostisland/faraday) middleware that respects HTTP cache,
+A [Faraday](https://github.com/lostisland/faraday) middleware that respects HTTP cache,
 by checking expiration and validation of the stored responses.
 
 ## Installation
@@ -53,15 +54,15 @@ This type of store **might not be persisted across multiple processes or connect
 so it is probably not suitable for most production environments.
 Make sure that you configure a store that is suitable for you.
 
-The stdlib `JSON` module is used for serialization by default, which can struggle with unicode 
-characters in responses. For example, if your JSON returns `"name": "Raül"` then you might see 
+The stdlib `JSON` module is used for serialization by default, which can struggle with unicode
+characters in responses in Ruby < 3.1. For example, if your JSON returns `"name": "Raül"` then you might see
 errors like:
 
 ```
 Response could not be serialized: "\xC3" from ASCII-8BIT to UTF-8. Try using Marshal to serialize.
 ```
 
-For full unicode support, or if you expect to be dealing with images, you can use 
+For full unicode support, or if you expect to be dealing with images, you can use the stdlib
 [Marshal][marshal] instead. Alternatively you could use another json library like `oj` or `yajl-ruby`.
 
 ```ruby
@@ -71,9 +72,38 @@ client = Faraday.new do |builder|
 end
 ```
 
+### Strategies
+
+You can provide a `:strategy` option to the middleware to specify the strategy to use.
+
+
+```ruby
+client = Faraday.new do |builder|
+  builder.use :http_cache, store: Rails.cache, strategy: Faraday::HttpCache::Strategies::ByVary
+  builder.adapter Faraday.default_adapter
+end
+```
+
+Available strategies are:
+
+### `Faraday::HttpCache::Strategies::ByUrl`
+
+The default strategy.
+It Uses URL + HTTP method to generate cache keys and stores an array of request + response for each key.
+
+#### `Faraday::HttpCache::Strategies::ByVary`
+
+This strategy uses headers from `Vary` header to generate cache keys.
+It also uses cache to store `Vary` headers mapped to the request URL.
+This strategy is more suitable for caching private responses with the same URLs but different results for different users, like `https://api.github.com/user`.
+
+#### Custom strategies
+
+You can write your own strategy by subclassing `Faraday::HttpCache::Strategies::BaseStrategy` and implementing `#write`, `#read` and `#delete` methods.
+
 ### Logging
 
-You can provide a `:logger` option that will be receive debug informations based on the middleware
+You can provide a `:logger` option that will receive debug information based on the middleware
 operations:
 
 ```ruby
@@ -82,7 +112,7 @@ client = Faraday.new do |builder|
   builder.adapter Faraday.default_adapter
 end
 
-client.get('http://site/api/users')
+client.get('https://site/api/users')
 # logs "HTTP Cache: [GET users] miss, store"
 ```
 
@@ -133,6 +163,7 @@ execute the files under the `examples` directory to see a sample of the middlewa
 ## What gets cached?
 
 The middleware will use the following headers to make caching decisions:
+- Vary
 - Cache-Control
 - Age
 - Last-Modified
@@ -155,7 +186,7 @@ client = Faraday.new do |builder|
   builder.adapter Faraday.default_adapter
 end
 
-client.get('http://site/api/some-private-resource') # => will be cached
+client.get('https://site/api/some-private-resource') # => will be cached
 ```
 
 ## License
@@ -163,4 +194,4 @@ client.get('http://site/api/some-private-resource') # => will be cached
 Copyright (c) 2012-2018 Plataformatec.
 Copyright (c) 2019 SourceLevel and contributors.
 
-  [marshal]: http://www.ruby-doc.org/core-2.0/Marshal.html
+  [marshal]: https://www.ruby-doc.org/core-3.0/Marshal.html
