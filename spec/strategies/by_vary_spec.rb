@@ -2,75 +2,52 @@
 
 require 'spec_helper'
 
-describe Faraday::HttpCache::Storage do
-  let(:cache_key) { '6e3b941d0f7572291c777b3e48c04b74124a55d0' }
+describe Faraday::HttpCache::Strategies::ByVary do
+  let(:vary_index_cache_key) { '64896419583e8022efeb21d0ece6e266c0e58b59' }
+  let(:cache_key) { '25230d75622fffc4f4de8a6af69e6e3764f7eb6f' }
+  let(:vary) { '' }
   let(:request) do
-    env = { method: :get, url: 'http://test/index' }
+    env = {method: :get, url: 'http://test/index'}
     double(env.merge(serializable_hash: env))
   end
 
-  let(:response) { double(serializable_hash: { response_headers: {} }) }
+  let(:response_payload) { {response_headers: {'Vary' => vary}} }
+
+  let(:response) do
+    instance_double(Faraday::HttpCache::Response, payload: response_payload, serializable_hash: response_payload)
+  end
 
   let(:cache) { Faraday::HttpCache::MemoryStore.new }
 
-  let(:storage) { Faraday::HttpCache::Storage.new(store: cache) }
-  subject { storage }
-
-  before do
-    allow(Kernel).to receive(:warn).with(
-      'Deprecated: Faraday::HttpCache::Storage is deprecated and will be removed '\
-      'in the next major release. Use Faraday::HttpCache::Strategies::ByUrl instead.'
-    )
-  end
-
-  it 'creates strategy and warns about deprecation' do
-    expect(Kernel).to receive(:warn).with(
-      'Deprecated: Faraday::HttpCache::Storage is deprecated and will be removed '\
-      'in the next major release. Use Faraday::HttpCache::Strategies::ByUrl instead.'
-    )
-    expect(storage).to be_a_kind_of(Faraday::HttpCache::Strategies::ByUrl)
-  end
-
-  describe 'Cache configuration' do
-    it 'uses a MemoryStore by default' do
-      expect(Faraday::HttpCache::MemoryStore).to receive(:new).and_call_original
-      Faraday::HttpCache::Storage.new
-    end
-
-    it 'raises an error when the given store is not valid' do
-      wrong = double
-
-      expect {
-        Faraday::HttpCache::Storage.new(store: wrong)
-      }.to raise_error(ArgumentError)
-    end
-  end
+  let(:strategy) { described_class.new(store: cache) }
+  subject { strategy }
 
   describe 'storing responses' do
-    shared_examples 'A storage with serialization' do
+    shared_examples 'A strategy with serialization' do
       it 'writes the response object to the underlying cache' do
-        entry = [serializer.dump(request.serializable_hash), serializer.dump(response.serializable_hash)]
-        expect(cache).to receive(:write).with(cache_key, [entry])
+        entry = serializer.dump(response.serializable_hash)
+        expect(cache).to receive(:write).with(vary_index_cache_key, vary)
+        expect(cache).to receive(:write).with(cache_key, entry)
         subject.write(request, response)
       end
     end
 
     context 'with the JSON serializer' do
       let(:serializer) { JSON }
-      it_behaves_like 'A storage with serialization'
+      it_behaves_like 'A strategy with serialization'
 
       context 'when ASCII characters in response cannot be converted to UTF-8', if: Gem::Version.new(RUBY_VERSION) < Gem::Version.new('3.1') do
-        let(:response) do
+        let(:response_payload) do
           body = String.new("\u2665").force_encoding('ASCII-8BIT')
-          double(:response, serializable_hash: { 'body' => body })
+          super().merge('body' => body)
         end
 
         it 'raises and logs a warning' do
           logger = double(:logger, warn: nil)
-          storage = Faraday::HttpCache::Storage.new(logger: logger)
+          strategy = described_class.new(logger: logger)
 
           expect {
-            storage.write(request, response)
+            strategy.write(request, response)
           }.to raise_error(::Encoding::UndefinedConversionError)
           expect(logger).to have_received(:warn).with(
             'Response could not be serialized: "\xE2" from ASCII-8BIT to UTF-8. Try using Marshal to serialize.'
@@ -80,18 +57,19 @@ describe Faraday::HttpCache::Storage do
     end
 
     context 'with the Marshal serializer' do
-      let(:cache_key) { '337d1e9c6c92423dd1c48a23054139058f97be40' }
+      let(:vary_index_cache_key) { '6a7cb42440c10ef6edeb1826086a4d90b04103f0' }
+      let(:cache_key) { '45e0efd1a60d29ed69d6c6018dfcb96f58db89e0' }
       let(:serializer) { Marshal }
-      let(:storage) { Faraday::HttpCache::Storage.new(store: cache, serializer: Marshal) }
+      let(:strategy) { described_class.new(store: cache, serializer: Marshal) }
 
-      it_behaves_like 'A storage with serialization'
+      it_behaves_like 'A strategy with serialization'
     end
   end
 
   describe 'reading responses' do
-    let(:storage) { Faraday::HttpCache::Storage.new(store: cache, serializer: serializer) }
+    let(:strategy) { described_class.new(store: cache, serializer: serializer) }
 
-    shared_examples 'A storage with serialization' do
+    shared_examples 'A strategy with serialization' do
       it 'returns nil if the response is not cached' do
         expect(subject.read(request)).to be_nil
       end
@@ -106,21 +84,21 @@ describe Faraday::HttpCache::Storage do
     context 'with the JSON serializer' do
       let(:serializer) { JSON }
 
-      it_behaves_like 'A storage with serialization'
+      it_behaves_like 'A strategy with serialization'
     end
 
     context 'with the Marshal serializer' do
       let(:serializer) { Marshal }
 
-      it_behaves_like 'A storage with serialization'
+      it_behaves_like 'A strategy with serialization'
     end
   end
 
   describe 'deleting responses' do
-    it 'removes the entries from the cache of the given URL' do
+    it 'ignores delete method' do
       subject.write(request, response)
       subject.delete(request.url)
-      expect(subject.read(request)).to be_nil
+      expect(subject.read(request)).not_to be_nil
     end
   end
 

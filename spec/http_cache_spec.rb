@@ -283,23 +283,13 @@ describe Faraday::HttpCache do
     expect(client.get('must-revalidate').body).to eq('1')
   end
 
-  it 'raises an error when misconfigured' do
-    expect {
-      client = Faraday.new(url: ENV['FARADAY_SERVER']) do |stack|
-        stack.use Faraday::HttpCache, i_have_no_idea: true
-      end
-
-      client.get('get')
-    }.to raise_error(ArgumentError)
-  end
-
   describe 'Configuration options' do
     let(:app) { double('it is an app!') }
 
     it 'uses the options to create a Cache Store' do
       store = double(read: nil, write: nil)
 
-      expect(Faraday::HttpCache::Storage).to receive(:new).with(hash_including(store: store))
+      expect(Faraday::HttpCache::Strategies::ByUrl).to receive(:new).with(hash_including(store: store))
       Faraday::HttpCache.new(app, store: store)
     end
   end

@@ -5,11 +5,12 @@ require 'faraday'
 require 'faraday/http_cache/storage'
 require 'faraday/http_cache/request'
 require 'faraday/http_cache/response'
+require 'faraday/http_cache/strategies'
 
 module Faraday
   # Public: The middleware responsible for caching and serving responses.
-  # The middleware use the provided configuration options to establish a
-  # 'Faraday::HttpCache::Storage' to cache responses retrieved by the stack
+  # The middleware use the provided configuration options to establish on of
+  # 'Faraday::HttpCache::Strategies' to cache responses retrieved by the stack
   # adapter. If a stored response can be served again for a subsequent
   # request, the middleware will return the response instead of issuing a new
   # request to it's server. This middleware should be the last attached handler
@@ -104,17 +105,14 @@ module Faraday
       super(app)
 
       options = options.dup
-      @logger = options.delete(:logger)
+      @logger = options[:logger]
       @shared_cache = options.delete(:shared_cache) { true }
       @instrumenter = options.delete(:instrumenter)
       @instrument_name = options.delete(:instrument_name) { EVENT_NAME }
 
-      store = options.delete(:store)
-      serializer = options.delete(:serializer)
+      strategy = options.delete(:strategy) { Strategies::ByUrl }
 
-      raise ArgumentError, "Unknown options: #{options.inspect}" unless options.empty?
-
-      @storage = Storage.new(store: store, serializer: serializer, logger: @logger)
+      @strategy = strategy.new(**options)
     end
 
     # Public: Process the request into a duplicate of this instance to
@@ -159,9 +157,6 @@ module Faraday
     # Internal: Gets the request object created from the Faraday env Hash.
     attr_reader :request
 
-    # Internal: Gets the storage instance associated with the middleware.
-    attr_reader :storage
-
     private
 
     # Internal: Should this cache instance act like a "shared cache" according
@@ -190,7 +185,7 @@ module Faraday
     #
     # Returns the 'Faraday::Response' instance to be served.
     def process(env)
-      entry = @storage.read(@request)
+      entry = @strategy.read(@request)
 
       return fetch(env) if entry.nil?
 
@@ -264,7 +259,7 @@ module Faraday
     def store(response)
       if shared_cache? ? response.cacheable_in_shared_cache? : response.cacheable_in_private_cache?
         trace :store
-        @storage.write(@request, response)
+        @strategy.write(@request, response)
       else
         trace :uncacheable
       end
@@ -274,10 +269,10 @@ module Faraday
       headers = %w[Location Content-Location]
       headers.each do |header|
         url = response.headers[header]
-        @storage.delete(url) if url
+        @strategy.delete(url) if url
       end
 
-      @storage.delete(request.url)
+      @strategy.delete(request.url)
       trace :delete
     end
 
