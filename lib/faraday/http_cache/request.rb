@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Faraday
   class HttpCache < Faraday::Middleware
     # Internal: A class to represent a request
@@ -24,6 +25,7 @@ module Faraday
       def cacheable?
         return false if method != :get && method != :head
         return false if cache_control.no_store?
+
         true
       end
 

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'time'
 require 'faraday/http_cache/cache_control'
 
@@ -204,7 +205,7 @@ module Faraday
       # Returns nothing.
       def ensure_date_header!
         date
-      rescue
+      rescue StandardError
         headers['Date'] = @now.httpdate
       end
 
