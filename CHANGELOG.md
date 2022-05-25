@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 2.3.0 (2022-05-25)
+
 * Added support for Ruby 3.0, 3.1.
 * Ruby version constraint changed to 2.4.0.
 
