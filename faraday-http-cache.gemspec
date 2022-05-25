@@ -6,7 +6,7 @@ Gem::Specification.new do |gem|
   gem.licenses      = ['Apache-2.0']
   gem.description   = 'Middleware to handle HTTP caching'
   gem.summary       = 'A Faraday middleware that stores and validates cache expiration.'
-  gem.authors       = ['George Guimarães', 'Gustavo Araujo']
+  gem.authors       = ['Lucas Mazza', 'George Guimarães', 'Gustavo Araujo']
   gem.email         = ['opensource@sourcelevel.io']
   gem.homepage      = 'https://github.com/sourcelevel/faraday-http-cache'
 
