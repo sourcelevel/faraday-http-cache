@@ -168,7 +168,7 @@ module Faraday
       end
 
       def warn(message)
-        @logger.warn(message) if @logger # rubocop:disable Style/SafeNavigation
+        @logger&.warn(message)
       end
     end
 

@@ -17,5 +17,6 @@ gem 'em-http-request',    '~> 1.1'
 gem 'rake',               '~> 13.0'
 gem 'rspec',              '~> 3.1'
 gem 'sinatra',            '~> 2.0'
+gem 'webrick'
 
 eval_gemfile 'gemfiles/rubocop.gemfile'

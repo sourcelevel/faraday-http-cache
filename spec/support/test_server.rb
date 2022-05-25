@@ -32,7 +32,7 @@ class TestServer
         Logger: WEBrick::Log.new(log),
         AccessLog: [[log, '[%{X-Faraday-Adapter}i] %m  %U  ->  %s %b']]
       }
-      Rack::Handler::WEBrick.run(TestApp, webrick_opts)
+      Rack::Handler::WEBrick.run(TestApp, **webrick_opts)
     end
   end
 
@@ -63,6 +63,6 @@ class TestServer
     server = TCPServer.new(@host, 0)
     server.addr[1]
   ensure
-    server.close if server # rubocop:disable Style/SafeNavigation
+    server&.close
   end
 end
