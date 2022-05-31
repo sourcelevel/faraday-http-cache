@@ -92,7 +92,7 @@ module Faraday
     #   Faraday::HttpCache.new(app, logger: my_logger)
     #
     #   # Initialize the middleware with a logger and Marshal as a serializer
-    #   Faraday:HttpCache.new(app, logger: my_logger, serializer: Marshal)
+    #   Faraday::HttpCache.new(app, logger: my_logger, serializer: Marshal)
     #
     #   # Initialize the middleware with a FileStore at the 'tmp' dir.
     #   store = ActiveSupport::Cache.lookup_store(:file_store, ['tmp'])
