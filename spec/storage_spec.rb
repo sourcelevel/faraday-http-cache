@@ -143,9 +143,10 @@ describe Faraday::HttpCache::Storage do
     end
 
     it 'is fresh until cached and that 1 second elapses then the response is no longer fresh' do
+      current_time = Time.now
       headers = {
-        'Date' => (Time.now - 39).httpdate,
-        'Expires' => (Time.now + 40).httpdate
+        'Date' => (current_time - 39).httpdate,
+        'Expires' => (current_time + 40).httpdate
       }
 
       response = Faraday::HttpCache::Response.new(response_headers: headers)
