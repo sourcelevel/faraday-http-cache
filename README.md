@@ -1,7 +1,7 @@
 # Faraday Http Cache
 
 [![Gem Version](https://badge.fury.io/rb/faraday-http-cache.svg)](https://rubygems.org/gems/faraday-http-cache)
-[![Build](https://github.com/sourcelevel/faraday-http-cache/workflows/Build/badge.svg)](https://github.com/sourcelevel/faraday-http-cache/actions)
+[![Build](https://github.com/sourcelevel/faraday-http-cache/actions/workflows/main.yml/badge.svg)](https://github.com/sourcelevel/faraday-http-cache/actions)
 
 A [Faraday](https://github.com/lostisland/faraday) middleware that respects HTTP cache,
 by checking expiration and validation of the stored responses.
