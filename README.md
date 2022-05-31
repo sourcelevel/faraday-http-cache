@@ -55,8 +55,8 @@ so it is probably not suitable for most production environments.
 Make sure that you configure a store that is suitable for you.
 
 The stdlib `JSON` module is used for serialization by default, which can struggle with unicode
-characters in responses in Ruby < 3.1. For example, if your JSON returns `"name": "Raül"` then you might see
-errors like:
+characters in responses in Ruby < 3.1. For example, if your JSON returns `"name": "Raül"` then
+you might see errors like:
 
 ```
 Response could not be serialized: "\xC3" from ASCII-8BIT to UTF-8. Try using Marshal to serialize.
@@ -76,7 +76,6 @@ end
 
 You can provide a `:strategy` option to the middleware to specify the strategy to use.
 
-
 ```ruby
 client = Faraday.new do |builder|
   builder.use :http_cache, store: Rails.cache, strategy: Faraday::HttpCache::Strategies::ByVary
@@ -86,7 +85,7 @@ end
 
 Available strategies are:
 
-### `Faraday::HttpCache::Strategies::ByUrl`
+#### `Faraday::HttpCache::Strategies::ByUrl`
 
 The default strategy.
 It Uses URL + HTTP method to generate cache keys and stores an array of request + response for each key.
@@ -96,6 +95,16 @@ It Uses URL + HTTP method to generate cache keys and stores an array of request 
 This strategy uses headers from `Vary` header to generate cache keys.
 It also uses cache to store `Vary` headers mapped to the request URL.
 This strategy is more suitable for caching private responses with the same URLs but different results for different users, like `https://api.github.com/user`.
+
+*Note:* To automatically remove stale cache keys, you might want to use the `:expires_in` option.
+
+```ruby
+store = ActiveSupport::Cache.lookup_store(:redis_cache_store, expires_in: 1.day, url: 'redis://localhost:6379/0')
+client = Faraday.new do |builder|
+  builder.use :http_cache, store: store, strategy: Faraday::HttpCache::Strategies::ByVary
+  builder.adapter Faraday.default_adapter
+end
+```
 
 #### Custom strategies
 
