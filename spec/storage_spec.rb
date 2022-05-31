@@ -28,7 +28,7 @@ describe Faraday::HttpCache::Storage do
       'Deprecated: Faraday::HttpCache::Storage is deprecated and will be removed '\
       'in the next major release. Use Faraday::HttpCache::Strategies::ByUrl instead.'
     )
-    expect(storage).to be_a_kind_of(Faraday::HttpCache::Strategies::ByUrl)
+    is_expected.to be_a_kind_of(Faraday::HttpCache::Strategies::ByUrl)
   end
 
   describe 'Cache configuration' do
