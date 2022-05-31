@@ -1,5 +1,10 @@
 ## Unreleased
 
+* Introduced a new `strategy` option to support different cache storage strategies.
+  * The original strategy moved from `Faraday::HttpCache::Storage` to `Faraday::HttpCache::Strategies::ByUrl`.
+  * The new `Faraday::HttpCache::Strategies::ByVary` strategy uses headers from `Vary` header to generate cache keys. It also uses the index with `Vary` headers mapped to the request URL.
+  * `Faraday::HttpCache::Storage` class deprecated.
+
 ## 2.3.0 (2022-05-25)
 
 * Added support for Ruby 3.0, 3.1.

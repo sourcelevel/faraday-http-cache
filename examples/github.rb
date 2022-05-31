@@ -2,17 +2,18 @@ require 'rubygems'
 require 'bundler/setup'
 
 require 'faraday/http_cache'
+require 'active_support'
 require 'active_support/logger'
 
 client = Faraday.new('https://api.github.com') do |stack|
-  stack.use :http_cache, logger: ActiveSupport::Logger.new($stdout)
+  stack.use :http_cache, logger: ActiveSupport::Logger.new($stdout), strategy: Faraday::HttpCache::Strategies::ByVary
   stack.adapter Faraday.default_adapter
 end
 
 5.times do |index|
   started = Time.now
   puts "Request ##{index + 1}"
-  response = client.get('repos/plataformatec/faraday-http-cache')
+  response = client.get('repos/sourcelevel/faraday-http-cache')
   finished = Time.now
   remaining = response.headers['X-RateLimit-Remaining']
   limit = response.headers['X-RateLimit-Limit']
