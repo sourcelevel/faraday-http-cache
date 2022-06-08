@@ -1,6 +1,7 @@
 ## Unreleased
 
-* Introduced a new `strategy` option to support different cache storage strategies.
+## 2.4.0 (2022-06-07)
+  * Introduced a new `strategy` option to support different cache storage strategies.
   * The original strategy moved from `Faraday::HttpCache::Storage` to `Faraday::HttpCache::Strategies::ByUrl`.
   * The new `Faraday::HttpCache::Strategies::ByVary` strategy uses headers from `Vary` header to generate cache keys. It also uses the index with `Vary` headers mapped to the request URL.
   * `Faraday::HttpCache::Storage` class deprecated.
