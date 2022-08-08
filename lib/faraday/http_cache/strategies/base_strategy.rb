@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'json'
+require 'logger'
 require 'faraday/http_cache/memory_store'
 
 module Faraday
