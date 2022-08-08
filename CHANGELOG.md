@@ -1,5 +1,10 @@
 ## Unreleased
 
+
+## 2.4.1 (2022-08-08)
+  * require `Logger` in `BaseStrategy` via [#131](https://github.com/sourcelevel/faraday-http-cache/pull/131)
+  * Use unique and sorted headers from the Vary header in `ByVary` strategy via [#132](https://github.com/sourcelevel/faraday-http-cache/pull/132)
+
 ## 2.4.0 (2022-06-07)
   * Introduced a new `strategy` option to support different cache storage strategies.
   * The original strategy moved from `Faraday::HttpCache::Storage` to `Faraday::HttpCache::Strategies::ByUrl`.
