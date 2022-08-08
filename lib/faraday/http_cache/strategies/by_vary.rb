@@ -77,7 +77,7 @@ module Faraday
         # @return [String]
         def response_cache_key_for(request, vary)
           method = request.method.to_s
-          headers = vary.split(/[\s,]+/).map { |header| request.headers[header] }
+          headers = vary.split(/[\s,]+/).uniq.sort.map { |header| request.headers[header] }
           Digest::SHA1.hexdigest("by_vary#{@cache_salt}#{method}#{request.url}#{headers.join}")
         end
       end

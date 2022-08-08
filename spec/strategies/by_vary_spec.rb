@@ -4,10 +4,11 @@ require 'spec_helper'
 
 describe Faraday::HttpCache::Strategies::ByVary do
   let(:vary_index_cache_key) { '64896419583e8022efeb21d0ece6e266c0e58b59' }
-  let(:cache_key) { '25230d75622fffc4f4de8a6af69e6e3764f7eb6f' }
-  let(:vary) { '' }
+  let(:cache_key) { '978047698d156fe8642a86dbfaacc675917c9a22' }
+  let(:vary) { 'Accept, Accept-Encoding, X-Requested-With' }
+  let(:headers) { {'Accept' => 'text/html', 'Accept-Encoding' => 'gzip, deflate, br' } }
   let(:request) do
-    env = {method: :get, url: 'http://test/index'}
+    env = {method: :get, url: 'http://test/index', headers: headers}
     double(env.merge(serializable_hash: env))
   end
 
@@ -54,11 +55,17 @@ describe Faraday::HttpCache::Strategies::ByVary do
           )
         end
       end
+
+      context 'with reordered and doubled values in the vary' do
+        let(:vary) { 'X-Requested-With,Accept,Accept-Encoding,Accept' }
+
+        it_behaves_like 'A strategy with serialization'
+      end
     end
 
     context 'with the Marshal serializer' do
       let(:vary_index_cache_key) { '6a7cb42440c10ef6edeb1826086a4d90b04103f0' }
-      let(:cache_key) { '45e0efd1a60d29ed69d6c6018dfcb96f58db89e0' }
+      let(:cache_key) { 'c9edbf280da95d4cac5acda8b8109c0aba2a469a' }
       let(:serializer) { Marshal }
       let(:strategy) { described_class.new(store: cache, serializer: Marshal) }
 
