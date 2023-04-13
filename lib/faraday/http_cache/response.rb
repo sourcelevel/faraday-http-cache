@@ -142,7 +142,8 @@ module Faraday
         {
           status: @payload[:status],
           body: @payload[:body],
-          response_headers: @payload[:response_headers]
+          response_headers: @payload[:response_headers],
+          reason_phrase: @payload[:reason_phrase]
         }
       end
 
