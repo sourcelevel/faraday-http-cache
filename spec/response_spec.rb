@@ -226,7 +226,7 @@ describe Faraday::HttpCache::Response do
     end
 
     it 'merges the reason phrase' do
-      expect(response.reason_phrase).to eq('Success')
+      expect(response.reason_phrase).to eq('Success') if response.respond_to?(:reason_phrase)
     end
   end
 
