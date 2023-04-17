@@ -200,7 +200,7 @@ describe Faraday::HttpCache::Response do
   end
 
   describe 'response unboxing' do
-    subject { described_class.new(status: 200, response_headers: {}, body: 'Hi!') }
+    subject { described_class.new(status: 200, response_headers: {}, body: 'Hi!', reason_phrase: 'Success') }
 
     let(:env) { { method: :get } }
     let(:response) { subject.to_response(env) }
@@ -223,6 +223,10 @@ describe Faraday::HttpCache::Response do
 
     it 'merges the body' do
       expect(response.body).to eq('Hi!')
+    end
+
+    it 'merges the reason phrase' do
+      expect(response.reason_phrase).to eq('Success')
     end
   end
 
