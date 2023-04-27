@@ -1,10 +1,11 @@
 ## Unreleased
 
+## 2.5.0 (2023-04-27)
+  * Add `reason_phrase` from the HTTP response to the data stored in the cache according to [RFC7230](https://www.rfc-editor.org/rfc/rfc7230#section-3.1.2) via [#134](https://github.com/sourcelevel/faraday-http-cache/pull/134)
 
 ## 2.4.1 (2022-08-08)
-  * require `Logger` in `BaseStrategy` via [#131](https://github.com/sourcelevel/faraday-http-cache/pull/131)
+  * Require `Logger` in `BaseStrategy` via [#131](https://github.com/sourcelevel/faraday-http-cache/pull/131)
   * Use unique and sorted headers from the Vary header in `ByVary` strategy via [#132](https://github.com/sourcelevel/faraday-http-cache/pull/132)
-
 ## 2.4.0 (2022-06-07)
   * Introduced a new `strategy` option to support different cache storage strategies.
   * The original strategy moved from `Faraday::HttpCache::Storage` to `Faraday::HttpCache::Strategies::ByUrl`.
