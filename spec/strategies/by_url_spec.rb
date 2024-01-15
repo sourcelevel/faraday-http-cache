@@ -86,6 +86,24 @@ describe Faraday::HttpCache::Strategies::ByUrl do
 
         expect(subject.read(request)).to be_a(Faraday::HttpCache::Response)
       end
+
+      context 'with a Vary header in the response in a different case than the matching request header' do
+        let(:request) do
+          Faraday::HttpCache::Request.new(
+            method: :get,
+            url: 'http://test/index',
+            headers: Faraday::Utils::Headers.new({ 'accept' => 'application/json' })
+          )
+        end
+        let(:response) do
+          Faraday::HttpCache::Response.new(response_headers: Faraday::Utils::Headers.new({ vary: 'Accept' }))
+        end
+
+        it 'reads stored message' do
+          subject.write(request, response)
+          expect(subject.read(request)).to be_a(Faraday::HttpCache::Response)
+        end
+      end
     end
 
     context 'with the JSON serializer' do

@@ -99,7 +99,7 @@ module Faraday
           vary = headers['Vary'].to_s
 
           vary.empty? || (vary != '*' && vary.split(/[\s,]+/).all? do |header|
-            request.headers[header] == cached_request[:headers][header]
+            request.headers[header] == (cached_request[:headers][header] || cached_request[:headers][header.downcase])
           end)
         end
 
