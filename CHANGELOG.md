@@ -1,16 +1,24 @@
 ## Unreleased
 
+## 2.5.1 (2024-01-16)
+
+* Support headers passed in using string keys when Vary header is in a different case via #137 (thanks @evman182)
+
 ## 2.5.0 (2023-04-27)
-  * Add `reason_phrase` from the HTTP response to the data stored in the cache according to [RFC7230](https://www.rfc-editor.org/rfc/rfc7230#section-3.1.2) via [#134](https://github.com/sourcelevel/faraday-http-cache/pull/134)
+
+* Add `reason_phrase` from the HTTP response to the data stored in the cache according to [RFC7230](https://www.rfc-editor.org/rfc/rfc7230#section-3.1.2) via [#134](https://github.com/sourcelevel/faraday-http-cache/pull/134)
 
 ## 2.4.1 (2022-08-08)
-  * Require `Logger` in `BaseStrategy` via [#131](https://github.com/sourcelevel/faraday-http-cache/pull/131)
-  * Use unique and sorted headers from the Vary header in `ByVary` strategy via [#132](https://github.com/sourcelevel/faraday-http-cache/pull/132)
+
+* Require `Logger` in `BaseStrategy` via [#131](https://github.com/sourcelevel/faraday-http-cache/pull/131)
+* Use unique and sorted headers from the Vary header in `ByVary` strategy via [#132](https://github.com/sourcelevel/faraday-http-cache/pull/132)
+
 ## 2.4.0 (2022-06-07)
-  * Introduced a new `strategy` option to support different cache storage strategies.
-  * The original strategy moved from `Faraday::HttpCache::Storage` to `Faraday::HttpCache::Strategies::ByUrl`.
-  * The new `Faraday::HttpCache::Strategies::ByVary` strategy uses headers from `Vary` header to generate cache keys. It also uses the index with `Vary` headers mapped to the request URL.
-  * `Faraday::HttpCache::Storage` class deprecated.
+
+* Introduced a new `strategy` option to support different cache storage strategies.
+* The original strategy moved from `Faraday::HttpCache::Storage` to `Faraday::HttpCache::Strategies::ByUrl`.
+* The new `Faraday::HttpCache::Strategies::ByVary` strategy uses headers from `Vary` header to generate cache keys. It also uses the index with `Vary` headers mapped to the request URL.
+* `Faraday::HttpCache::Storage` class deprecated.
 
 ## 2.3.0 (2022-05-25)
 
