@@ -19,24 +19,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: ['2.4', '2.5', '2.6', '2.7', '3.0', '3.1']
+        ruby: ['3.2', '3.3', '3.4']
         faraday_adapter: [net_http, em_http]
-        faraday: ['~> 0.8.0', '~> 0.15.0', '~> 0.17.3', '~> 1.0', '~> 2.0']
+        faraday: ['~> 1.0', '~> 2.0']
         exclude:
-          # Faraday 2 requires Ruby 2.6+
-          - ruby: '2.5'
-            faraday: '~> 2.0'
-          - ruby: '2.4'
-            faraday: '~> 2.0'
-          # Ruby 3.0+ requires Faraday >= 0.17.3
-          - ruby: '3.0'
-            faraday: '~> 0.8.0'
-          - ruby: '3.0'
-            faraday: '~> 0.15.0'
-          - ruby: '3.1'
-            faraday: '~> 0.8.0'
-          - ruby: '3.1'
-            faraday: '~> 0.15.0'
           # faraday-em_http does not support Faraday 2.0+
           - faraday: '~> 2.0'
             faraday_adapter: em_http
