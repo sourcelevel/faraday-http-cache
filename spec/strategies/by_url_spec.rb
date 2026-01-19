@@ -29,6 +29,29 @@ describe Faraday::HttpCache::Strategies::ByUrl do
         described_class.new(store: wrong)
       }.to raise_error(ArgumentError)
     end
+
+    context 'with max_entries set' do
+      let(:max_entries) { 2 }
+      let(:strategy) { described_class.new(store: cache, max_entries: max_entries) }
+      let(:response) { double(serializable_hash: { response_headers: { 'Vary' => 'X-Foo' } }) }
+
+      it 'limits the number of cached entries' do
+        requests = Array.new(max_entries + 1) do |i|
+          env = { method: :get, url: 'http://test/index', headers: { 'X-Foo' => i } }
+          double(env.merge(serializable_hash: env))
+        end
+
+        requests.each { |request| subject.write(request, response) }
+
+        expect(subject.cache.read(cache_key).count).to eq(max_entries)
+
+        expect(subject.read(requests.first)).to eq(nil)
+
+        requests.last(max_entries).each do |request|
+          expect(subject.read(request)).not_to be_nil
+        end
+      end
+    end
   end
 
   describe 'storing responses' do

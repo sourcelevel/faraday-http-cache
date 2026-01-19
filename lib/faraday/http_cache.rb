@@ -85,6 +85,8 @@ module Faraday
     # :instrumenter    - An instrumentation object that should respond to 'instrument'.
     # :instrument_name - The String name of the instrument being reported on (optional).
     # :logger          - A logger object.
+    # :max_entries     - The maximum number of entries to store per cache key. This option is only
+    #                    used when using the +ByUrl+ cache strategy.
     #
     # Examples:
     #
