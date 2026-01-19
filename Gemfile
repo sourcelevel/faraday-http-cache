@@ -14,10 +14,10 @@ end
 
 gem 'activesupport',      '>= 7.0'
 gem 'em-http-request',    '>= 1.1'
+gem 'rackup'
 gem 'rake',               '>= 13.0'
 gem 'rspec',              '>= 3.1'
 gem 'sinatra',            '>= 3.0'
-gem 'rackup'
 gem 'webrick'
 
 eval_gemfile 'gemfiles/rubocop.gemfile'
