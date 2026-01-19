@@ -10,6 +10,11 @@ module Faraday
       # The original strategy by Faraday::HttpCache.
       # Uses URL + HTTP method to generate cache keys.
       class ByUrl < BaseStrategy
+        def initialize(options = {})
+          super
+          @max_entries = options[:max_entries]
+        end
+
         # Store a response inside the cache.
         #
         # @param [Faraday::HttpCache::Request] request - instance of the executed HTTP request.
@@ -26,6 +31,7 @@ module Faraday
           end
 
           entries << entry
+          entries = entries.last(@max_entries) unless @max_entries.nil?
 
           cache.write(key, entries)
         rescue ::Encoding::UndefinedConversionError => e
