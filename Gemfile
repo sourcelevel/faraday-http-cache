@@ -12,11 +12,11 @@ elsif ENV['FARADAY_ADAPTER'] == 'em_http'
   gem 'faraday-em_http'
 end
 
-gem 'activesupport',      '>= 5.0'
-gem 'em-http-request',    '~> 1.1'
-gem 'rake',               '~> 13.0'
-gem 'rspec',              '~> 3.1'
-gem 'sinatra',            '~> 2.0'
+gem 'activesupport',      '>= 7.0'
+gem 'em-http-request',    '>= 1.1'
+gem 'rake',               '>= 13.0'
+gem 'rspec',              '>= 3.1'
+gem 'sinatra',            '>= 3.0'
 gem 'webrick'
 
 eval_gemfile 'gemfiles/rubocop.gemfile'
