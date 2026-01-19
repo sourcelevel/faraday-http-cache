@@ -48,7 +48,7 @@ module Faraday
   class HttpCache < Faraday::Middleware
     UNSAFE_METHODS = %i[post put delete patch].freeze
 
-    ERROR_STATUSES = (400..499).freeze
+    ERROR_STATUSES = (400..499)
 
     # The name of the instrumentation event.
     EVENT_NAME = 'http_cache.faraday'

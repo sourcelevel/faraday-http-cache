@@ -80,9 +80,7 @@ module Faraday
         end
 
         def deserialize_object(object)
-          @serializer.load(object).each_with_object({}) do |(key, value), hash|
-            hash[key.to_sym] = value
-          end
+          @serializer.load(object).transform_keys(&:to_sym)
         end
 
         def warn(message)
