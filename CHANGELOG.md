@@ -3,6 +3,14 @@
 * Added support for `Cache-Control: stale-while-revalidate`.
 * Added `:on_stale` middleware callback hook to trigger custom background refresh logic when stale cached responses are served.
 
+## [2.7.0](https://github.com/sourcelevel/faraday-http-cache/compare/v2.6.1...v2.7.0) (2026-04-14)
+
+
+### Miscellaneous
+
+* add release-please for automated releases to RubyGems ([3e0f9ff](https://github.com/sourcelevel/faraday-http-cache/commit/3e0f9ff2a132438dda0c4980133a8cddf15a448d))
+* release 2.7.0 ([a79c386](https://github.com/sourcelevel/faraday-http-cache/commit/a79c386a882b6a4a4ca0f3903794cc5619d7a705))
+
 ## 2.5.1 (2024-01-16)
 
 * Support headers passed in using string keys when Vary header is in a different case via #137 (thanks @evman182)
