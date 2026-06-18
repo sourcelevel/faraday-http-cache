@@ -279,10 +279,12 @@ module Faraday
     end
 
     def delete(request, response)
-      headers = %w[Location Content-Location]
-      headers.each do |header|
-        url = response.headers[header]
-        @strategy.delete(url) if url
+      response_headers = response.headers
+      if response_headers
+        %w[Location Content-Location].each do |header|
+          url = response_headers[header]
+          @strategy.delete(url) if url
+        end
       end
 
       @strategy.delete(request.url)
