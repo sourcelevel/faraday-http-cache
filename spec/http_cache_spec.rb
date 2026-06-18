@@ -107,6 +107,17 @@ describe Faraday::HttpCache do
       client.post('delete-with-content-location')
       expect(client.get('get').body).to eq('2')
     end
+
+    it 'invalidates the request url when the response has no headers' do
+      middleware = Faraday::HttpCache.new(->(env) { env }, logger: logger)
+      middleware.instance_variable_set(:@trace, [])
+      request = double(url: 'http://test/index')
+      response = double(headers: nil)
+      strategy = middleware.instance_variable_get(:@strategy)
+
+      expect(strategy).to receive(:delete).with('http://test/index')
+      expect { middleware.send(:delete, request, response) }.not_to raise_error
+    end
   end
 
   describe 'when acting as a shared cache' do
