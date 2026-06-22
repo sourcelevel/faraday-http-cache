@@ -70,9 +70,13 @@ module Faraday
 
       # Internal: Gets the 'stale-while-revalidate' directive as an Integer.
       #
-      # Returns nil if the 'stale-while-revalidate' directive isn't present.
+      # Returns nil if the 'stale-while-revalidate' directive isn't present, or
+      # assigned as boolean.
       def stale_while_revalidate
-        @directives['stale-while-revalidate'].to_i if @directives.key?('stale-while-revalidate')
+        return unless @directives.key?('stale-while-revalidate')
+        return if @directives['stale-while-revalidate'] == true
+
+        @directives['stale-while-revalidate'].to_i
       end
 
       # Internal: Gets the String representation for the cache directives.
