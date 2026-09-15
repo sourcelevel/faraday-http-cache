@@ -52,6 +52,23 @@ describe Faraday::HttpCache::CacheControl do
     expect(cache_control.shared_max_age).to eq(600)
   end
 
+  it 'responds to #max_age with nil when the max-age directive has no value' do
+    cache_control = Faraday::HttpCache::CacheControl.new('public, max-age')
+    expect(cache_control.max_age).to be_nil
+  end
+
+  it 'responds to #shared_max_age with nil when the s-maxage directive has no value' do
+    cache_control = Faraday::HttpCache::CacheControl.new('public, s-maxage')
+    expect(cache_control.shared_max_age).to be_nil
+  end
+
+  it 'normalizes max ages without raising when a directive has no value' do
+    cache_control = Faraday::HttpCache::CacheControl.new('max-age, s-maxage=600')
+    cache_control.normalize_max_ages(100)
+    expect(cache_control.max_age).to be_nil
+    expect(cache_control.shared_max_age).to eq(500)
+  end
+
   it 'responds to #shared_max_age with nil when no s-maxage directive present' do
     cache_control = Faraday::HttpCache::CacheControl.new('public')
     expect(cache_control.shared_max_age).to be_nil

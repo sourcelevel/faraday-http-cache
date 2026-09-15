@@ -34,9 +34,9 @@ module Faraday
 
       # Internal: Gets the 'max-age' directive as an Integer.
       #
-      # Returns nil if the 'max-age' directive isn't present.
+      # Returns nil if the 'max-age' directive isn't present or has no value.
       def max_age
-        @directives['max-age'].to_i if @directives.key?('max-age')
+        integer_directive('max-age')
       end
 
       # Internal: Gets the 'max-age' directive as an Integer.
@@ -45,16 +45,16 @@ module Faraday
       # if present to account for having to remove static age header when caching responses
       def normalize_max_ages(age)
         if age > 0
-          @directives['max-age'] = @directives['max-age'].to_i - age if @directives.key?('max-age')
-          @directives['s-maxage'] = @directives['s-maxage'].to_i - age if @directives.key?('s-maxage')
+          @directives['max-age'] = max_age - age if max_age
+          @directives['s-maxage'] = shared_max_age - age if shared_max_age
         end
       end
 
       # Internal: Gets the 's-maxage' directive as an Integer.
       #
-      # Returns nil if the 's-maxage' directive isn't present.
+      # Returns nil if the 's-maxage' directive isn't present or has no value.
       def shared_max_age
-        @directives['s-maxage'].to_i if @directives.key?('s-maxage')
+        integer_directive('s-maxage')
       end
       alias s_maxage shared_max_age
 
@@ -70,13 +70,10 @@ module Faraday
 
       # Internal: Gets the 'stale-while-revalidate' directive as an Integer.
       #
-      # Returns nil if the 'stale-while-revalidate' directive isn't present, or
-      # assigned as boolean.
+      # Returns nil if the 'stale-while-revalidate' directive isn't present or
+      # has no value.
       def stale_while_revalidate
-        return unless @directives.key?('stale-while-revalidate')
-        return if @directives['stale-while-revalidate'] == true
-
-        @directives['stale-while-revalidate'].to_i
+        integer_directive('stale-while-revalidate')
       end
 
       # Internal: Gets the String representation for the cache directives.
@@ -101,6 +98,16 @@ module Faraday
       end
 
       private
+
+      # Internal: Reads a directive whose value must be an integer.
+      # A directive given without a value (a bare 'max-age') is parsed as
+      # true; treat it as absent instead of calling to_i on it.
+      #
+      # Returns the Integer value, or nil.
+      def integer_directive(name)
+        value = @directives[name]
+        value.to_i unless value.nil? || value == true
+      end
 
       # Internal: Parses the Cache Control string to a Hash.
       # Existing whitespace will be removed and the string is split on commas.
