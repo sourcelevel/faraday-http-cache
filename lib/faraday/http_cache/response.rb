@@ -98,6 +98,22 @@ module Faraday
         cacheable?(false)
       end
 
+      # Internal: Checks if a shared cache may reuse this response for requests
+      # other than the one that carried an 'Authorization' header.
+      #
+      # RFC 9111 section 3.5: a shared cache must not use a cached response to
+      # a request with an 'Authorization' header to satisfy any subsequent
+      # request unless the response carries a 'Cache-Control' directive that
+      # explicitly allows it. The directives with that effect are
+      # 'must-revalidate', 'public' and 's-maxage'.
+      #
+      # Returns true if one of those directives is present.
+      def shared_cache_authorized?
+        cache_control.public? ||
+          cache_control.must_revalidate? ||
+          !cache_control.shared_max_age.nil?
+      end
+
       # Internal: Gets the response age in seconds.
       #
       # Returns the 'Age' header if present, or subtracts the response 'date'

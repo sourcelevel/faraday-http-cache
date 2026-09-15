@@ -196,7 +196,7 @@ module Faraday
     def process(env)
       entry = @strategy.read(@request)
 
-      return fetch(env) if entry.nil?
+      return fetch(env) if entry.nil? || !reusable?(entry)
 
       if entry.fresh? && !@request.no_cache?
         response = entry.to_response(env)
@@ -270,12 +270,47 @@ module Faraday
     #
     # Returns nothing.
     def store(response)
-      if shared_cache? ? response.cacheable_in_shared_cache? : response.cacheable_in_private_cache?
+      if storable?(response)
         trace :store
         @strategy.write(@request, response)
       else
         trace :uncacheable
       end
+    end
+
+    # Internal: Checks if the response may be stored by this cache instance.
+    # A shared cache also refuses responses to requests that carried an
+    # 'Authorization' header unless the response explicitly allows it
+    # (RFC 9111 section 3.5), so what is never stored is never served to
+    # another caller.
+    #
+    # response - a 'Faraday::HttpCache::Response' instance.
+    #
+    # Returns true or false.
+    def storable?(response)
+      return response.cacheable_in_private_cache? unless shared_cache?
+      return false if authorization_bearing? && !response.shared_cache_authorized?
+
+      response.cacheable_in_shared_cache?
+    end
+
+    # Internal: Checks if a stored entry may be served for the current request.
+    # Entries written by earlier versions of this middleware may be responses
+    # to authenticated requests that a shared cache must not reuse; such an
+    # entry is treated as a miss and replaced.
+    #
+    # entry - a 'Faraday::HttpCache::Response' read from the strategy.
+    #
+    # Returns true or false.
+    def reusable?(entry)
+      return true unless shared_cache? && authorization_bearing?
+
+      entry.shared_cache_authorized?
+    end
+
+    # Internal: Checks if the current request carries an 'Authorization' header.
+    def authorization_bearing?
+      !@request.headers['Authorization'].nil?
     end
 
     def delete(request, response)
