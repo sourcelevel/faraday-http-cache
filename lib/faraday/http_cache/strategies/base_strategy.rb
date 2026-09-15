@@ -29,7 +29,9 @@ module Faraday
         # @option options [Faraday::HttpCache::MemoryStore, nil] :store - a cache
         #   store object that should respond to 'read', 'write', and 'delete'.
         # @option options [#dump#load] :serializer - an object that should
-        #   respond to 'dump' and 'load'.
+        #   respond to 'dump' and 'load'. 'load' must never instantiate classes
+        #   named by the data, since the cached entries contain response headers
+        #   sent by the origin server.
         # @option options [Logger, nil] :logger - an object to be used to emit warnings.
         def initialize(options = {})
           @cache = options[:store] || Faraday::HttpCache::MemoryStore.new
@@ -80,7 +82,12 @@ module Faraday
         end
 
         def deserialize_object(object)
-          @serializer.load(object).transform_keys(&:to_sym)
+          # JSON.load enables create_additions, so a `json_class` key in the
+          # entry would instantiate that class. Response headers are stored
+          # verbatim, which lets an origin server plant such a key. JSON.parse
+          # only ever builds plain Ruby objects.
+          loaded = @serializer.equal?(::JSON) ? ::JSON.parse(object) : @serializer.load(object)
+          loaded.transform_keys(&:to_sym)
         end
 
         def warn(message)
