@@ -314,9 +314,11 @@ module Faraday
     end
 
     def delete(request, response)
-      headers = %w[Location Content-Location]
-      headers.each do |header|
-        url = response.headers[header]
+      # A response cut short by a timeout or a reset can arrive without
+      # headers; there is still an entry to invalidate for the request URL.
+      headers = response.headers || {}
+      %w[Location Content-Location].each do |header|
+        url = headers[header]
         @strategy.delete(url) if url
       end
 
