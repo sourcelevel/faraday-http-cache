@@ -1,8 +1,3 @@
-## Unreleased
-
-* Added support for `Cache-Control: stale-while-revalidate`.
-* Added `:on_stale` middleware callback hook to trigger custom background refresh logic when stale cached responses are served.
-
 ## [3.0.0](https://github.com/sourcelevel/faraday-http-cache/compare/v2.8.0...v3.0.0) (2026-09-15)
 
 
@@ -51,6 +46,12 @@
 * Pin json below 3 when testing against Faraday 1 ([#146](https://github.com/sourcelevel/faraday-http-cache/issues/146)) ([59d4263](https://github.com/sourcelevel/faraday-http-cache/commit/59d42635bc5a8014f0fadd8436a231cda5792d2a))
 
 ## [2.7.0](https://github.com/sourcelevel/faraday-http-cache/compare/v2.6.1...v2.7.0) (2026-04-14)
+
+
+### Features
+
+* Added support for `Cache-Control: stale-while-revalidate` ([#139](https://github.com/sourcelevel/faraday-http-cache/pull/139))
+* Added `:on_stale` middleware callback hook to trigger custom background refresh logic when stale cached responses are served ([#139](https://github.com/sourcelevel/faraday-http-cache/pull/139))
 
 
 ### Miscellaneous
