@@ -3,6 +3,30 @@
 * Added support for `Cache-Control: stale-while-revalidate`.
 * Added `:on_stale` middleware callback hook to trigger custom background refresh logic when stale cached responses are served.
 
+## [2.8.0](https://github.com/sourcelevel/faraday-http-cache/compare/v2.7.0...v2.8.0) (2026-09-15)
+
+
+### Bug Fixes
+
+* Parse JSON cache entries safely and stop sharing authenticated responses ([#147](https://github.com/sourcelevel/faraday-http-cache/issues/147)) ([64754d5](https://github.com/sourcelevel/faraday-http-cache/commit/64754d5859f806c7f480a29f00f24a75a1bdac88))
+* release-please version-file config and workflow API key auth ([4fd5dd3](https://github.com/sourcelevel/faraday-http-cache/commit/4fd5dd3400740b8ca8bfbf040cd570171b18bc8b))
+* use API key for RubyGems publish instead of OIDC trusted publishing ([dd859d2](https://github.com/sourcelevel/faraday-http-cache/commit/dd859d24a11a0f873a88cf496ad5f2f41153c9d7))
+
+
+### Miscellaneous
+
+* Release 2.8.0 ([56c567b](https://github.com/sourcelevel/faraday-http-cache/commit/56c567b9f43546ed7179b3f80efdace800d7dbb8))
+
+
+### Documentation
+
+* Add a security policy ([#145](https://github.com/sourcelevel/faraday-http-cache/issues/145)) ([9414b3b](https://github.com/sourcelevel/faraday-http-cache/commit/9414b3b7d1fdd3ad3eacdfc7a12062e2062a0c6a))
+
+
+### Continuous Integration
+
+* Pin json below 3 when testing against Faraday 1 ([#146](https://github.com/sourcelevel/faraday-http-cache/issues/146)) ([59d4263](https://github.com/sourcelevel/faraday-http-cache/commit/59d42635bc5a8014f0fadd8436a231cda5792d2a))
+
 ## [2.7.0](https://github.com/sourcelevel/faraday-http-cache/compare/v2.6.1...v2.7.0) (2026-04-14)
 
 
