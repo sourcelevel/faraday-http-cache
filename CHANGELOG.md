@@ -21,6 +21,13 @@
 * Install the bundle before publishing to RubyGems ([#148](https://github.com/sourcelevel/faraday-http-cache/issues/148)) ([6b67002](https://github.com/sourcelevel/faraday-http-cache/commit/6b67002af3d1991e09eb5f9626198e7eedc9f65c))
 * Publish to RubyGems with trusted publishing ([#150](https://github.com/sourcelevel/faraday-http-cache/issues/150)) ([5090892](https://github.com/sourcelevel/faraday-http-cache/commit/5090892ee1ad39eb627428184fcb3be9e6049827))
 
+## [3.0.1](https://github.com/sourcelevel/faraday-http-cache/compare/v3.0.0...v3.0.1) (2026-09-15)
+
+
+### Documentation
+
+* Move the stale-while-revalidate entries under 2.7.0 ([#154](https://github.com/sourcelevel/faraday-http-cache/issues/154)) ([0cbb7aa](https://github.com/sourcelevel/faraday-http-cache/commit/0cbb7aa38ecd87aee76ff6753a9a63eeeb4e1b7d))
+
 ## [2.8.0](https://github.com/sourcelevel/faraday-http-cache/compare/v2.7.0...v2.8.0) (2026-09-15)
 
 
