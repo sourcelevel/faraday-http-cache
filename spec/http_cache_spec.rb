@@ -96,6 +96,33 @@ describe Faraday::HttpCache do
       client.get('broken')
     end
 
+    it 'still expires the request URL when the response has no headers' do
+      store = Faraday::HttpCache::MemoryStore.new
+      cached = Faraday.new(url: ENV['FARADAY_SERVER']) do |stack|
+        stack.use Faraday::HttpCache, store: store
+        stack.adapter ENV['FARADAY_ADAPTER'].to_sym
+      end
+      # Mimics an adapter that gives up mid-response: the env is completed
+      # with no status worth the name and no response headers at all.
+      headerless_adapter = Class.new(Faraday::Adapter) do
+        def call(env)
+          super
+          env.status = 0
+          env.response_headers = nil
+          env.response.finish(env)
+        end
+      end
+      broken = Faraday.new(url: ENV['FARADAY_SERVER']) do |stack|
+        stack.use Faraday::HttpCache, store: store
+        stack.adapter headerless_adapter
+      end
+
+      cached.get('get')
+      broken.post('get')
+
+      expect(cached.get('get').body).to eq('2')
+    end
+
     it 'expires entries for the "Location" header' do
       client.get('get')
       client.post('delete-with-location')
