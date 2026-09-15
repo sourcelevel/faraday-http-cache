@@ -23,6 +23,20 @@ describe Faraday::HttpCache::Strategies::ByVary do
   let(:strategy) { described_class.new(store: cache) }
   subject { strategy }
 
+  describe 'deserializing entries' do
+    let(:response_payload) { { response_headers: { 'Vary' => vary, 'json_class' => 'JsonGadget' } } }
+
+    before { JsonGadget.invocations.clear }
+
+    it 'never instantiates classes named by the cached data' do
+      strategy.write(request, response)
+      cached = strategy.read(request)
+
+      expect(JsonGadget.invocations).to be_empty
+      expect(cached.payload[:response_headers]['json_class']).to eq('JsonGadget')
+    end
+  end
+
   describe 'storing responses' do
     shared_examples 'A strategy with serialization' do
       it 'writes the response object to the underlying cache' do

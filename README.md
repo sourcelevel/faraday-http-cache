@@ -62,8 +62,10 @@ you might see errors like:
 Response could not be serialized: "\xC3" from ASCII-8BIT to UTF-8. Try using Marshal to serialize.
 ```
 
-For full unicode support, or if you expect to be dealing with images, you can use the stdlib
-[Marshal][marshal] instead. Alternatively you could use another json library like `oj` or `yajl-ruby`.
+For full unicode support, or if you expect to be dealing with images, you can use another json
+library like `oj` or `yajl-ruby`, or the stdlib [Marshal][marshal]. Only pick Marshal when you fully
+trust the cache store: `Marshal.load` will instantiate any object found in the data, while the
+default `JSON` serializer parses entries into plain hashes and never instantiates classes.
 
 ```ruby
 client = Faraday.new do |builder|
@@ -214,9 +216,11 @@ The `max-age`, `must-revalidate`, `proxy-revalidate`, `s-maxage` and
 
 ### Shared vs. non-shared caches
 
-By default, the middleware acts as a "shared cache" per RFC 2616. This means it does not cache
-responses with `Cache-Control: private`. This behavior can be changed by passing in the
-`:shared_cache` configuration option:
+By default, the middleware acts as a "shared cache" per RFC 9111. This means it does not cache
+responses with `Cache-Control: private`, and it only stores and reuses responses to requests that
+carried an `Authorization` header when the response explicitly allows it with `public`,
+`must-revalidate` or `s-maxage` (RFC 9111 section 3.5). This behavior can be changed by passing in
+the `:shared_cache` configuration option:
 
 ```ruby
 client = Faraday.new do |builder|

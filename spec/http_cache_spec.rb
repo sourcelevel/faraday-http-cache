@@ -121,6 +121,48 @@ describe Faraday::HttpCache do
       expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /private] miss, uncacheable') }
       client.get('private')
     end
+
+    describe 'responses to requests with an "Authorization" header' do
+      def get_as(user, path = 'authenticated')
+        client.get(path) { |request| request.headers['Authorization'] = "Bearer #{user}" }
+      end
+
+      it 'does not serve one caller the response cached for another' do
+        alice = get_as('alice')
+        bob = get_as('bob')
+
+        expect(alice.body).to eq('1:Bearer alice')
+        expect(bob.body).to eq('2:Bearer bob')
+      end
+
+      it 'logs that the response is uncacheable' do
+        expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /authenticated] miss, uncacheable') }
+        get_as('alice')
+      end
+
+      it 'caches responses that are explicitly marked as public' do
+        get_as('alice', 'authenticated-public')
+        bob = get_as('bob', 'authenticated-public')
+
+        expect(bob.body).to eq('1:Bearer alice')
+      end
+
+      it 'does not serve entries stored before the authorization check existed' do
+        store = Faraday::HttpCache::MemoryStore.new
+        clients = [false, true].map do |shared|
+          Faraday.new(url: ENV['FARADAY_SERVER']) do |stack|
+            stack.use Faraday::HttpCache, store: store, shared_cache: shared
+            stack.adapter ENV['FARADAY_ADAPTER'].to_sym
+          end
+        end
+        private_client, shared_client = clients
+
+        private_client.get('authenticated') { |request| request.headers['Authorization'] = 'Bearer alice' }
+        bob = shared_client.get('authenticated') { |request| request.headers['Authorization'] = 'Bearer bob' }
+
+        expect(bob.body).to eq('2:Bearer bob')
+      end
+    end
   end
 
   describe 'when acting as a private cache' do
@@ -134,6 +176,13 @@ describe Faraday::HttpCache do
     it 'logs that a private response is stored' do
       expect(logger).to receive(:debug) { |&block| expect(block.call).to eq('HTTP Cache: [GET /private] miss, store') }
       client.get('private')
+    end
+
+    it 'caches responses to requests with an "Authorization" header' do
+      client.get('authenticated') { |request| request.headers['Authorization'] = 'Bearer alice' }
+      bob = client.get('authenticated') { |request| request.headers['Authorization'] = 'Bearer bob' }
+
+      expect(bob.body).to eq('1:Bearer alice')
     end
   end
 

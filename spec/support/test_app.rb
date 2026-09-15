@@ -85,6 +85,14 @@ class TestApp < Sinatra::Base
     halt 405
   end
 
+  get '/authenticated' do
+    [200, { 'Cache-Control' => 'max-age=200' }, "#{increment_counter}:#{env['HTTP_AUTHORIZATION']}"]
+  end
+
+  get '/authenticated-public' do
+    [200, { 'Cache-Control' => 'public, max-age=200' }, "#{increment_counter}:#{env['HTTP_AUTHORIZATION']}"]
+  end
+
   get '/private' do
     [200, { 'Cache-Control' => 'private, max-age=100' }, increment_counter]
   end

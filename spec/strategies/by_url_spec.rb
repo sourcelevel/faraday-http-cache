@@ -16,6 +16,20 @@ describe Faraday::HttpCache::Strategies::ByUrl do
   let(:strategy) { described_class.new(store: cache) }
   subject { strategy }
 
+  describe 'deserializing entries' do
+    let(:response) { double(serializable_hash: { response_headers: { 'json_class' => 'JsonGadget' } }) }
+
+    before { JsonGadget.invocations.clear }
+
+    it 'never instantiates classes named by the cached data' do
+      strategy.write(request, response)
+      cached = strategy.read(request)
+
+      expect(JsonGadget.invocations).to be_empty
+      expect(cached.payload[:response_headers]['json_class']).to eq('JsonGadget')
+    end
+  end
+
   describe 'Cache configuration' do
     it 'uses a MemoryStore by default' do
       expect(Faraday::HttpCache::MemoryStore).to receive(:new).and_call_original
