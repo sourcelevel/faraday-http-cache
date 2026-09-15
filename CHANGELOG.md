@@ -3,6 +3,29 @@
 * Added support for `Cache-Control: stale-while-revalidate`.
 * Added `:on_stale` middleware callback hook to trigger custom background refresh logic when stale cached responses are served.
 
+## [3.0.0](https://github.com/sourcelevel/faraday-http-cache/compare/v2.8.0...v3.0.0) (2026-09-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* Test on Ruby 3.3 to 4.0 and require Ruby 3.3 ([#151](https://github.com/sourcelevel/faraday-http-cache/issues/151))
+
+### Bug Fixes
+
+* Ignore max-age and s-maxage directives without a value ([#152](https://github.com/sourcelevel/faraday-http-cache/issues/152)) ([d7e3e91](https://github.com/sourcelevel/faraday-http-cache/commit/d7e3e915d68d91302f9136faed8ed927b97c87e4))
+* Invalidate the request URL even when the response has no headers ([#153](https://github.com/sourcelevel/faraday-http-cache/issues/153)) ([e7aa611](https://github.com/sourcelevel/faraday-http-cache/commit/e7aa6116e63ba5431088b10e354625e2b8c820f9)), closes [#142](https://github.com/sourcelevel/faraday-http-cache/issues/142)
+
+
+### Miscellaneous
+
+* Test on Ruby 3.3 to 4.0 and require Ruby 3.3 ([#151](https://github.com/sourcelevel/faraday-http-cache/issues/151)) ([221ccec](https://github.com/sourcelevel/faraday-http-cache/commit/221ccec272d258571b18e45eac5f04bbae26eadd))
+
+
+### Continuous Integration
+
+* Install the bundle before publishing to RubyGems ([#148](https://github.com/sourcelevel/faraday-http-cache/issues/148)) ([6b67002](https://github.com/sourcelevel/faraday-http-cache/commit/6b67002af3d1991e09eb5f9626198e7eedc9f65c))
+* Publish to RubyGems with trusted publishing ([#150](https://github.com/sourcelevel/faraday-http-cache/issues/150)) ([5090892](https://github.com/sourcelevel/faraday-http-cache/commit/5090892ee1ad39eb627428184fcb3be9e6049827))
+
 ## [2.8.0](https://github.com/sourcelevel/faraday-http-cache/compare/v2.7.0...v2.8.0) (2026-09-15)
 
 
