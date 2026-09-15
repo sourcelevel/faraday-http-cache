@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+  # Re-run the RubyGems publish for the tag master already points at.
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -21,13 +23,14 @@ jobs:
 
   rubygems-publish:
     needs: release-please
-    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    if: ${{ needs.release-please.outputs.release_created == 'true' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.3"
+          bundler-cache: true
       - uses: rubygems/release-gem@v1
         with:
           await-release: false
