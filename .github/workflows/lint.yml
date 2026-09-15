@@ -14,10 +14,10 @@ jobs:
       BUNDLE_GEMFILE: 'gemfiles/rubocop.gemfile'
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.3'
+          ruby-version: '3.4'
           bundler-cache: true
       - name: Lint Ruby code with Rubocop
         run: bundle exec rubocop
