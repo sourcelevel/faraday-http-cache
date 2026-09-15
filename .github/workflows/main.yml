@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: ['3.2', '3.3', '3.4']
+        ruby: ['3.3', '3.4', '4.0']
         faraday_adapter: [net_http, em_http]
         faraday: ['~> 1.0', '~> 2.0']
         exclude:
@@ -28,7 +28,7 @@ jobs:
             faraday_adapter: em_http
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
